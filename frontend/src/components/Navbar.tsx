@@ -12,12 +12,18 @@ import {
   User as UserIcon,
   ChevronRight,
   Clock,
-  Inbox
+  Inbox,
+  Menu,
 } from 'lucide-react';
 import { NotificationItem } from '../types';
 import { getNotificationTargetRoute, getNotificationMeta, formatNotificationTime } from '../utils/notificationUtils';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onToggleMobileNav?: () => void;
+  mobileNavOpen?: boolean;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen }) => {
   const { user, logout } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -103,24 +109,40 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand */}
-        <Link to="/" className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition">
-          <div className="bg-indigo-600 text-white p-2 rounded-lg">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">
-            Warran<span className="text-indigo-600 dark:text-indigo-400">Track</span>
-          </span>
-        </Link>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Left: Mobile Nav Hamburger + Brand */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {user && (
+            <button
+              type="button"
+              onClick={onToggleMobileNav}
+              className="lg:hidden p-2 -ml-1 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileNavOpen}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+
+          <Link to="/" className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition">
+            <div className="bg-indigo-600 text-white p-1.5 sm:p-2 rounded-lg shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <span className="font-bold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">
+              Warran<span className="text-indigo-600 dark:text-indigo-400">Track</span>
+            </span>
+          </Link>
+        </div>
 
         {/* Right Nav */}
-        <div className="flex items-center gap-2.5 sm:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           <ThemeToggle />
 
           {user ? (
             <>
-              {getRoleBadge(user.role)}
+              <div className="hidden md:inline-flex">
+                {getRoleBadge(user.role)}
+              </div>
 
               {/* Notifications Popover Container */}
               <div className="relative" ref={popoverRef}>
@@ -151,7 +173,7 @@ export const Navbar: React.FC = () => {
 
                 {/* Notifications Dropdown Panel */}
                 {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 sm:w-[420px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 py-0 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                  <div className="fixed sm:absolute right-2 sm:right-0 left-2 sm:left-auto top-16 sm:top-auto mt-2 sm:w-[420px] max-w-[calc(100vw-1rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 py-0 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                     {/* Header */}
                     <div className="p-4 bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                       <div className="flex items-center gap-2">

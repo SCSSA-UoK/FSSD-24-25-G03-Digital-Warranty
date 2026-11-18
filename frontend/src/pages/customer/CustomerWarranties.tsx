@@ -268,10 +268,10 @@ export const CustomerWarranties: React.FC = () => {
 
       {/* Printable Digital Warranty Certificate Modal */}
       {certModalWarranty && (
-        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full p-8 shadow-2xl border-4 border-slate-900 dark:border-slate-700 space-y-6 relative print:bg-white print:text-slate-900 print:p-0 print:border-none print:shadow-none print:max-w-full">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border-2 sm:border-4 border-slate-900 dark:border-slate-700 space-y-4 sm:space-y-6 relative print:bg-white print:text-slate-900 print:p-0 print:border-none print:shadow-none print:max-w-full my-auto max-h-[92vh] overflow-y-auto">
             {/* Action Bar (Hidden on print) */}
-            <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-slate-800 print:hidden">
+            <div className="flex flex-wrap justify-between items-center gap-2 pb-3 sm:pb-4 border-b border-slate-200 dark:border-slate-800 print:hidden">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Official Digital Certificate Preview
               </span>
@@ -279,9 +279,9 @@ export const CustomerWarranties: React.FC = () => {
                 <button
                   type="button"
                   onClick={handlePrintCertificate}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                  className="px-3.5 sm:px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition cursor-pointer"
                 >
-                  <Printer className="w-4 h-4" /> Print / Save as PDF
+                  <Printer className="w-4 h-4" /> Print / PDF
                 </button>
                 <button
                   type="button"
@@ -294,21 +294,21 @@ export const CustomerWarranties: React.FC = () => {
             </div>
 
             {/* Certificate Document */}
-            <div className="p-8 bg-gradient-to-b from-amber-50/40 via-white to-amber-50/20 dark:from-slate-800/80 dark:via-slate-900 dark:to-slate-800/80 border-8 border-double border-amber-600/30 dark:border-amber-500/40 rounded-xl space-y-6 text-center print:bg-white print:border-amber-600/30">
+            <div className="p-4 sm:p-8 bg-gradient-to-b from-amber-50/40 via-white to-amber-50/20 dark:from-slate-800/80 dark:via-slate-900 dark:to-slate-800/80 border-4 sm:border-8 border-double border-amber-600/30 dark:border-amber-500/40 rounded-xl space-y-4 sm:space-y-6 text-center print:bg-white print:border-amber-600/30">
               <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-400 print:text-amber-700">
-                <Award className="w-8 h-8" />
-                <span className="text-xl font-serif font-bold uppercase tracking-widest text-slate-900 dark:text-slate-100 print:text-slate-900">
+                <Award className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
+                <span className="text-base sm:text-xl font-serif font-bold uppercase tracking-widest text-slate-900 dark:text-slate-100 print:text-slate-900">
                   WarranTrack Digital Certificate
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 tracking-wide uppercase print:text-slate-500">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 tracking-wide uppercase print:text-slate-500">
                 Official Tamper-Evident Warranty Coverage Proof
               </p>
 
               <div className="py-2 border-y border-amber-200/60 dark:border-amber-700/40 space-y-1 print:border-amber-200/60">
                 <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold print:text-slate-500">Registered Product</div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 print:text-slate-900">{certModalWarranty.productName}</h2>
-                <div className="text-sm font-medium text-slate-600 dark:text-slate-300 print:text-slate-600">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 print:text-slate-900">{certModalWarranty.productName}</h2>
+                <div className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 print:text-slate-600">
                   {certModalWarranty.productBrand} {certModalWarranty.productModel ? `(${certModalWarranty.productModel})` : ''}
                 </div>
                 {certModalWarranty.serialNumber && (
@@ -321,7 +321,7 @@ export const CustomerWarranties: React.FC = () => {
               </div>
 
               {/* Certificate Details Grid */}
-              <div className="grid grid-cols-2 gap-4 text-left text-xs bg-white dark:bg-slate-800/70 p-4 rounded-xl border border-amber-200/50 dark:border-slate-700 shadow-xs print:bg-white print:border-amber-200/50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-left text-xs bg-white dark:bg-slate-800/70 p-3 sm:p-4 rounded-xl border border-amber-200/50 dark:border-slate-700 shadow-xs print:bg-white print:border-amber-200/50">
                 <div>
                   <span className="text-slate-500 dark:text-slate-400 uppercase font-semibold block flex items-center gap-1 print:text-slate-400">
                     <Store className="w-3.5 h-3.5 text-slate-400" /> Issuing Retailer:
@@ -339,7 +339,7 @@ export const CustomerWarranties: React.FC = () => {
               </div>
 
               {/* Policy Snapshot */}
-              <div className="text-left text-xs bg-slate-50 dark:bg-slate-800/70 p-4 rounded-xl border border-slate-200 dark:border-slate-700 print:bg-slate-50 print:border-slate-200">
+              <div className="text-left text-xs bg-slate-50 dark:bg-slate-800/70 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 print:bg-slate-50 print:border-slate-200">
                 <span className="text-slate-500 dark:text-slate-400 uppercase font-bold text-[11px] block mb-1 print:text-slate-500">
                   Snapshotted Policy Terms
                 </span>
@@ -362,7 +362,7 @@ export const CustomerWarranties: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-2 bg-white rounded-lg border border-slate-300 dark:border-slate-600 shadow-xs">
+                <div className="p-2 bg-white rounded-lg border border-slate-300 dark:border-slate-600 shadow-xs shrink-0">
                   <QRCodeSVG
                     value={`${window.location.origin}/verify/${certModalWarranty.qrToken}`}
                     size={100}

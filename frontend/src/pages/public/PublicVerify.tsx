@@ -55,19 +55,19 @@ export const PublicVerify: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12 px-4 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-6 sm:py-12 px-3 sm:px-4 transition-colors">
       <div className="max-w-lg mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md overflow-hidden">
         {/* Header Banner */}
         <div
-          className={`p-6 text-white text-center flex flex-col items-center gap-2 ${warranty.currentlyValid ? 'bg-emerald-600' : 'bg-amber-600'
+          className={`p-5 sm:p-6 text-white text-center flex flex-col items-center gap-2 ${warranty.currentlyValid ? 'bg-emerald-600' : 'bg-amber-600'
             }`}
         >
           {warranty.currentlyValid ? (
-            <CheckCircle2 className="w-12 h-12" />
+            <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12" />
           ) : (
-            <Clock className="w-12 h-12" />
+            <Clock className="w-10 h-10 sm:w-12 sm:h-12" />
           )}
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-xl sm:text-2xl font-bold">
             {warranty.currentlyValid ? 'Valid Warranty Verified' : 'Warranty Expired'}
           </h2>
           <p className="text-xs text-white/90">
@@ -76,9 +76,9 @@ export const PublicVerify: React.FC = () => {
         </div>
 
         {/* Non-sensitive Public Details */}
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">
+            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 shrink-0">
               <Package className="w-5 h-5" />
             </div>
             <div>
@@ -96,7 +96,7 @@ export const PublicVerify: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">
+            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 shrink-0">
               <Store className="w-5 h-5" />
             </div>
             <div>
@@ -105,7 +105,7 @@ export const PublicVerify: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
               <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" /> Start Date

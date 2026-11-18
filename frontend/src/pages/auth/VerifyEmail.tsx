@@ -53,7 +53,7 @@ export const VerifyEmail: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm text-center transition-colors">
+    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm text-center transition-colors">
       <div className="bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
         <Mail className="w-6 h-6" />
       </div>
