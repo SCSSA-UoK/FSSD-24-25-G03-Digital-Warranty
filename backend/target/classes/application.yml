@@ -14,8 +14,8 @@ spring:
   mail:
     host: ${SPRING_MAIL_HOST:smtp.gmail.com}
     port: ${SPRING_MAIL_PORT:587}
-    username: ${SPRING_MAIL_USERNAME:}
-    password: ${SPRING_MAIL_PASSWORD:}
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -35,16 +35,19 @@ server:
 # JWT & Bootstrap Configuration
 app:
   jwt:
-    secret: ${JWT_SECRET:warrantrack-super-secret-key-that-is-at-least-256-bits-long-for-hs256}
+    secret: ${JWT_SECRET}
     expiration-ms: 86400000  # 24 hours (1 day)
 
   initial-admin:
-    password: ${INITIAL_ADMIN_PASSWORD:admin123}
+    password: ${INITIAL_ADMIN_PASSWORD}
 
   otp:
     expiry-minutes: 5
     max-attempts: 5
     resend-cooldown-seconds: 60
+
+  warranty:
+    reminder-cron: ${WARRANTY_REMINDER_CRON:0 0 9 * * ?}
 
   cors:
     allowed-origins: http://localhost:5173
