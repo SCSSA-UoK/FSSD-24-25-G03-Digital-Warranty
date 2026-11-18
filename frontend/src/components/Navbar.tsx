@@ -80,19 +80,19 @@ export const Navbar: React.FC = () => {
     switch (role) {
       case 'ADMIN':
         return (
-          <span className="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+          <span className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200/70 dark:border-purple-800/60 text-xs font-semibold px-2.5 py-0.5 rounded-full">
             Administrator
           </span>
         );
       case 'RETAILER':
         return (
-          <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+          <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/60 text-xs font-semibold px-2.5 py-0.5 rounded-full">
             Retailer
           </span>
         );
       case 'CUSTOMER':
         return (
-          <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+          <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 text-xs font-semibold px-2.5 py-0.5 rounded-full">
             Customer
           </span>
         );
@@ -256,7 +256,7 @@ export const Navbar: React.FC = () => {
                               <div className="flex-1 min-w-0 space-y-1">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span
-                                    className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${meta.badgeBg} ${meta.badgeText} ${meta.badgeBorder} dark:bg-slate-800 dark:border-slate-700`}
+                                    className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${meta.badgeBg} ${meta.badgeText} ${meta.badgeBorder}`}
                                   >
                                     {meta.category}
                                   </span>
@@ -265,7 +265,7 @@ export const Navbar: React.FC = () => {
                                       New
                                     </span>
                                   )}
-                                  <span className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1 ml-auto">
+                                  <span className="text-[10px] text-slate-400 dark:text-slate-400 flex items-center gap-1 ml-auto">
                                     <Clock className="w-3 h-3" />
                                     {formatNotificationTime(n.createdAt)}
                                   </span>
@@ -301,7 +301,7 @@ export const Navbar: React.FC = () => {
 
                     {/* Footer */}
                     <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                      <span className="text-[11px] text-slate-400 dark:text-slate-500">Clicking any alert marks it as read and opens the record</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Clicking any alert marks it as read and opens the record</span>
                       <Link
                         to="/notifications"
                         onClick={() => setShowNotifications(false)}
@@ -328,7 +328,7 @@ export const Navbar: React.FC = () => {
                   <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition leading-tight">
                     {user.name}
                   </span>
-                  <span className="text-[11px] text-slate-400 dark:text-slate-500 leading-tight">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
                     {user.email}
                   </span>
                 </div>

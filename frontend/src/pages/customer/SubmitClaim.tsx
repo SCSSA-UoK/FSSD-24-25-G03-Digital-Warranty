@@ -208,7 +208,7 @@ export const SubmitClaim: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setEvidenceList(evidenceList.filter((_, i) => i !== idx))}
-                    className="text-rose-500 hover:text-rose-700 font-bold ml-2 cursor-pointer"
+                    className="text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 font-bold ml-2 cursor-pointer"
                   >
                     &times;
                   </button>

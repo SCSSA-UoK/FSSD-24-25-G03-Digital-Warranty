@@ -63,7 +63,7 @@ export const PurchaseList: React.FC = () => {
   const getLinkingBadge = (status: string, hasWarranty?: boolean) => {
     if (hasWarranty === false) {
       return (
-        <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-slate-200">
+        <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-slate-200 dark:border-slate-700">
           Standard Sale (No Warranty)
         </span>
       );
@@ -71,19 +71,19 @@ export const PurchaseList: React.FC = () => {
     switch (status) {
       case 'LINKED':
         return (
-          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Linked to Customer
+          <span className="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-emerald-200 dark:border-emerald-800/60">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Linked to Customer
           </span>
         );
       case 'PENDING_VERIFICATION':
         return (
-          <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-amber-200">
-            <Clock className="w-3 h-3 text-amber-500" /> Pending Claim Verification
+          <span className="inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-amber-200 dark:border-amber-800/60">
+            <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" /> Pending Claim Verification
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-slate-200">
+          <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-slate-200 dark:border-slate-700">
             Unclaimed by Customer
           </span>
         );
@@ -187,8 +187,8 @@ export const PurchaseList: React.FC = () => {
       {/* Top Header & Quick Action Buttons */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Purchases & Issued Warranties</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Purchases & Issued Warranties</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Auditable sales ledger tracking registered customer purchases, unique hardware serial numbers, and digital warranty certificates
           </p>
         </div>
@@ -196,10 +196,10 @@ export const PurchaseList: React.FC = () => {
           <button
             onClick={exportToCSV}
             disabled={filtered.length === 0}
-            className="px-3.5 py-2 border border-slate-300 text-slate-700 bg-white font-medium rounded-lg hover:bg-slate-50 transition text-sm shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+            className="px-3.5 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition text-sm shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
             title="Export filtered records as CSV"
           >
-            <Download className="w-4 h-4 text-slate-500" /> Export CSV
+            <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" /> Export CSV
           </button>
           <Link
             to="/retailer/pos"
@@ -212,43 +212,43 @@ export const PurchaseList: React.FC = () => {
 
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 shrink-0">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0">
             <ShoppingCart className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 leading-none">{totalCount}</div>
-            <div className="text-xs text-slate-500 font-medium mt-1">Total Purchases</div>
+            <div className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-none">{totalCount}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Total Purchases</div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-emerald-700 leading-none">{warrantyCount}</div>
-            <div className="text-xs text-slate-500 font-medium mt-1">Digital Warranties</div>
+            <div className="text-xl font-bold text-emerald-700 dark:text-emerald-400 leading-none">{warrantyCount}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Digital Warranties</div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-indigo-700 leading-none">{linkedCount}</div>
-            <div className="text-xs text-slate-500 font-medium mt-1">Linked Customers</div>
+            <div className="text-xl font-bold text-indigo-700 dark:text-indigo-400 leading-none">{linkedCount}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Linked Customers</div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
             <Receipt className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-amber-700 leading-none">{unclaimedCount}</div>
-            <div className="text-xs text-slate-500 font-medium mt-1">Unclaimed Cards</div>
+            <div className="text-xl font-bold text-amber-700 dark:text-amber-400 leading-none">{unclaimedCount}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Unclaimed Cards</div>
           </div>
         </div>
       </div>
@@ -260,10 +260,10 @@ export const PurchaseList: React.FC = () => {
           <button
             type="button"
             onClick={() => setFilterTab('ALL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
               filterTab === 'ALL'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
             }`}
           >
             All Purchases ({totalCount})
@@ -271,10 +271,10 @@ export const PurchaseList: React.FC = () => {
           <button
             type="button"
             onClick={() => setFilterTab('WARRANTY')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap flex items-center gap-1 cursor-pointer ${
               filterTab === 'WARRANTY'
                 ? 'bg-emerald-700 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" /> Warranties ({warrantyCount})
@@ -282,10 +282,10 @@ export const PurchaseList: React.FC = () => {
           <button
             type="button"
             onClick={() => setFilterTab('BILL_ONLY')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap flex items-center gap-1 cursor-pointer ${
               filterTab === 'BILL_ONLY'
-                ? 'bg-slate-700 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-slate-700 dark:bg-slate-600 text-white shadow-xs'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
             }`}
           >
             <Receipt className="w-3.5 h-3.5" /> Bill Only ({billOnlyCount})
@@ -293,10 +293,10 @@ export const PurchaseList: React.FC = () => {
           <button
             type="button"
             onClick={() => setFilterTab('LINKED')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap flex items-center gap-1 cursor-pointer ${
               filterTab === 'LINKED'
                 ? 'bg-indigo-700 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5" /> Linked ({linkedCount})
@@ -304,10 +304,10 @@ export const PurchaseList: React.FC = () => {
           <button
             type="button"
             onClick={() => setFilterTab('UNCLAIMED')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
               filterTab === 'UNCLAIMED'
                 ? 'bg-amber-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
             }`}
           >
             Unclaimed ({unclaimedCount})
@@ -316,18 +316,18 @@ export const PurchaseList: React.FC = () => {
 
         {/* Search Input */}
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search reference, serial, product..."
-            className="w-full pl-9 pr-8 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            className="w-full pl-9 pr-8 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+              className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               title="Clear search"
             >
               <X className="w-4 h-4" />
@@ -337,17 +337,17 @@ export const PurchaseList: React.FC = () => {
       </div>
 
       {/* Main Purchases & Warranties Data Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
         {loading ? (
           <div className="py-20 text-center">
             <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-sm text-slate-500 font-medium">Loading purchases & issued warranties...</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Loading purchases & issued warranties...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-16 text-center text-slate-500 space-y-3">
-            <ShoppingCart className="w-12 h-12 mx-auto text-slate-300" />
-            <div className="text-base font-semibold text-slate-700">No records found</div>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <div className="py-16 text-center text-slate-500 dark:text-slate-400 space-y-3">
+            <ShoppingCart className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600" />
+            <div className="text-base font-semibold text-slate-700 dark:text-slate-200">No records found</div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
               {search || filterTab !== 'ALL'
                 ? 'No purchases match your current search query and filter criteria.'
                 : 'No purchases have been registered yet. Open the POS billing terminal to record a sale.'}
@@ -358,7 +358,7 @@ export const PurchaseList: React.FC = () => {
                   setSearch('');
                   setFilterTab('ALL');
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-lg transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 rounded-lg transition cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -368,7 +368,7 @@ export const PurchaseList: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse table-auto">
               <thead>
-                <tr className="bg-slate-50/90 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/90 select-none">
+                <tr className="bg-slate-50/90 dark:bg-slate-800/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200/90 dark:border-slate-800 select-none">
                   <th className="px-5 py-3.5 w-[16%] min-w-[170px]">Reference & Invoice</th>
                   <th className="px-5 py-3.5 w-[22%] min-w-[210px]">Product & Details</th>
                   <th className="px-5 py-3.5 w-[15%] min-w-[155px]">Serial Number</th>
@@ -378,46 +378,46 @@ export const PurchaseList: React.FC = () => {
                   <th className="px-5 py-3.5 w-[8%] min-w-[125px] text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                 {filtered.map((p) => {
                   const hasWarranty = p.hasWarranty !== false;
                   return (
                     <tr
                       key={p.id}
-                      className="hover:bg-slate-50/70 transition-colors duration-150 group"
+                      className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors duration-150 group"
                     >
                       {/* Reference & Invoice */}
                       <td className="px-5 py-4 align-top">
                         <div className="flex items-center gap-1.5">
                           <span
-                            className="font-mono font-bold text-xs text-slate-900 tracking-tight cursor-pointer hover:text-indigo-600 transition"
+                            className="font-mono font-bold text-xs text-slate-900 dark:text-slate-100 tracking-tight cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition"
                             onClick={() => copyToClipboard(p.purchaseReference)}
                             title="Click to copy reference"
                           >
                             {p.purchaseReference}
                           </span>
                           {copiedText === p.purchaseReference ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                           ) : (
                             <button
                               onClick={() => copyToClipboard(p.purchaseReference)}
-                              className="text-slate-300 hover:text-slate-500 transition opacity-0 group-hover:opacity-100"
+                              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition opacity-0 group-hover:opacity-100 cursor-pointer"
                               title="Copy Reference"
                             >
                               <Copy className="w-3 h-3" />
                             </button>
                           )}
                         </div>
-                        <div className="text-[11px] font-mono text-slate-500 mt-0.5">
+                        <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
                           Inv: {p.invoiceNumber}
                         </div>
                         <div className="mt-1.5">
                           {p.billId ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-700 bg-indigo-50/90 px-2 py-0.5 rounded-md border border-indigo-200/60">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50/90 dark:bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-200/60 dark:border-indigo-800/60">
                               <Receipt className="w-2.5 h-2.5" /> POS Bill
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
                               <Receipt className="w-2.5 h-2.5 text-slate-400" /> Direct Sale
                             </span>
                           )}
@@ -426,17 +426,17 @@ export const PurchaseList: React.FC = () => {
 
                       {/* Product & Details */}
                       <td className="px-5 py-4 align-top">
-                        <div className="font-semibold text-sm text-slate-900 group-hover:text-indigo-900 transition-colors">
+                        <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors">
                           {p.productName}
                         </div>
-                        <div className="text-xs text-slate-500 font-medium mt-0.5">
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                           {p.productBrand ? `${p.productBrand} ${p.productModel || ''}` : p.productModel || '—'}
                         </div>
                         {p.unitPrice != null && (
-                          <div className="text-xs font-semibold text-emerald-700 mt-1 flex items-center gap-1">
+                          <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-1 flex items-center gap-1">
                             ${p.unitPrice.toFixed(2)}
                             {p.quantity ? (
-                              <span className="text-slate-400 font-normal">× {p.quantity}</span>
+                              <span className="text-slate-500 dark:text-slate-400 font-normal">× {p.quantity}</span>
                             ) : null}
                           </div>
                         )}
@@ -447,7 +447,7 @@ export const PurchaseList: React.FC = () => {
                         {p.serialNumber ? (
                           <div className="flex items-center gap-1.5">
                             <span
-                              className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-900 text-white shadow-2xs tracking-wider cursor-pointer hover:bg-slate-800 transition"
+                              className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-900 dark:bg-slate-800 text-white border border-slate-800 dark:border-slate-700 shadow-2xs tracking-wider cursor-pointer hover:bg-slate-800 dark:hover:bg-slate-700 transition"
                               onClick={() => copyToClipboard(p.serialNumber!)}
                               title="Click to copy unique serial number"
                             >
@@ -455,11 +455,11 @@ export const PurchaseList: React.FC = () => {
                               {p.serialNumber}
                             </span>
                             {copiedText === p.serialNumber && (
-                              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             )}
                           </div>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200/70 italic">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1 rounded-lg border border-slate-200/70 dark:border-slate-700 italic">
                             No Serial
                           </span>
                         )}
@@ -468,14 +468,14 @@ export const PurchaseList: React.FC = () => {
                       {/* Customer Contact */}
                       <td className="px-5 py-4 align-top">
                         {p.customerEmail ? (
-                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-800">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-800 dark:text-slate-200">
                             <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span className="truncate max-w-[155px]" title={p.customerEmail}>
                               {p.customerEmail}
                             </span>
                           </div>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
                             <User className="w-3 h-3 text-slate-400" /> Walk-in Buyer
                           </span>
                         )}
@@ -483,11 +483,11 @@ export const PurchaseList: React.FC = () => {
 
                       {/* Sale Date & Time */}
                       <td className="px-5 py-4 align-top whitespace-nowrap">
-                        <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                        <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span>{p.purchaseDate}</span>
                         </div>
-                        <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5 mt-1">
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 mt-1">
                           <Clock className="w-3 h-3 text-slate-400 shrink-0" />
                           <span>{formatSaleTime(p.createdAt)}</span>
                         </div>
@@ -498,25 +498,25 @@ export const PurchaseList: React.FC = () => {
                         {hasWarranty ? (
                           <>
                             <div>
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
-                                <ShieldCheck className="w-3 h-3 text-emerald-600" /> Digital Warranty
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+                                <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Digital Warranty
                               </span>
                             </div>
                             <div>{getLinkingBadge(p.linkingStatus, true)}</div>
                             {p.warranty?.expiryDate && (
-                              <div className="text-[10px] text-slate-400 font-medium">
-                                Valid till: <span className="text-slate-600 font-semibold">{p.warranty.expiryDate}</span>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                Valid till: <span className="text-slate-700 dark:text-slate-200 font-semibold">{p.warranty.expiryDate}</span>
                               </div>
                             )}
                           </>
                         ) : (
                           <>
                             <div>
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                 <ShieldAlert className="w-3 h-3 text-slate-400" /> Bill Only
                               </span>
                             </div>
-                            <div className="text-[10px] text-slate-400 italic">No warranty issued</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 italic">No warranty issued</div>
                           </>
                         )}
                       </td>
@@ -528,15 +528,15 @@ export const PurchaseList: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => setSelectedPurchase(p)}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 px-2.5 py-1.5 rounded-lg border border-indigo-200/80 transition shadow-2xs"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 active:bg-indigo-200 px-2.5 py-1.5 rounded-lg border border-indigo-200/80 dark:border-indigo-800/60 transition shadow-2xs cursor-pointer"
                               title="View official digital warranty card & QR"
                             >
-                              <QrCode className="w-3.5 h-3.5 text-indigo-600" /> View Card
+                              <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> View Card
                             </button>
                             <Link
                               to={`/verify/${p.warranty.qrToken}`}
                               target="_blank"
-                              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition"
+                              className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
                               title="Open public verification page in new tab"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -545,13 +545,13 @@ export const PurchaseList: React.FC = () => {
                         ) : p.billId ? (
                           <Link
                             to="/retailer/bills"
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-200 transition"
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 transition"
                             title="View POS invoice receipt"
                           >
-                            <Receipt className="w-3.5 h-3.5 text-slate-500" /> Receipt
+                            <Receipt className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" /> Receipt
                           </Link>
                         ) : (
-                          <span className="text-xs text-slate-400 italic">Standard Sale</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 italic">Standard Sale</span>
                         )}
                       </td>
                     </tr>
@@ -564,12 +564,12 @@ export const PurchaseList: React.FC = () => {
 
         {/* Table Footer Summary Bar */}
         {!loading && filtered.length > 0 && (
-          <div className="px-5 py-3.5 bg-slate-50/80 border-t border-slate-200 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="px-5 py-3.5 bg-slate-50/80 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              Showing <span className="font-semibold text-slate-800">{filtered.length}</span> of{' '}
-              <span className="font-semibold text-slate-800">{purchases.length}</span> registered purchase records
+              Showing <span className="font-semibold text-slate-800 dark:text-slate-200">{filtered.length}</span> of{' '}
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{purchases.length}</span> registered purchase records
             </div>
-            <div className="flex items-center gap-3 text-[11px] text-slate-400 font-medium">
+            <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
               <span>Unique Serial Key Verification Active</span>
               <span>•</span>
               <span>Live Blockchain/QR Ready</span>
@@ -580,81 +580,81 @@ export const PurchaseList: React.FC = () => {
 
       {/* Quick-View Digital Warranty Certificate Modal */}
       {selectedPurchase && selectedPurchase.warranty && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5 animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="flex justify-between items-start border-b border-slate-100 pb-3">
+            <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Official Digital Warranty</div>
-                  <h3 className="text-base font-bold text-slate-900 leading-tight">{selectedPurchase.productName}</h3>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Official Digital Warranty</div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 leading-tight">{selectedPurchase.productName}</h3>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedPurchase(null)}
-                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition text-lg font-bold"
+                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition text-lg font-bold cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
             {/* Certificate Details Grid */}
-            <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200/70 text-xs">
+            <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200/70 dark:border-slate-700 text-xs">
               <div>
-                <span className="text-[11px] text-slate-400 block font-medium">Product Brand / Model:</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Product Brand / Model:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-100">
                   {selectedPurchase.productBrand || '—'} {selectedPurchase.productModel || ''}
                 </span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block font-medium">Serial Number:</span>
-                <span className="font-mono font-bold text-slate-900">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Serial Number:</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                   {selectedPurchase.serialNumber || 'N/A'}
                 </span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block font-medium">Purchase Reference:</span>
-                <span className="font-mono text-slate-800">{selectedPurchase.purchaseReference}</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Purchase Reference:</span>
+                <span className="font-mono text-slate-800 dark:text-slate-200">{selectedPurchase.purchaseReference}</span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block font-medium">Invoice Number:</span>
-                <span className="font-mono text-slate-800">{selectedPurchase.invoiceNumber}</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Invoice Number:</span>
+                <span className="font-mono text-slate-800 dark:text-slate-200">{selectedPurchase.invoiceNumber}</span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block font-medium">Registered Customer:</span>
-                <span className="font-medium text-slate-800 truncate block">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Registered Customer:</span>
+                <span className="font-medium text-slate-800 dark:text-slate-200 truncate block">
                   {selectedPurchase.customerEmail || 'Walk-in Buyer'}
                 </span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block font-medium">Sale Date:</span>
-                <span className="font-semibold text-slate-800">{selectedPurchase.purchaseDate}</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Sale Date:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedPurchase.purchaseDate}</span>
               </div>
-              <div className="col-span-2 pt-2 border-t border-slate-200/80 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500 font-medium">Coverage Period:</span>
-                <span className="font-bold text-emerald-700 font-mono text-xs">
+              <div className="col-span-2 pt-2 border-t border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Coverage Period:</span>
+                <span className="font-bold text-emerald-700 dark:text-emerald-400 font-mono text-xs">
                   {selectedPurchase.warranty.startDate} &rarr; {selectedPurchase.warranty.expiryDate}
                 </span>
               </div>
             </div>
 
             {/* QR Code Container */}
-            <div className="text-center p-4 bg-slate-50/50 rounded-xl border border-slate-200 space-y-2">
-              <div className="inline-block p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+            <div className="text-center p-4 bg-slate-50/50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="inline-block p-3 bg-white rounded-xl border border-slate-200 dark:border-slate-600 shadow-xs">
                 <QRCodeSVG
                   value={`${window.location.origin}/verify/${selectedPurchase.warranty.qrToken}`}
                   size={140}
                   level="H"
                 />
               </div>
-              <div className="text-[11px] font-medium text-slate-600">
+              <div className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
                 Scan with smartphone camera to verify authenticity
               </div>
-              <div className="text-[10px] font-mono text-slate-400 truncate max-w-xs mx-auto">
+              <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate max-w-xs mx-auto">
                 Token: {selectedPurchase.warranty.qrToken}
               </div>
             </div>
@@ -671,7 +671,7 @@ export const PurchaseList: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedPurchase(null)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-medium hover:bg-slate-50 transition"
+                className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 Close
               </button>

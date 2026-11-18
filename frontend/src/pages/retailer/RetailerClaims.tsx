@@ -131,14 +131,14 @@ export const RetailerClaims: React.FC = () => {
 
   const getStatusBadge = (status: ClaimStatus) => {
     const styles: Record<ClaimStatus, string> = {
-      SUBMITTED: 'bg-amber-100 text-amber-800',
-      UNDER_REVIEW: 'bg-blue-100 text-blue-800',
-      APPROVED: 'bg-emerald-100 text-emerald-800',
-      REJECTED: 'bg-rose-100 text-rose-800',
-      ADDITIONAL_INFO_REQUIRED: 'bg-purple-100 text-purple-800',
-      CANCELLED: 'bg-slate-100 text-slate-800',
-      IN_PROGRESS: 'bg-indigo-100 text-indigo-800',
-      COMPLETED: 'bg-teal-100 text-teal-800',
+      SUBMITTED: 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60',
+      UNDER_REVIEW: 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60',
+      APPROVED: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60',
+      REJECTED: 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60',
+      ADDITIONAL_INFO_REQUIRED: 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60',
+      CANCELLED: 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700',
+      IN_PROGRESS: 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60',
+      COMPLETED: 'bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60',
     };
     return (
       <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${styles[status]}`}>
@@ -152,14 +152,14 @@ export const RetailerClaims: React.FC = () => {
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Warranty Claims & After-Sales Service</h1>
-          <p className="text-sm text-slate-500">Review customer claims, make decisions, and update repair progress</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Warranty Claims & After-Sales Service</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Review customer claims, make decisions, and update repair progress</p>
         </div>
         <div className="flex items-center gap-2">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Claims</option>
             <option value="SUBMITTED">Submitted (Pending Review)</option>
@@ -173,7 +173,7 @@ export const RetailerClaims: React.FC = () => {
           </select>
           <button
             onClick={fetchClaims}
-            className="p-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600"
+            className="p-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer"
             title="Refresh"
           >
             <RefreshCw className="w-4 h-4" />
@@ -183,12 +183,12 @@ export const RetailerClaims: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Claims List */}
-        <div className="lg:col-span-1 bg-white rounded-xl border border-slate-200 shadow-xs divide-y divide-slate-100 max-h-[80vh] overflow-y-auto">
+        <div className="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 max-h-[80vh] overflow-y-auto">
           {loading ? (
-            <div className="p-8 text-center text-slate-400 text-sm">Loading claims...</div>
+            <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">Loading claims...</div>
           ) : claims.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-sm">
-              <ShieldAlert className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+            <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">
+              <ShieldAlert className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
               No claims found for this filter.
             </div>
           ) : (
@@ -196,16 +196,16 @@ export const RetailerClaims: React.FC = () => {
               <div
                 key={c.id}
                 onClick={() => setSelectedClaim(c)}
-                className={`p-4 cursor-pointer hover:bg-slate-50 transition ${
-                  selectedClaim?.id === c.id ? 'bg-blue-50/70 border-l-4 border-blue-600' : ''
+                className={`p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition ${
+                  selectedClaim?.id === c.id ? 'bg-blue-50/70 dark:bg-blue-950/40 border-l-4 border-blue-600' : ''
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-sm text-slate-900">{c.productName}</span>
+                  <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{c.productName}</span>
                   {getStatusBadge(c.currentStatus)}
                 </div>
-                <div className="text-xs text-slate-600 line-clamp-2">{c.issueDescription}</div>
-                <div className="flex items-center justify-between mt-2 text-[11px] text-slate-400">
+                <div className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2">{c.issueDescription}</div>
+                <div className="flex items-center justify-between mt-2 text-[11px] text-slate-500 dark:text-slate-400">
                   <span>{c.customerName}</span>
                   <span>{new Date(c.createdAt).toLocaleDateString()}</span>
                 </div>
@@ -215,15 +215,15 @@ export const RetailerClaims: React.FC = () => {
         </div>
 
         {/* Right Column: Detailed View & Action Panel */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-6">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs p-6 space-y-6">
           {selectedClaim ? (
             <>
               {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100 gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
                 <div>
-                  <div className="text-xs text-slate-400 uppercase font-semibold">Claim Detail</div>
-                  <h2 className="text-xl font-bold text-slate-900">{selectedClaim.productName}</h2>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Claim Detail</div>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{selectedClaim.productName}</h2>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
                     Customer: {selectedClaim.customerName} ({selectedClaim.customerEmail})
                   </div>
                 </div>
@@ -231,11 +231,11 @@ export const RetailerClaims: React.FC = () => {
               </div>
 
               {/* Action Buttons depending on claim state machine */}
-              <div className="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="flex flex-wrap gap-2 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                 {selectedClaim.currentStatus === 'SUBMITTED' && (
                   <button
                     onClick={() => handleStartReview(selectedClaim.id)}
-                    className="px-3.5 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition"
+                    className="px-3.5 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition cursor-pointer"
                   >
                     Start Review (Move to UNDER_REVIEW)
                   </button>
@@ -245,19 +245,19 @@ export const RetailerClaims: React.FC = () => {
                   <>
                     <button
                       onClick={() => setDecisionModal('APPROVE')}
-                      className="px-3.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition flex items-center gap-1 cursor-pointer"
                     >
                       <CheckCircle className="w-3.5 h-3.5" /> Approve Claim
                     </button>
                     <button
                       onClick={() => setDecisionModal('REJECT')}
-                      className="px-3.5 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center gap-1 cursor-pointer"
                     >
                       <XCircle className="w-3.5 h-3.5" /> Reject Claim
                     </button>
                     <button
                       onClick={() => setInfoModal(true)}
-                      className="px-3.5 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-semibold hover:bg-purple-700 transition flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-semibold hover:bg-purple-700 transition flex items-center gap-1 cursor-pointer"
                     >
                       <MessageSquare className="w-3.5 h-3.5" /> Request Info
                     </button>
@@ -268,13 +268,13 @@ export const RetailerClaims: React.FC = () => {
                   <>
                     <button
                       onClick={() => setServiceModal(true)}
-                      className="px-3.5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center gap-1 cursor-pointer"
                     >
                       <Wrench className="w-3.5 h-3.5" /> Add Service Update
                     </button>
                     <button
                       onClick={() => setCompleteModal(true)}
-                      className="px-3.5 py-1.5 bg-teal-600 text-white rounded-lg text-xs font-semibold hover:bg-teal-700 transition flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-teal-600 text-white rounded-lg text-xs font-semibold hover:bg-teal-700 transition flex items-center gap-1 cursor-pointer"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" /> Complete Claim
                     </button>
@@ -282,22 +282,22 @@ export const RetailerClaims: React.FC = () => {
                 )}
 
                 {selectedClaim.currentStatus === 'ADDITIONAL_INFO_REQUIRED' && (
-                  <span className="text-xs text-purple-700 font-medium py-1">
+                  <span className="text-xs text-purple-700 dark:text-purple-300 font-medium py-1">
                     Waiting for customer to provide additional evidence / reply.
                   </span>
                 )}
                 {selectedClaim.currentStatus === 'COMPLETED' && (
-                  <span className="text-xs text-teal-700 font-medium py-1">
+                  <span className="text-xs text-teal-700 dark:text-teal-300 font-medium py-1">
                     This claim is completed and service has concluded.
                   </span>
                 )}
                 {selectedClaim.currentStatus === 'REJECTED' && (
-                  <span className="text-xs text-rose-700 font-medium py-1">
+                  <span className="text-xs text-rose-700 dark:text-rose-300 font-medium py-1">
                     Claim rejected: {selectedClaim.decisionReason}
                   </span>
                 )}
                 {selectedClaim.currentStatus === 'CANCELLED' && (
-                  <span className="text-xs text-slate-500 font-medium py-1">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium py-1">
                     Claim was cancelled by customer: {selectedClaim.cancellationReason}
                   </span>
                 )}
@@ -305,8 +305,8 @@ export const RetailerClaims: React.FC = () => {
 
               {/* Issue Description */}
               <div>
-                <span className="text-xs text-slate-400 uppercase font-semibold">Issue Description</span>
-                <p className="mt-1 text-sm text-slate-800 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Issue Description</span>
+                <p className="mt-1 text-sm text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
                   {selectedClaim.issueDescription}
                 </p>
               </div>
@@ -314,12 +314,12 @@ export const RetailerClaims: React.FC = () => {
               {/* Service Progress Notes */}
               {selectedClaim.serviceNotes && selectedClaim.serviceNotes.length > 0 && (
                 <div>
-                  <span className="text-xs text-slate-400 uppercase font-semibold">Service Updates</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Service Updates</span>
                   <div className="mt-2 space-y-2">
                     {selectedClaim.serviceNotes.map((sn, i) => (
-                      <div key={i} className="text-xs p-3 bg-indigo-50/50 rounded-lg border border-indigo-100">
-                        <div className="font-semibold text-indigo-900">{sn.note}</div>
-                        <div className="text-[10px] text-indigo-500 mt-1">
+                      <div key={i} className="text-xs p-3 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg border border-indigo-100 dark:border-indigo-800/50">
+                        <div className="font-semibold text-indigo-900 dark:text-indigo-200">{sn.note}</div>
+                        <div className="text-[10px] text-indigo-500 dark:text-indigo-400 mt-1">
                           By {sn.addedBy} at {new Date(sn.addedAt).toLocaleString()}
                         </div>
                       </div>
@@ -330,22 +330,22 @@ export const RetailerClaims: React.FC = () => {
 
               {/* Final Resolution if Completed */}
               {selectedClaim.resolutionNotes && (
-                <div className="p-4 bg-teal-50 border border-teal-200 rounded-xl">
-                  <span className="text-xs text-teal-800 uppercase font-semibold">Final Resolution Notes</span>
-                  <p className="text-sm text-teal-900 mt-1">{selectedClaim.resolutionNotes}</p>
+                <div className="p-4 bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 rounded-xl">
+                  <span className="text-xs text-teal-800 dark:text-teal-300 uppercase font-semibold">Final Resolution Notes</span>
+                  <p className="text-sm text-teal-900 dark:text-teal-200 mt-1">{selectedClaim.resolutionNotes}</p>
                 </div>
               )}
 
               {/* Auditable Claim Status History Timeline */}
               <div>
-                <span className="text-xs text-slate-400 uppercase font-semibold">Audited Status Transition History</span>
-                <div className="mt-3 relative pl-6 border-l-2 border-slate-200 space-y-4">
+                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Audited Status Transition History</span>
+                <div className="mt-3 relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-4">
                   {selectedClaim.statusHistory?.map((h) => (
                     <div key={h.id} className="relative">
-                      <div className="absolute -left-[31px] top-0.5 bg-slate-400 rounded-full w-2.5 h-2.5 border-2 border-white ring-2 ring-slate-200"></div>
-                      <div className="text-xs font-bold text-slate-800">{h.newStatus.replace(/_/g, ' ')}</div>
-                      <div className="text-xs text-slate-600">{h.note}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
+                      <div className="absolute -left-[31px] top-0.5 bg-slate-400 rounded-full w-2.5 h-2.5 border-2 border-white dark:border-slate-900 ring-2 ring-slate-200 dark:ring-slate-700"></div>
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-200">{h.newStatus.replace(/_/g, ' ')}</div>
+                      <div className="text-xs text-slate-600 dark:text-slate-400">{h.note}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                         By {h.changedBy} on {new Date(h.changedAt).toLocaleString()}
                       </div>
                     </div>
@@ -354,7 +354,7 @@ export const RetailerClaims: React.FC = () => {
               </div>
             </>
           ) : (
-            <div className="text-center py-20 text-slate-400 text-sm">
+            <div className="text-center py-20 text-slate-500 dark:text-slate-400 text-sm">
               Select a warranty claim from the list on the left to view details and take action.
             </div>
           )}
@@ -363,20 +363,20 @@ export const RetailerClaims: React.FC = () => {
 
       {/* Decision Modal (Approve or Reject) */}
       {decisionModal && selectedClaim && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
               {decisionModal === 'APPROVE' ? 'Approve Warranty Claim' : 'Reject Warranty Claim'}
             </h3>
 
             <form onSubmit={handleDecisionSubmit} className="space-y-4">
               {decisionModal === 'APPROVE' ? (
                 <div>
-                  <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Resolution Type</label>
+                  <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Resolution Type</label>
                   <select
                     value={resolutionType}
                     onChange={(e) => setResolutionType(e.target.value as ResolutionType)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="REPAIR">Repair product</option>
                     <option value="REPLACEMENT">Replace with new product</option>
@@ -384,7 +384,7 @@ export const RetailerClaims: React.FC = () => {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
                     Rejection Reason <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -393,9 +393,9 @@ export const RetailerClaims: React.FC = () => {
                     value={decisionReason}
                     onChange={(e) => setDecisionReason(e.target.value)}
                     placeholder="State reason for rejection (e.g., physical damage outside warranty terms)..."
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
                   />
-                  <span className="text-[11px] text-slate-400 mt-1 block">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
                     A clear reason is mandatory when rejecting a claim.
                   </span>
                 </div>
@@ -408,14 +408,14 @@ export const RetailerClaims: React.FC = () => {
                     setDecisionModal(null);
                     setDecisionReason('');
                   }}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || (decisionModal === 'REJECT' && !decisionReason.trim())}
-                  className={`px-4 py-2 text-white rounded-lg text-sm font-semibold disabled:opacity-50 ${
+                  className={`px-4 py-2 text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer ${
                     decisionModal === 'APPROVE' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'
                   }`}
                 >
@@ -429,16 +429,16 @@ export const RetailerClaims: React.FC = () => {
 
       {/* Request Info Modal */}
       {infoModal && selectedClaim && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Request Additional Information</h3>
-            <p className="text-xs text-slate-500">
-              The claim will move to <strong>ADDITIONAL_INFO_REQUIRED</strong>. Once the customer provides the requested information, it automatically returns to UNDER_REVIEW.
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Request Additional Information</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              The claim will move to <strong className="text-slate-800 dark:text-slate-200">ADDITIONAL_INFO_REQUIRED</strong>. Once the customer provides the requested information, it automatically returns to UNDER_REVIEW.
             </p>
 
             <form onSubmit={handleInfoSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
                   Required Information / Photos <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -447,7 +447,7 @@ export const RetailerClaims: React.FC = () => {
                   value={infoReason}
                   onChange={(e) => setInfoReason(e.target.value)}
                   placeholder="e.g. Please provide a clear photo of the back serial label and the error code screen..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
 
@@ -458,14 +458,14 @@ export const RetailerClaims: React.FC = () => {
                     setInfoModal(false);
                     setInfoReason('');
                   }}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || !infoReason.trim()}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? 'Sending...' : 'Send Request to Customer'}
                 </button>
@@ -477,13 +477,13 @@ export const RetailerClaims: React.FC = () => {
 
       {/* Service Update Modal */}
       {serviceModal && selectedClaim && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Add Service Progress Update</h3>
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Add Service Progress Update</h3>
 
             <form onSubmit={handleServiceSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
                   Progress Note <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -492,7 +492,7 @@ export const RetailerClaims: React.FC = () => {
                   value={serviceNote}
                   onChange={(e) => setServiceNote(e.target.value)}
                   placeholder="e.g. Replacement screen component ordered from manufacturer..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -503,14 +503,14 @@ export const RetailerClaims: React.FC = () => {
                     setServiceModal(false);
                     setServiceNote('');
                   }}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || !serviceNote.trim()}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? 'Saving...' : 'Add Progress Note'}
                 </button>
@@ -522,13 +522,13 @@ export const RetailerClaims: React.FC = () => {
 
       {/* Complete Claim Modal */}
       {completeModal && selectedClaim && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Mark Claim as Completed</h3>
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Mark Claim as Completed</h3>
 
             <form onSubmit={handleCompleteSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
                   Final Resolution Notes <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -537,7 +537,7 @@ export const RetailerClaims: React.FC = () => {
                   value={completeNotes}
                   onChange={(e) => setCompleteNotes(e.target.value)}
                   placeholder="e.g. Main display panel replaced and full calibration tested successfully. Unit ready for customer pickup."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
 
@@ -548,14 +548,14 @@ export const RetailerClaims: React.FC = () => {
                     setCompleteModal(false);
                     setCompleteNotes('');
                   }}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || !completeNotes.trim()}
-                  className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? 'Completing...' : 'Mark Completed'}
                 </button>

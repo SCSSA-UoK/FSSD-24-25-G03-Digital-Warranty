@@ -457,7 +457,7 @@ export const AdminDashboard: React.FC = () => {
                   <path
                     d={linePath}
                     fill="none"
-                    stroke="#4f46e5"
+                    stroke="#6366f1"
                     strokeWidth="3"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -475,8 +475,8 @@ export const AdminDashboard: React.FC = () => {
                           cx={pt.x}
                           cy={pt.y}
                           r="10"
-                          fill="#4f46e5"
-                          fillOpacity="0.2"
+                          fill="#6366f1"
+                          fillOpacity="0.25"
                           className="animate-ping"
                         />
                       )}
@@ -485,10 +485,9 @@ export const AdminDashboard: React.FC = () => {
                         cx={pt.x}
                         cy={pt.y}
                         r={isHovered ? '6' : '4.5'}
-                        fill="#ffffff"
-                        stroke="#4f46e5"
+                        stroke="#6366f1"
                         strokeWidth={isHovered ? '3.5' : '2.5'}
-                        className="cursor-pointer transition-all duration-150"
+                        className="fill-white dark:fill-slate-900 cursor-pointer transition-all duration-150"
                         onMouseEnter={() => setHoveredPointIndex(idx)}
                         onMouseLeave={() => setHoveredPointIndex(null)}
                       />
@@ -502,11 +501,11 @@ export const AdminDashboard: React.FC = () => {
                             width="72"
                             height="24"
                             rx="6"
-                            fill="#1e293b"
+                            className="fill-slate-800 dark:fill-slate-700"
                           />
                           <polygon
                             points={`${pt.x - 4},${pt.y - 8} ${pt.x + 4},${pt.y - 8} ${pt.x},${pt.y - 3}`}
-                            fill="#1e293b"
+                            className="fill-slate-800 dark:fill-slate-700"
                           />
                           <text
                             x={pt.x}

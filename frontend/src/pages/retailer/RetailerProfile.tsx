@@ -62,7 +62,7 @@ export const RetailerProfile: React.FC = () => {
   }
 
   if (!retailer) {
-    return <div className="p-8 text-center text-slate-500">Retailer profile not found.</div>;
+    return <div className="p-8 text-center text-slate-500 dark:text-slate-400">Retailer profile not found.</div>;
   }
 
   return (

@@ -121,7 +121,7 @@ export const CustomerLookupInput: React.FC<CustomerLookupInputProps> = ({
             <X className="w-3 h-3" /> Clear Customer
           </button>
         ) : (
-          <span className="text-[11px] text-slate-400 dark:text-slate-500">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">
             Auto-lookup by phone or email
           </span>
         )}
@@ -206,7 +206,7 @@ export const CustomerLookupInput: React.FC<CustomerLookupInputProps> = ({
                 setDropdownOpen(true);
               }}
               placeholder="Search existing customer by phone, email, or name..."
-              className="w-full pl-9 pr-8 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-2xs"
+              className="w-full pl-9 pr-8 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-2xs"
             />
             {lookupQuery && (
               <button
@@ -223,7 +223,7 @@ export const CustomerLookupInput: React.FC<CustomerLookupInputProps> = ({
           {dropdownOpen && (
             <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
-                <div className="p-4 text-center text-xs text-slate-400 dark:text-slate-500">
+                <div className="p-4 text-center text-xs text-slate-500 dark:text-slate-400">
                   Searching customer directory...
                 </div>
               ) : results.length === 0 ? (
@@ -231,13 +231,13 @@ export const CustomerLookupInput: React.FC<CustomerLookupInputProps> = ({
                   <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                     No customer records matched "{lookupQuery}"
                   </div>
-                  <div className="text-[11px] text-slate-400 dark:text-slate-500">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400">
                     Fill in details below to register a new customer profile.
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+                  <div className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
                     <span>Matching Customer Accounts</span>
                     <span>Click to auto-fill</span>
                   </div>

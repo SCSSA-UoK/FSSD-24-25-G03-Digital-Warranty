@@ -320,14 +320,14 @@ export const PosBilling: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-xl">
             <Receipt className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">POS Billing Terminal</h1>
-            <p className="text-xs text-slate-500">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">POS Billing Terminal</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Create instant bills for both warranty and non-warranty products with automatic QR warranty linking.
             </p>
           </div>
@@ -335,7 +335,7 @@ export const PosBilling: React.FC = () => {
         <div className="flex items-center gap-2">
           <Link
             to="/retailer/bills"
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-semibold rounded-lg transition"
           >
             <History className="w-4 h-4" />
             Bills & Invoice History
@@ -344,12 +344,12 @@ export const PosBilling: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm flex items-center justify-between gap-2">
+        <div className="p-4 bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-800/60 text-red-700 dark:text-rose-300 rounded-xl text-sm flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 shrink-0" />
+            <AlertCircle className="w-5 h-5 shrink-0 text-red-600 dark:text-rose-400" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">
+          <button onClick={() => setError(null)} className="text-red-500 dark:text-rose-400 hover:text-red-700 dark:hover:text-rose-200 cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -359,42 +359,42 @@ export const PosBilling: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Product Selection (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
               {/* Search input */}
               <div className="relative w-full sm:max-w-xs">
-                <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search catalog products..."
-                  className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-9 pr-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs w-full sm:w-auto justify-center">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs w-full sm:w-auto justify-center">
                 <button
                   onClick={() => setFilterType('ALL')}
-                  className={`px-2.5 py-1 rounded-md font-medium transition ${
-                    filterType === 'ALL' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'
+                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                    filterType === 'ALL' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   All
                 </button>
                 <button
                   onClick={() => setFilterType('WARRANTY')}
-                  className={`px-2.5 py-1 rounded-md font-medium transition ${
-                    filterType === 'WARRANTY' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-600'
+                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                    filterType === 'WARRANTY' ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   Warranty
                 </button>
                 <button
                   onClick={() => setFilterType('NON_WARRANTY')}
-                  className={`px-2.5 py-1 rounded-md font-medium transition ${
-                    filterType === 'NON_WARRANTY' ? 'bg-white text-amber-700 shadow-xs' : 'text-slate-600'
+                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                    filterType === 'NON_WARRANTY' ? 'bg-white dark:bg-slate-700 text-amber-700 dark:text-amber-400 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   Non-Warranty
@@ -404,7 +404,7 @@ export const PosBilling: React.FC = () => {
               {/* Custom Item Button */}
               <button
                 onClick={() => setShowCustomModal(true)}
-                className="w-full sm:w-auto px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition shrink-0"
+                className="w-full sm:w-auto px-3 py-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition shrink-0 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Custom Item
@@ -413,9 +413,9 @@ export const PosBilling: React.FC = () => {
 
             {/* Product Grid */}
             {loadingProducts ? (
-              <div className="p-8 text-center text-xs text-slate-400">Loading catalog products...</div>
+              <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">Loading catalog products...</div>
             ) : filteredProducts.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-500">
+              <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
                 No matching products found. Try a different search or click "+ Custom Item".
               </div>
             ) : (
@@ -435,52 +435,52 @@ export const PosBilling: React.FC = () => {
                       }}
                       className={`p-3 rounded-xl border transition flex flex-col justify-between group ${
                         isOutOfStock
-                          ? 'bg-slate-100/90 border-slate-200 opacity-65 cursor-not-allowed'
-                          : 'bg-slate-50/70 hover:bg-blue-50/50 border-slate-200 hover:border-blue-300 cursor-pointer'
+                          ? 'bg-slate-100/90 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 opacity-65 cursor-not-allowed'
+                          : 'bg-slate-50/70 dark:bg-slate-800/60 hover:bg-blue-50/50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500/60 cursor-pointer'
                       }`}
                     >
                       <div>
                         <div className="flex items-start justify-between gap-1 mb-1">
-                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{p.brand}</span>
+                          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{p.brand}</span>
                           {isOutOfStock ? (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200/70 dark:border-rose-800/60">
                               Out of Stock
                             </span>
                           ) : hasW ? (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                              <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               {p.warrantyDuration} {p.warrantyUnit?.substring(0, 2).toLowerCase()}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
-                              <ShieldAlert className="w-3 h-3 text-slate-500" />
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                              <ShieldAlert className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                               No Warranty
                             </span>
                           )}
                         </div>
-                        <h4 className={`text-xs font-bold line-clamp-1 ${isOutOfStock ? 'text-slate-500' : 'text-slate-900 group-hover:text-blue-600'}`}>
+                        <h4 className={`text-xs font-bold line-clamp-1 ${isOutOfStock ? 'text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400'}`}>
                           {p.name}
                         </h4>
-                        <p className="text-[11px] text-slate-400 line-clamp-1">{p.model} &bull; {p.category}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">{p.model} &bull; {p.category}</p>
                       </div>
 
-                      <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                      <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
                         <div>
-                          <span className={`text-sm font-extrabold block ${isOutOfStock ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                          <span className={`text-sm font-extrabold block ${isOutOfStock ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-900 dark:text-slate-100'}`}>
                             ${(p.price || 0).toFixed(2)}
                           </span>
                           <span className={`text-[10px] font-semibold ${
-                            (p.stockQuantity ?? 0) > 5 ? 'text-emerald-600' : (p.stockQuantity ?? 0) > 0 ? 'text-amber-600' : 'text-rose-600 font-bold'
+                            (p.stockQuantity ?? 0) > 5 ? 'text-emerald-600 dark:text-emerald-400' : (p.stockQuantity ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400 font-bold'
                           }`}>
                             {(p.stockQuantity ?? 0) > 0 ? `${p.stockQuantity} in stock` : 'Out of stock (0)'}
                           </span>
                         </div>
                         {isOutOfStock ? (
-                          <span className="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                          <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800/60">
                             Unavailable
                           </span>
                         ) : (
-                          <span className="text-[11px] font-semibold text-blue-600 group-hover:underline flex items-center gap-0.5">
+                          <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 group-hover:underline flex items-center gap-0.5">
                             <Plus className="w-3 h-3" /> Add
                           </span>
                         )}
@@ -511,13 +511,13 @@ export const PosBilling: React.FC = () => {
             {/* Current Cart */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Cart Items ({cart.reduce((sum, i) => sum + i.quantity, 0)})
                 </span>
                 {cart.length > 0 && (
                   <button
                     onClick={clearCart}
-                    className="text-[11px] text-red-600 hover:text-red-800 font-semibold"
+                    className="text-[11px] text-red-600 dark:text-rose-400 hover:text-red-800 dark:hover:text-rose-300 font-semibold cursor-pointer"
                   >
                     Clear All
                   </button>
@@ -525,8 +525,8 @@ export const PosBilling: React.FC = () => {
               </div>
 
               {cart.length === 0 ? (
-                <div className="p-8 text-center border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-xs">
-                  <ShoppingBag className="w-8 h-8 mx-auto text-slate-300 mb-1" />
+                <div className="p-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-xs">
+                  <ShoppingBag className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-1" />
                   Cart is empty. Select products from the left or add a custom item.
                 </div>
               ) : (
@@ -542,20 +542,20 @@ export const PosBilling: React.FC = () => {
                         key={item.id}
                         className={`p-2.5 rounded-xl space-y-2 border ${
                           isZeroStock || isExceedingStock
-                            ? 'bg-rose-50/70 border-rose-200'
-                            : 'bg-slate-50 border border-slate-200'
+                            ? 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60'
+                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <h5 className="text-xs font-bold text-slate-900 truncate">{item.productName}</h5>
+                            <h5 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{item.productName}</h5>
                             {item.hasWarranty ? (
-                              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold">
-                                <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">
+                                <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                                 Warranty Active ({item.warrantyDuration} {item.warrantyUnit.toLowerCase()})
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 font-medium">
+                              <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                                 <ShieldAlert className="w-3 h-3 text-slate-400" />
                                 No Warranty (Bill Only)
                               </span>
@@ -563,7 +563,7 @@ export const PosBilling: React.FC = () => {
                           </div>
                           <button
                             onClick={() => removeFromCart(item.id)}
-                            className="text-slate-400 hover:text-red-600 transition p-1"
+                            className="text-slate-400 hover:text-red-600 dark:hover:text-rose-400 transition p-1 cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -571,31 +571,31 @@ export const PosBilling: React.FC = () => {
 
                         {/* Stock warning pill if violating */}
                         {isZeroStock ? (
-                          <div className="text-[10px] font-bold text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded border border-rose-300">
+                          <div className="text-[10px] font-bold text-rose-700 dark:text-rose-300 bg-rose-100/70 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-300 dark:border-rose-800">
                             ⚠️ Item is Out of Stock (0 available in store) &mdash; remove from cart
                           </div>
                         ) : isExceedingStock ? (
-                          <div className="text-[10px] font-semibold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded border border-amber-300">
+                          <div className="text-[10px] font-semibold text-amber-800 dark:text-amber-300 bg-amber-100/70 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-800">
                             ⚠️ Quantity ({item.quantity}) exceeds available stock ({availableStock} units)
                           </div>
                         ) : null}
 
                         {/* Controls: Price, Qty, Line Total */}
-                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/50">
+                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/50 dark:border-slate-700/60">
                           {/* Qty controls */}
-                          <div className="flex items-center border border-slate-300 bg-white rounded-md">
+                          <div className="flex items-center border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-md overflow-hidden">
                             <button
                               type="button"
                               onClick={() => updateQuantity(item.id, -1)}
-                              className="px-2 py-0.5 text-slate-600 hover:bg-slate-100 font-bold"
+                              className="px-2 py-0.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold cursor-pointer"
                             >
                               -
                             </button>
-                            <span className="px-2 font-semibold text-slate-900">{item.quantity}</span>
+                            <span className="px-2 font-semibold text-slate-900 dark:text-slate-100">{item.quantity}</span>
                             <button
                               type="button"
                               onClick={() => updateQuantity(item.id, 1)}
-                              className="px-2 py-0.5 text-slate-600 hover:bg-slate-100 font-bold"
+                              className="px-2 py-0.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold cursor-pointer"
                             >
                               +
                             </button>
@@ -603,45 +603,45 @@ export const PosBilling: React.FC = () => {
 
                           {/* Editable Unit Price */}
                           <div className="flex items-center gap-1">
-                            <span className="text-[11px] text-slate-400">@ $</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">@ $</span>
                             <input
                               type="number"
                               min="0"
                               step="0.01"
                               value={item.unitPrice}
                               onChange={(e) => updateUnitPrice(item.id, parseFloat(e.target.value) || 0)}
-                              className="w-16 px-1.5 py-0.5 border border-slate-300 rounded text-right text-xs bg-white"
+                              className="w-16 px-1.5 py-0.5 border border-slate-300 dark:border-slate-600 rounded text-right text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                             />
                           </div>
 
                           {/* Line total */}
-                          <span className="font-extrabold text-slate-900">
+                          <span className="font-extrabold text-slate-900 dark:text-slate-100">
                             ${(item.unitPrice * item.quantity).toFixed(2)}
                           </span>
                         </div>
 
                         {/* Line Item Warranty & Serial Number */}
-                        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-200/50 text-[11px]">
+                        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-200/50 dark:border-slate-700/60 text-[11px]">
                           <button
                             type="button"
                             onClick={() => toggleWarranty(item.id)}
-                            className={`font-semibold px-2 py-0.5 rounded transition shrink-0 ${
+                            className={`font-semibold px-2 py-0.5 rounded transition shrink-0 cursor-pointer ${
                               item.hasWarranty
-                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-200 dark:hover:bg-emerald-900/60'
+                                : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
                             }`}
                           >
                             {item.hasWarranty ? '✓ Has Warranty' : '✕ No Warranty'}
                           </button>
 
                           <div className="flex items-center gap-1.5 flex-1 max-w-[210px]">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase shrink-0">S/N:</span>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase shrink-0">S/N:</span>
                             <input
                               type="text"
                               placeholder="Scan or enter Serial #"
                               value={item.serialNumber || ''}
                               onChange={(e) => updateSerialNumber(item.id, e.target.value)}
-                              className="w-full px-2 py-1 border border-slate-300 rounded text-[11px] bg-white font-mono focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              className="w-full px-2 py-1 border border-slate-300 dark:border-slate-600 rounded text-[11px] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500"
                               title="Unit Serial Number / IMEI / Barcode"
                             />
                           </div>
@@ -654,12 +654,12 @@ export const PosBilling: React.FC = () => {
             </div>
 
             {/* Price Calculations */}
-            <div className="p-3 bg-slate-50 rounded-xl space-y-2 text-xs border border-slate-200">
-              <div className="flex justify-between text-slate-600">
+            <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2 text-xs border border-slate-200 dark:border-slate-700">
+              <div className="flex justify-between text-slate-600 dark:text-slate-300">
                 <span>Subtotal</span>
-                <span className="font-semibold text-slate-900">${subtotal.toFixed(2)}</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">${subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-600">
+              <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                 <span>Discount ($)</span>
                 <input
                   type="number"
@@ -667,10 +667,10 @@ export const PosBilling: React.FC = () => {
                   step="0.01"
                   value={discountAmount}
                   onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
-                  className="w-20 px-2 py-0.5 border border-slate-300 rounded text-right bg-white"
+                  className="w-20 px-2 py-0.5 border border-slate-300 dark:border-slate-600 rounded text-right bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
-              <div className="flex items-center justify-between text-slate-600">
+              <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                 <span>Tax / VAT ($)</span>
                 <input
                   type="number"
@@ -678,18 +678,18 @@ export const PosBilling: React.FC = () => {
                   step="0.01"
                   value={taxAmount}
                   onChange={(e) => setTaxAmount(parseFloat(e.target.value) || 0)}
-                  className="w-20 px-2 py-0.5 border border-slate-300 rounded text-right bg-white"
+                  className="w-20 px-2 py-0.5 border border-slate-300 dark:border-slate-600 rounded text-right bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
-              <div className="flex justify-between pt-2 border-t border-slate-200 text-sm font-extrabold text-slate-900">
+              <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-700 text-sm font-extrabold text-slate-900 dark:text-slate-100">
                 <span>Grand Total</span>
-                <span className="text-blue-600">${grandTotal.toFixed(2)}</span>
+                <span className="text-blue-600 dark:text-blue-400">${grandTotal.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Payment Method */}
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 Payment Method
               </span>
               <div className="grid grid-cols-3 gap-1.5 text-xs">
@@ -698,10 +698,10 @@ export const PosBilling: React.FC = () => {
                     key={method}
                     type="button"
                     onClick={() => setPaymentMethod(method)}
-                    className={`py-1.5 rounded-lg font-semibold border transition ${
+                    className={`py-1.5 rounded-lg font-semibold border transition cursor-pointer ${
                       paymentMethod === method
                         ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     {method}
@@ -713,14 +713,14 @@ export const PosBilling: React.FC = () => {
                 placeholder="Payment notes / Txn ID (optional)"
                 value={paymentNotes}
                 onChange={(e) => setPaymentNotes(e.target.value)}
-                className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-1.5 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             {/* Stock Violation Alert */}
             {hasStockViolations && (
-              <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <span>Items in cart are out of stock or exceed inventory. Adjust cart to proceed.</span>
               </div>
             )}
@@ -729,7 +729,7 @@ export const PosBilling: React.FC = () => {
             <button
               onClick={handleGenerateBill}
               disabled={submitting || cart.length === 0 || hasStockViolations}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <CreditCard className="w-5 h-5" />
               {submitting ? 'Generating Bill...' : `Complete Sale & Print ($${grandTotal.toFixed(2)})`}
@@ -740,30 +740,30 @@ export const PosBilling: React.FC = () => {
 
       {/* Custom Item Modal */}
       {showCustomModal && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900">Add Custom Line Item</h3>
-              <button onClick={() => setShowCustomModal(false)} className="text-slate-400 hover:text-slate-600">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Add Custom Line Item</h3>
+              <button onClick={() => setShowCustomModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleAddCustomItem} className="space-y-3 text-xs">
               <div>
-                <label className="block font-semibold uppercase text-slate-700 mb-1">Item Description / Name</label>
+                <label className="block font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Item Description / Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. HDMI 2.1 Cable 2m / Screen Protector"
                   value={customItem.name}
                   onChange={(e) => setCustomItem({ ...customItem, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold uppercase text-slate-700 mb-1">Unit Price ($)</label>
+                <label className="block font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Unit Price ($)</label>
                 <input
                   type="number"
                   step="0.01"
@@ -772,16 +772,16 @@ export const PosBilling: React.FC = () => {
                   placeholder="0.00"
                   value={customItem.price}
                   onChange={(e) => setCustomItem({ ...customItem, price: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Warranty Toggle */}
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-bold text-slate-900 block">Has Warranty?</span>
-                    <span className="text-[11px] text-slate-500">Toggle on if this item provides warranty</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100 block">Has Warranty?</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">Toggle on if this item provides warranty</span>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -790,28 +790,28 @@ export const PosBilling: React.FC = () => {
                       onChange={(e) => setCustomItem({ ...customItem, hasWarranty: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                   </label>
                 </div>
 
                 {customItem.hasWarranty && (
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Duration</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Duration</label>
                       <input
                         type="number"
                         min="1"
                         value={customItem.duration}
                         onChange={(e) => setCustomItem({ ...customItem, duration: parseInt(e.target.value) || 1 })}
-                        className="w-full px-2 py-1 border border-slate-300 rounded bg-white"
+                        className="w-full px-2 py-1 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">Unit</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Unit</label>
                       <select
                         value={customItem.unit}
                         onChange={(e) => setCustomItem({ ...customItem, unit: e.target.value as WarrantyUnit })}
-                        className="w-full px-2 py-1 border border-slate-300 rounded bg-white"
+                        className="w-full px-2 py-1 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                       >
                         <option value="DAYS">Days</option>
                         <option value="MONTHS">Months</option>
@@ -826,13 +826,13 @@ export const PosBilling: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowCustomModal(false)}
-                  className="px-3 py-1.5 border border-slate-300 rounded-lg text-slate-700 font-medium"
+                  className="px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+                  className="px-4 py-1.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 cursor-pointer"
                 >
                   Add to Cart
                 </button>
@@ -844,14 +844,14 @@ export const PosBilling: React.FC = () => {
 
       {/* Official Printable Bill / Receipt Modal */}
       {createdBill && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 md:p-6 z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl p-4 sm:p-6 shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] my-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 no-print shrink-0">
-              <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm sm:text-base">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 md:p-6 z-50 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl p-4 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] my-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 no-print shrink-0">
+              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm sm:text-base">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Sale Completed & Bill Issued!</span>
               </div>
-              <button onClick={() => setCreatedBill(null)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition" aria-label="Close">
+              <button onClick={() => setCreatedBill(null)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" aria-label="Close">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -861,63 +861,63 @@ export const PosBilling: React.FC = () => {
               <div
                 ref={receiptRef}
                 id="printable-pos-receipt"
-                className="p-4 sm:p-6 md:p-8 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs sm:text-sm text-slate-800 space-y-4 sm:space-y-6"
+                className="p-4 sm:p-6 md:p-8 bg-slate-50 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 rounded-xl font-mono text-xs sm:text-sm text-slate-800 dark:text-slate-200 space-y-4 sm:space-y-6"
               >
                 {/* Store Header */}
-                <div className="text-center space-y-1 border-b border-dashed border-slate-300 pb-3 sm:pb-4">
-                  <h2 className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-slate-900 font-sans">
+                <div className="text-center space-y-1 border-b border-dashed border-slate-300 dark:border-slate-600 pb-3 sm:pb-4">
+                  <h2 className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
                     {createdBill.retailerBusinessName || 'WarranTrack Retail Store'}
                   </h2>
                   {createdBill.retailerAddress && (
-                    <p className="text-[11px] sm:text-xs text-slate-600">{createdBill.retailerAddress}</p>
+                    <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">{createdBill.retailerAddress}</p>
                   )}
-                  <div className="text-[10px] sm:text-xs text-slate-500">
+                  <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
                     {createdBill.retailerContactPhone && <span>Tel: {createdBill.retailerContactPhone} &bull; </span>}
                     {createdBill.retailerContactEmail && <span>{createdBill.retailerContactEmail}</span>}
                   </div>
                 </div>
 
                 {/* Invoice Metadata */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] sm:text-xs border-b border-dashed border-slate-300 pb-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] sm:text-xs border-b border-dashed border-slate-300 dark:border-slate-600 pb-3">
                   <div className="space-y-0.5">
-                    <div><span className="text-slate-500">INV #:</span> <strong className="text-slate-900">{createdBill.invoiceNumber}</strong></div>
-                    <div><span className="text-slate-500">Customer:</span> <strong className="text-slate-900">{createdBill.customerName}</strong></div>
-                    {createdBill.customerEmail && <div><span className="text-slate-500">Email:</span> {createdBill.customerEmail}</div>}
+                    <div><span className="text-slate-500 dark:text-slate-400">INV #:</span> <strong className="text-slate-900 dark:text-slate-100">{createdBill.invoiceNumber}</strong></div>
+                    <div><span className="text-slate-500 dark:text-slate-400">Customer:</span> <strong className="text-slate-900 dark:text-slate-100">{createdBill.customerName}</strong></div>
+                    {createdBill.customerEmail && <div><span className="text-slate-500 dark:text-slate-400">Email:</span> {createdBill.customerEmail}</div>}
                   </div>
                   <div className="sm:text-right space-y-0.5">
-                    <div><span className="text-slate-500">Date:</span> {new Date(createdBill.createdAt).toLocaleDateString()} {new Date(createdBill.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                    <div><span className="text-slate-500">Paid via:</span> <span className="font-semibold">{createdBill.paymentMethod}</span></div>
+                    <div><span className="text-slate-500 dark:text-slate-400">Date:</span> {new Date(createdBill.createdAt).toLocaleDateString()} {new Date(createdBill.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div><span className="text-slate-500 dark:text-slate-400">Paid via:</span> <span className="font-semibold text-slate-900 dark:text-slate-100">{createdBill.paymentMethod}</span></div>
                   </div>
                 </div>
 
                 {/* Line Items */}
-                <div className="space-y-1.5 border-b border-dashed border-slate-300 pb-3 sm:pb-4">
-                  <div className="grid grid-cols-12 gap-2 font-bold text-[11px] sm:text-xs text-slate-500 uppercase pb-1.5 border-b border-slate-200">
+                <div className="space-y-1.5 border-b border-dashed border-slate-300 dark:border-slate-600 pb-3 sm:pb-4">
+                  <div className="grid grid-cols-12 gap-2 font-bold text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 uppercase pb-1.5 border-b border-slate-200 dark:border-slate-700">
                     <span className="col-span-6 sm:col-span-7">Item</span>
                     <span className="col-span-2 sm:col-span-1 text-center">Qty</span>
                     <span className="col-span-2 text-right">Price</span>
                     <span className="col-span-2 text-right">Total</span>
                   </div>
                   {createdBill.items.map((item, idx) => (
-                    <div key={idx} className="grid grid-cols-12 gap-2 py-1.5 items-start text-xs sm:text-sm border-b border-slate-200/50 last:border-b-0">
+                    <div key={idx} className="grid grid-cols-12 gap-2 py-1.5 items-start text-xs sm:text-sm border-b border-slate-200/50 dark:border-slate-700/60 last:border-b-0">
                       <div className="col-span-6 sm:col-span-7 pr-1">
-                        <div className="font-bold text-slate-900 break-words">{item.productName}</div>
+                        <div className="font-bold text-slate-900 dark:text-slate-100 break-words">{item.productName}</div>
                         {item.hasWarranty ? (
-                          <div className="text-[10px] sm:text-xs text-emerald-700 font-sans font-semibold mt-0.5">
+                          <div className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-sans font-semibold mt-0.5">
                             [✓ Warranty: {item.warrantyDuration} {item.warrantyUnit?.toLowerCase()} until {item.warrantyExpiryDate}]
                           </div>
                         ) : (
-                          <div className="text-[10px] sm:text-xs text-slate-500 font-sans mt-0.5">
+                          <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-sans mt-0.5">
                             [Non-Warranty Product]
                           </div>
                         )}
                         {item.serialNumber && (
-                          <div className="text-[10px] sm:text-xs text-slate-500 mt-0.5">S/N: {item.serialNumber}</div>
+                          <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">S/N: {item.serialNumber}</div>
                         )}
                       </div>
                       <div className="col-span-2 sm:col-span-1 text-center font-medium">{item.quantity}</div>
                       <div className="col-span-2 text-right font-medium">${item.unitPrice.toFixed(2)}</div>
-                      <div className="col-span-2 text-right font-bold text-slate-900">${item.lineTotal.toFixed(2)}</div>
+                      <div className="col-span-2 text-right font-bold text-slate-900 dark:text-slate-100">${item.lineTotal.toFixed(2)}</div>
                     </div>
                   ))}
                 </div>
@@ -925,22 +925,22 @@ export const PosBilling: React.FC = () => {
                 {/* Totals */}
                 <div className="max-w-xs sm:max-w-sm ml-auto space-y-1 text-right text-xs sm:text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Subtotal:</span>
+                    <span className="text-slate-600 dark:text-slate-400">Subtotal:</span>
                     <span>${createdBill.subtotal.toFixed(2)}</span>
                   </div>
                   {createdBill.discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-700 font-medium">
+                    <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-medium">
                       <span>Discount:</span>
                       <span>-${createdBill.discountAmount.toFixed(2)}</span>
                     </div>
                   )}
                   {createdBill.taxAmount > 0 && (
-                    <div className="flex justify-between text-slate-600">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Tax:</span>
                       <span>+${createdBill.taxAmount.toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-sm sm:text-base font-extrabold text-slate-900 pt-1.5 border-t border-slate-300">
+                  <div className="flex justify-between text-sm sm:text-base font-extrabold text-slate-900 dark:text-slate-100 pt-1.5 border-t border-slate-300 dark:border-slate-600">
                     <span>Total Paid:</span>
                     <span>${createdBill.grandTotal.toFixed(2)}</span>
                   </div>
@@ -948,23 +948,25 @@ export const PosBilling: React.FC = () => {
 
                 {/* Digital Warranty QR Codes Section (Printed on Bill!) */}
                 {createdBill.items.some((item) => item.hasWarranty && item.qrToken) && (
-                  <div className="pt-4 border-t-2 border-dashed border-slate-300 space-y-3">
-                    <div className="text-center font-bold text-slate-900 font-sans uppercase text-[11px] sm:text-xs tracking-wider">
+                  <div className="pt-4 border-t-2 border-dashed border-slate-300 dark:border-slate-600 space-y-3">
+                    <div className="text-center font-bold text-slate-900 dark:text-slate-100 font-sans uppercase text-[11px] sm:text-xs tracking-wider">
                       Digital Warranty Passport QR Code
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {createdBill.items
                         .filter((item) => item.hasWarranty && item.qrToken)
                         .map((item, idx) => (
-                          <div key={idx} className="flex flex-col items-center text-center p-3 bg-white rounded-lg border border-slate-200 shadow-2xs space-y-1.5">
-                            <QRCodeSVG
-                              value={`${window.location.origin}/verify/${item.qrToken}`}
-                              size={100}
-                            />
-                            <span className="text-[11px] font-bold text-slate-800 font-sans line-clamp-1">
+                          <div key={idx} className="flex flex-col items-center text-center p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs space-y-1.5">
+                            <div className="p-1.5 bg-white rounded-md">
+                              <QRCodeSVG
+                                value={`${window.location.origin}/verify/${item.qrToken}`}
+                                size={100}
+                              />
+                            </div>
+                            <span className="text-[11px] font-bold text-slate-800 dark:text-slate-100 font-sans line-clamp-1">
                               {item.productName}
                             </span>
-                            <span className="text-[9px] sm:text-[10px] text-slate-500 font-sans leading-tight">
+                            <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-sans leading-tight">
                               Scan to verify or claim<br/>
                               (Valid till {item.warrantyExpiryDate})
                             </span>
@@ -975,7 +977,7 @@ export const PosBilling: React.FC = () => {
                 )}
 
                 {/* Footer */}
-                <div className="text-center text-[10px] sm:text-[11px] text-slate-400 pt-2 border-t border-dashed border-slate-200 space-y-0.5">
+                <div className="text-center text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-dashed border-slate-200 dark:border-slate-700 space-y-0.5">
                   <p>Thank you for your business!</p>
                   <p>Powered by WarranTrack &bull; Digital Warranty & Billing Platform</p>
                 </div>
@@ -983,18 +985,18 @@ export const PosBilling: React.FC = () => {
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 no-print shrink-0">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 no-print shrink-0">
               <button
                 type="button"
                 onClick={() => setCreatedBill(null)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 font-medium rounded-lg text-xs hover:bg-slate-50 transition"
+                className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 Close & New Sale
               </button>
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-md transition"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
                 Print Receipt
@@ -1012,6 +1014,7 @@ export const PosBilling: React.FC = () => {
           }
           #printable-pos-receipt, #printable-pos-receipt * {
             visibility: visible;
+            color: #0f172a !important;
           }
           #printable-pos-receipt {
             position: absolute;

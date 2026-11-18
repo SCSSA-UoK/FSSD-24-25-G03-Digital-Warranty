@@ -44,57 +44,57 @@ export const RegisterRetailer: React.FC = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto my-12 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+    <div className="max-w-xl mx-auto my-12 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <div className="text-center space-y-2 mb-6">
         <div className="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
           <Store className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900">Retailer Partner Registration</h2>
-        <p className="text-sm text-slate-500">Register your business to issue digital warranties and manage service claims</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Retailer Partner Registration</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Register your business to issue digital warranties and manage service claims</p>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="mb-4 p-3 bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-800/60 text-red-700 dark:text-rose-300 rounded-lg text-sm flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600 dark:text-rose-400" />
           <span className="break-words">{error}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="text-xs font-bold uppercase text-slate-400 tracking-wider pt-2 border-b border-slate-100 pb-1">
+        <div className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider pt-2 border-b border-slate-100 dark:border-slate-800 pb-1">
           Account Login Credentials
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Representative Name</label>
+            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Representative Name</label>
             <input
               type="text"
               name="name"
               required
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Jane Smith"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Account Email</label>
+            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Account Email</label>
             <input
               type="email"
               name="email"
               required
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="rep@store.com"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Account Password</label>
+          <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Account Password</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -103,13 +103,13 @@ export const RegisterRetailer: React.FC = () => {
               minLength={6}
               value={formData.password}
               onChange={handleChange}
-              className="w-full pl-3.5 pr-10 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full pl-3.5 pr-10 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="••••••••"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none transition p-0.5"
+              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none transition p-0.5"
               title={showPassword ? 'Hide password' : 'Show password'}
               tabIndex={-1}
             >
@@ -118,33 +118,33 @@ export const RegisterRetailer: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-xs font-bold uppercase text-slate-400 tracking-wider pt-4 border-b border-slate-100 pb-1">
+        <div className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider pt-4 border-b border-slate-100 dark:border-slate-800 pb-1">
           Business & Store Information
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Business Name</label>
+            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Business Name</label>
             <input
               type="text"
               name="businessName"
               required
               value={formData.businessName}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Apex Electronics Ltd"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Business Reg. / Tax ID</label>
+            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Business Reg. / Tax ID</label>
             <input
               type="text"
               name="registrationNumber"
               required
               value={formData.registrationNumber}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="REG-8921734"
             />
           </div>
@@ -152,65 +152,65 @@ export const RegisterRetailer: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Public Contact Email</label>
+            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Public Contact Email</label>
             <input
               type="email"
               name="contactEmail"
               required
               value={formData.contactEmail}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="support@apex.com"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Public Contact Phone</label>
+            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Public Contact Phone</label>
             <input
               type="tel"
               name="contactPhone"
               required
               value={formData.contactPhone}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="+1 555-8888"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Store / Business Address</label>
+          <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Store / Business Address</label>
           <input
             type="text"
             name="address"
             required
             value={formData.address}
             onChange={handleChange}
-            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             placeholder="123 Tech Boulevard, Suite 400"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Business Description (Optional)</label>
+          <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Business Description (Optional)</label>
           <textarea
             name="description"
             rows={2}
             value={formData.description}
             onChange={handleChange}
-            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             placeholder="Consumer electronics and home appliances retailer..."
           />
         </div>
 
-        <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-800">
+        <div className="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-lg border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-300">
           Notice: Retailer registrations require verification and approval by the platform administrator before product catalog and purchase registration tools become active.
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+          className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -222,9 +222,9 @@ export const RegisterRetailer: React.FC = () => {
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-slate-100 text-center text-xs text-slate-600">
+      <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-600 dark:text-slate-400">
         Already registered?{' '}
-        <Link to="/login" className="text-blue-600 font-semibold hover:underline">
+        <Link to="/login" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
           Sign In
         </Link>
       </div>
