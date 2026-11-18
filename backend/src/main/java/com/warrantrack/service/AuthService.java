@@ -180,10 +180,6 @@ public class AuthService {
             throw new BadRequestException("ACCOUNT_INACTIVE: Your account is currently inactive. Would you like to reactivate it?");
         }
 
-        if (user.getRole() == Role.CUSTOMER && !user.isEmailVerified()) {
-            throw new UnauthorizedException("Please verify your email address before signing in.");
-        }
-
         String retailerId = null;
         ApprovalStatus approvalStatus = null;
 

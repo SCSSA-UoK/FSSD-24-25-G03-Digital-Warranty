@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (userDetails instanceof UserPrincipal userPrincipal
                         && "CUSTOMER".equals(userPrincipal.getRole())
                         && !userPrincipal.isEmailVerified()
-                        && !isEmailVerificationRequest(request)) {
+                        && !isAllowedUnverifiedRequest(request)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentType("application/json");
                     response.getWriter().write("{\"success\":false,\"message\":\"Please verify your email address before accessing your account.\"}");
@@ -66,9 +66,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isEmailVerificationRequest(HttpServletRequest request) {
+    private boolean isAllowedUnverifiedRequest(HttpServletRequest request) {
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String path = request.getRequestURI();
-        return "/api/auth/verify-email".equals(path) || "/api/auth/resend-otp".equals(path);
+        return "/api/auth/me".equals(path)
+                || "/api/auth/verify-email".equals(path)
+                || "/api/auth/resend-otp".equals(path);
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
