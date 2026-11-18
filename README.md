@@ -168,13 +168,13 @@ Warranty claims strictly enforce a deterministic finite state machine implemente
 - **Java Development Kit (JDK) 17+**
 - **Apache Maven 3.8+**
 - **Node.js 18+** & **npm**
-- **MongoDB** (Local instance on `localhost:27017` or cloud MongoDB Atlas URI)
+- **MongoDB Atlas** (cloud database)
 
 ### Step 1: Clone & Configure Backend
 ```bash
 cd backend
 ```
-*(Optional)* Configure your database URI or credentials in `backend/.env` (a pre-configured template is included in `backend/.env.example`). Defaults run on `localhost:27017/warrantrack_db`.
+Configure the MongoDB Atlas URI in `backend/.env` using the template in `backend/.env.example`. The backend requires `SPRING_DATA_MONGODB_URI` and does not connect to a local MongoDB instance.
 
 ### Step 2: Run Spring Boot Backend
 ```bash

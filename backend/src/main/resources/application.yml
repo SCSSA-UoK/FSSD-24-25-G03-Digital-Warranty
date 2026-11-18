@@ -7,7 +7,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/warrantrack_db}
+      uri: ${SPRING_DATA_MONGODB_URI}
       database: warrantrack_db
       auto-index-creation: true
 
