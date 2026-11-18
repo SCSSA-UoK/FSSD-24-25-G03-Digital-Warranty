@@ -183,7 +183,7 @@ export const RetailerClaims: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Claims List */}
-        <div className="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 max-h-[80vh] overflow-y-auto">
+        <div className="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 max-h-72 lg:max-h-[80vh] overflow-y-auto">
           {loading ? (
             <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">Loading claims...</div>
           ) : claims.length === 0 ? (

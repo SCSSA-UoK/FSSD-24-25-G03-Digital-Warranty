@@ -4,36 +4,39 @@ import { ShieldCheck, QrCode, FileText, Store, CheckCircle, ArrowRight } from 'l
 
 export const Landing: React.FC = () => {
   return (
-    <div className="space-y-16 py-8">
+    <div className="space-y-12 sm:space-y-16 py-4 sm:py-8">
       {/* Hero */}
-      <section className="text-center max-w-3xl mx-auto space-y-6 pt-6">
-        <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 rounded-full text-xs font-semibold">
-          <ShieldCheck className="w-4 h-4" /> Smart Digital Warranty & After-Sales Platform
+      <section className="text-center max-w-3xl mx-auto space-y-4 sm:space-y-6 pt-4 sm:pt-6 px-2">
+        <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-semibold max-w-full">
+          <ShieldCheck className="w-4 h-4 shrink-0" />
+          <span className="truncate">Smart Digital Warranty & After-Sales Platform</span>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
           Say goodbye to lost paper receipts and warranty cards.
         </h1>
-        <p className="text-lg text-slate-600 dark:text-slate-300">
+        <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
           WarranTrack centralizes your warranties across participating retailers in one unified global account. Verify coverage via secure QR codes, submit claims, and track repairs in real-time.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-4 w-full max-w-md sm:max-w-none mx-auto">
           <Link
             to="/register"
-            className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 shadow-md transition flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 shadow-md transition flex items-center justify-center gap-2 text-sm sm:text-base text-center"
           >
-            Create Customer Account <ArrowRight className="w-4 h-4" />
+            <span>Create Customer Account</span>
+            <ArrowRight className="w-4 h-4 shrink-0" />
           </Link>
           <Link
             to="/register/retailer"
-            className="px-6 py-3 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-medium rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-3 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-medium rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center justify-center gap-2 text-sm sm:text-base text-center"
           >
-            <Store className="w-4 h-4" /> Retailer Registration
+            <Store className="w-4 h-4 shrink-0" />
+            <span>Retailer Registration</span>
           </Link>
         </div>
       </section>
 
       {/* Feature Highlights */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 pt-4 sm:pt-8">
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3 transition-colors">
           <div className="bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 w-12 h-12 rounded-xl flex items-center justify-center">
             <QrCode className="w-6 h-6" />

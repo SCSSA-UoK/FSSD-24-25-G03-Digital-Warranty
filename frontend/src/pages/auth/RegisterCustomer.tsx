@@ -32,7 +32,7 @@ export const RegisterCustomer: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
       <div className="text-center space-y-2 mb-6">
         <div className="bg-emerald-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
           <ShieldCheck className="w-6 h-6" />

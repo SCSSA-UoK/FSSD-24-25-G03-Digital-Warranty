@@ -3,15 +3,34 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   html.dark {
     color-scheme: dark;
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased transition-colors duration-200;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased transition-colors duration-200 overflow-x-hidden;
   }
 
   html.dark body {
     @apply bg-slate-950 text-slate-100;
   }
+
+  img, svg, video, canvas, audio, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+  }
 }
+
+/* Fluid responsive utilities */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+

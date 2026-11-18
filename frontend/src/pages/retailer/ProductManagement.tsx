@@ -247,8 +247,8 @@ export const ProductManagement: React.FC = () => {
 
       {/* Add / Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[92vh] overflow-y-auto my-auto">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
               {editingProduct ? 'Edit Catalog Product' : 'Add New Product to Catalog'}
             </h3>
@@ -266,7 +266,7 @@ export const ProductManagement: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Brand</label>
                   <input
@@ -296,7 +296,7 @@ export const ProductManagement: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Category</label>
                   <input
