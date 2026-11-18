@@ -132,7 +132,7 @@ export const SubmitClaim: React.FC = () => {
             >
               {warranties.map((w) => (
                 <option key={w.id} value={w.id}>
-                  {w.productName} ({w.retailerBusinessName}) &bull; Valid until {w.expiryDate}{' '}
+                  {w.productName}{w.serialNumber ? ` [S/N: ${w.serialNumber}]` : ''} ({w.retailerBusinessName}) &bull; Valid until {w.expiryDate}{' '}
                   {!w.eligibleForClaim ? '(EXPIRED)' : ''}
                 </option>
               ))}
@@ -148,6 +148,11 @@ export const SubmitClaim: React.FC = () => {
                 {selectedWarranty.eligibleForClaim ? 'Eligible for Claims' : 'Expired'}
               </span>
             </div>
+            {selectedWarranty.serialNumber && (
+              <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                Unit Serial Number: {selectedWarranty.serialNumber}
+              </div>
+            )}
             <div>Terms: {selectedWarranty.termsSnapshot}</div>
           </div>
         )}

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { productApi, billingApi } from '../../api';
 import { Product, Bill, WarrantyUnit, PaymentMethod, CreateBillRequest } from '../../types';
-import { QRCodeSVG } from 'qrcode.react';
 import { 
   CreditCard, 
   Search, 
@@ -19,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CustomerLookupInput } from '../../components/CustomerLookupInput';
+import { InvoiceReceipt } from '../../components/InvoiceReceipt';
 
 interface CartLineItem {
   id: string; // local key
@@ -26,7 +26,7 @@ interface CartLineItem {
   productName: string;
   brand?: string;
   category?: string;
-  serialNumber?: string;
+  serialNumbers: string[];
   quantity: number;
   unitPrice: number;
   hasWarranty: boolean;
@@ -103,7 +103,12 @@ export const PosBilling: React.FC = () => {
         return;
       }
       const updated = [...cart];
-      updated[existingIndex].quantity += 1;
+      const existing = updated[existingIndex];
+      updated[existingIndex] = {
+        ...existing,
+        quantity: existing.quantity + 1,
+        serialNumbers: [...existing.serialNumbers, ''],
+      };
       setCart(updated);
     } else {
       const isWarranty = product.hasWarranty !== false;
@@ -113,7 +118,7 @@ export const PosBilling: React.FC = () => {
         productName: `${product.brand} ${product.name}`,
         brand: product.brand,
         category: product.category,
-        serialNumber: '',
+        serialNumbers: [''],
         quantity: 1,
         unitPrice: product.price || 0,
         hasWarranty: isWarranty,
@@ -136,7 +141,7 @@ export const PosBilling: React.FC = () => {
       productName: customItem.name.trim(),
       brand: 'Custom Item',
       category: 'General',
-      serialNumber: '',
+      serialNumbers: [''],
       quantity: 1,
       unitPrice: customItem.price || 0,
       hasWarranty: customItem.hasWarranty,
@@ -176,7 +181,16 @@ export const PosBilling: React.FC = () => {
         .map((it) => {
           if (it.id === id) {
             const newQty = it.quantity + delta;
-            return newQty > 0 ? { ...it, quantity: newQty } : null;
+            if (newQty <= 0) return null;
+            const nextSerials = [...it.serialNumbers];
+            while (nextSerials.length < newQty) {
+              nextSerials.push('');
+            }
+            return {
+              ...it,
+              quantity: newQty,
+              serialNumbers: nextSerials.slice(0, newQty),
+            };
           }
           return it;
         })
@@ -191,10 +205,19 @@ export const PosBilling: React.FC = () => {
     );
   };
 
-  const updateSerialNumber = (id: string, serial: string) => {
+  const updateSerialNumberAt = (id: string, unitIndex: number, serial: string) => {
     setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, serialNumber: serial } : item))
+      prev.map((item) => {
+        if (item.id !== id) return item;
+        const nextSerials = [...item.serialNumbers];
+        while (nextSerials.length < item.quantity) {
+          nextSerials.push('');
+        }
+        nextSerials[unitIndex] = serial;
+        return { ...item, serialNumbers: nextSerials };
+      })
     );
+    setError(null);
   };
 
   const toggleWarranty = (id: string) => {
@@ -230,6 +253,34 @@ export const PosBilling: React.FC = () => {
     return available <= 0 || item.quantity > available;
   });
 
+  // Track duplicate serial numbers across the entire cart (case-insensitive)
+  const serialOccurrences = new Map<string, number>();
+  cart.forEach((item) => {
+    item.serialNumbers.slice(0, item.quantity).forEach((sn) => {
+      const normalized = sn.trim().toLowerCase();
+      if (normalized) {
+        serialOccurrences.set(normalized, (serialOccurrences.get(normalized) || 0) + 1);
+      }
+    });
+  });
+
+  const duplicateSerialsInCart = new Set<string>(
+    Array.from(serialOccurrences.entries())
+      .filter(([, count]) => count > 1)
+      .map(([sn]) => sn)
+  );
+
+  const hasDuplicateSerials = duplicateSerialsInCart.size > 0;
+
+  const hasIncompleteSerials = cart.some((item) => {
+    const slots = item.serialNumbers.slice(0, item.quantity);
+    const filledCount = slots.filter((s) => s.trim().length > 0).length;
+    if (item.hasWarranty) {
+      return filledCount !== item.quantity;
+    }
+    return filledCount > 0 && filledCount !== item.quantity;
+  });
+
   // Handle Checkout / Generate Bill
   const handleGenerateBill = async () => {
     if (cart.length === 0) {
@@ -262,6 +313,36 @@ export const PosBilling: React.FC = () => {
       }
     }
 
+    // Validate manually entered serial numbers: count matches quantity & zero duplicates
+    const seenSerials = new Set<string>();
+    for (const item of cart) {
+      const trimmedSerials = item.serialNumbers.slice(0, item.quantity).map((s) => s.trim());
+      const filledSerials = trimmedSerials.filter((s) => s.length > 0);
+
+      if (item.hasWarranty && filledSerials.length !== item.quantity) {
+        setError(
+          `Please manually enter all ${item.quantity} serial number(s) for "${item.productName}" (${filledSerials.length} of ${item.quantity} entered).`
+        );
+        return;
+      }
+
+      if (!item.hasWarranty && filledSerials.length > 0 && filledSerials.length !== item.quantity) {
+        setError(
+          `Serial number count for "${item.productName}" (${filledSerials.length}) must match quantity (${item.quantity}), or leave all blank.`
+        );
+        return;
+      }
+
+      for (const sn of filledSerials) {
+        const key = sn.toLowerCase();
+        if (seenSerials.has(key)) {
+          setError(`Duplicate serial number "${sn}" found in cart. Every physical unit must have a unique serial number.`);
+          return;
+        }
+        seenSerials.add(key);
+      }
+    }
+
     setError(null);
     setSubmitting(true);
 
@@ -273,19 +354,24 @@ export const PosBilling: React.FC = () => {
       taxAmount: Number(taxAmount) || 0,
       paymentMethod,
       paymentNotes: paymentNotes.trim() || undefined,
-      items: cart.map((item) => ({
-        productId: item.productId,
-        productName: item.productName,
-        brand: item.brand,
-        category: item.category,
-        serialNumber: item.serialNumber?.trim() || undefined,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        hasWarranty: item.hasWarranty,
-        warrantyDuration: item.hasWarranty ? item.warrantyDuration : undefined,
-        warrantyUnit: item.hasWarranty ? item.warrantyUnit : undefined,
-        warrantyTerms: item.hasWarranty ? item.warrantyTerms : undefined,
-      })),
+      items: cart.map((item) => {
+        const cleanedSerials = item.serialNumbers.slice(0, item.quantity).map((s) => s.trim());
+        const hasAnySerial = cleanedSerials.some((s) => s.length > 0);
+        return {
+          productId: item.productId,
+          productName: item.productName,
+          brand: item.brand,
+          category: item.category,
+          serialNumber: item.quantity === 1 && cleanedSerials[0] ? cleanedSerials[0] : undefined,
+          serialNumbers: hasAnySerial ? cleanedSerials : undefined,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          hasWarranty: item.hasWarranty,
+          warrantyDuration: item.hasWarranty ? item.warrantyDuration : undefined,
+          warrantyUnit: item.hasWarranty ? item.warrantyUnit : undefined,
+          warrantyTerms: item.hasWarranty ? item.warrantyTerms : undefined,
+        };
+      }),
     };
 
     try {
@@ -530,7 +616,7 @@ export const PosBilling: React.FC = () => {
                   Cart is empty. Select products from the left or add a custom item.
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
                   {cart.map((item) => {
                     const linkedProduct = item.productId ? products.find((p) => p.id === item.productId) : null;
                     const availableStock = linkedProduct ? (linkedProduct.stockQuantity ?? 0) : null;
@@ -620,30 +706,84 @@ export const PosBilling: React.FC = () => {
                           </span>
                         </div>
 
-                        {/* Line Item Warranty & Serial Number */}
-                        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-200/50 dark:border-slate-700/60 text-[11px]">
-                          <button
-                            type="button"
-                            onClick={() => toggleWarranty(item.id)}
-                            className={`font-semibold px-2 py-0.5 rounded transition shrink-0 cursor-pointer ${
-                              item.hasWarranty
-                                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-200 dark:hover:bg-emerald-900/60'
-                                : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
-                            }`}
-                          >
-                            {item.hasWarranty ? '✓ Has Warranty' : '✕ No Warranty'}
-                          </button>
+                        {/* Line Item Warranty Toggle & Per-Unit Manual Serial Number Inputs */}
+                        <div className="space-y-2 pt-1.5 border-t border-slate-200/50 dark:border-slate-700/60 text-[11px]">
+                          <div className="flex items-center justify-between gap-2">
+                            <button
+                              type="button"
+                              onClick={() => toggleWarranty(item.id)}
+                              className={`font-semibold px-2 py-0.5 rounded transition shrink-0 cursor-pointer ${
+                                item.hasWarranty
+                                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-200 dark:hover:bg-emerald-900/60'
+                                  : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+                              }`}
+                            >
+                              {item.hasWarranty ? '✓ Has Warranty' : '✕ No Warranty'}
+                            </button>
 
-                          <div className="flex items-center gap-1.5 flex-1 max-w-[210px]">
-                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase shrink-0">S/N:</span>
-                            <input
-                              type="text"
-                              placeholder="Scan or enter Serial #"
-                              value={item.serialNumber || ''}
-                              onChange={(e) => updateSerialNumber(item.id, e.target.value)}
-                              className="w-full px-2 py-1 border border-slate-300 dark:border-slate-600 rounded text-[11px] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              title="Unit Serial Number / IMEI / Barcode"
-                            />
+                            {(() => {
+                              const filled = item.serialNumbers
+                                .slice(0, item.quantity)
+                                .filter((s) => s.trim().length > 0).length;
+                              const isComplete = filled === item.quantity;
+                              return (
+                                <span
+                                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                    isComplete
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300'
+                                      : item.hasWarranty
+                                      ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
+                                      : 'text-slate-500 dark:text-slate-400'
+                                  }`}
+                                >
+                                  S/N: {filled}/{item.quantity} {item.hasWarranty ? 'Required' : 'Optional'}
+                                </span>
+                              );
+                            })()}
+                          </div>
+
+                          {/* Separate manual serial number field for EVERY physical unit */}
+                          <div className="space-y-1.5">
+                            {Array.from({ length: item.quantity }).map((_, unitIdx) => {
+                              const val = item.serialNumbers[unitIdx] || '';
+                              const trimmed = val.trim();
+                              const isDup = trimmed.length > 0 && duplicateSerialsInCart.has(trimmed.toLowerCase());
+                              const isMissingRequired = item.hasWarranty && trimmed.length === 0;
+
+                              return (
+                                <div key={`${item.id}-unit-${unitIdx}`} className="flex items-center gap-1.5">
+                                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase shrink-0 w-14">
+                                    Unit #{unitIdx + 1}:
+                                  </span>
+                                  <div className="flex-1 relative">
+                                    <input
+                                      type="text"
+                                      required={item.hasWarranty}
+                                      placeholder={
+                                        item.hasWarranty
+                                          ? `Enter actual S/N for unit #${unitIdx + 1} *`
+                                          : `Optional S/N for unit #${unitIdx + 1}`
+                                      }
+                                      value={val}
+                                      onChange={(e) => updateSerialNumberAt(item.id, unitIdx, e.target.value)}
+                                      className={`w-full px-2 py-1 border rounded text-[11px] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono focus:outline-none focus:ring-1 ${
+                                        isDup
+                                          ? 'border-rose-500 dark:border-rose-500 focus:ring-rose-500'
+                                          : isMissingRequired
+                                          ? 'border-amber-300 dark:border-amber-700/80 focus:ring-blue-500'
+                                          : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500'
+                                      }`}
+                                      title={`Physical Serial Number / IMEI for Unit #${unitIdx + 1}`}
+                                    />
+                                  </div>
+                                  {isDup && (
+                                    <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 shrink-0">
+                                      Duplicate
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -717,7 +857,7 @@ export const PosBilling: React.FC = () => {
               />
             </div>
 
-            {/* Stock Violation Alert */}
+            {/* Stock & Serial Validation Alerts */}
             {hasStockViolations && (
               <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-semibold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
@@ -725,10 +865,24 @@ export const PosBilling: React.FC = () => {
               </div>
             )}
 
+            {hasDuplicateSerials && (
+              <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                <span>Duplicate serial numbers detected in cart. Each physical unit must have a unique serial number.</span>
+              </div>
+            )}
+
+            {!hasDuplicateSerials && cart.length > 0 && hasIncompleteSerials && (
+              <div className="p-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 rounded-lg text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                <span>Enter all required unit serial numbers manually before completing the sale.</span>
+              </div>
+            )}
+
             {/* Submit Action */}
             <button
               onClick={handleGenerateBill}
-              disabled={submitting || cart.length === 0 || hasStockViolations}
+              disabled={submitting || cart.length === 0 || hasStockViolations || hasDuplicateSerials || hasIncompleteSerials}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <CreditCard className="w-5 h-5" />
@@ -858,130 +1012,11 @@ export const PosBilling: React.FC = () => {
 
             {/* Scrollable Printable Receipt Paper Container */}
             <div className="flex-1 overflow-y-auto pr-1 py-1">
-              <div
-                ref={receiptRef}
-                id="printable-pos-receipt"
-                className="p-4 sm:p-6 md:p-8 bg-slate-50 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 rounded-xl font-mono text-xs sm:text-sm text-slate-800 dark:text-slate-200 space-y-4 sm:space-y-6"
-              >
-                {/* Store Header */}
-                <div className="text-center space-y-1 border-b border-dashed border-slate-300 dark:border-slate-600 pb-3 sm:pb-4">
-                  <h2 className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
-                    {createdBill.retailerBusinessName || 'WarranTrack Retail Store'}
-                  </h2>
-                  {createdBill.retailerAddress && (
-                    <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">{createdBill.retailerAddress}</p>
-                  )}
-                  <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
-                    {createdBill.retailerContactPhone && <span>Tel: {createdBill.retailerContactPhone} &bull; </span>}
-                    {createdBill.retailerContactEmail && <span>{createdBill.retailerContactEmail}</span>}
-                  </div>
-                </div>
-
-                {/* Invoice Metadata */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] sm:text-xs border-b border-dashed border-slate-300 dark:border-slate-600 pb-3">
-                  <div className="space-y-0.5">
-                    <div><span className="text-slate-500 dark:text-slate-400">INV #:</span> <strong className="text-slate-900 dark:text-slate-100">{createdBill.invoiceNumber}</strong></div>
-                    <div><span className="text-slate-500 dark:text-slate-400">Customer:</span> <strong className="text-slate-900 dark:text-slate-100">{createdBill.customerName}</strong></div>
-                    {createdBill.customerEmail && <div><span className="text-slate-500 dark:text-slate-400">Email:</span> {createdBill.customerEmail}</div>}
-                  </div>
-                  <div className="sm:text-right space-y-0.5">
-                    <div><span className="text-slate-500 dark:text-slate-400">Date:</span> {new Date(createdBill.createdAt).toLocaleDateString()} {new Date(createdBill.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                    <div><span className="text-slate-500 dark:text-slate-400">Paid via:</span> <span className="font-semibold text-slate-900 dark:text-slate-100">{createdBill.paymentMethod}</span></div>
-                  </div>
-                </div>
-
-                {/* Line Items */}
-                <div className="space-y-1.5 border-b border-dashed border-slate-300 dark:border-slate-600 pb-3 sm:pb-4">
-                  <div className="grid grid-cols-12 gap-2 font-bold text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 uppercase pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                    <span className="col-span-6 sm:col-span-7">Item</span>
-                    <span className="col-span-2 sm:col-span-1 text-center">Qty</span>
-                    <span className="col-span-2 text-right">Price</span>
-                    <span className="col-span-2 text-right">Total</span>
-                  </div>
-                  {createdBill.items.map((item, idx) => (
-                    <div key={idx} className="grid grid-cols-12 gap-2 py-1.5 items-start text-xs sm:text-sm border-b border-slate-200/50 dark:border-slate-700/60 last:border-b-0">
-                      <div className="col-span-6 sm:col-span-7 pr-1">
-                        <div className="font-bold text-slate-900 dark:text-slate-100 break-words">{item.productName}</div>
-                        {item.hasWarranty ? (
-                          <div className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-sans font-semibold mt-0.5">
-                            [✓ Warranty: {item.warrantyDuration} {item.warrantyUnit?.toLowerCase()} until {item.warrantyExpiryDate}]
-                          </div>
-                        ) : (
-                          <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-sans mt-0.5">
-                            [Non-Warranty Product]
-                          </div>
-                        )}
-                        {item.serialNumber && (
-                          <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">S/N: {item.serialNumber}</div>
-                        )}
-                      </div>
-                      <div className="col-span-2 sm:col-span-1 text-center font-medium">{item.quantity}</div>
-                      <div className="col-span-2 text-right font-medium">${item.unitPrice.toFixed(2)}</div>
-                      <div className="col-span-2 text-right font-bold text-slate-900 dark:text-slate-100">${item.lineTotal.toFixed(2)}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Totals */}
-                <div className="max-w-xs sm:max-w-sm ml-auto space-y-1 text-right text-xs sm:text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Subtotal:</span>
-                    <span>${createdBill.subtotal.toFixed(2)}</span>
-                  </div>
-                  {createdBill.discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-medium">
-                      <span>Discount:</span>
-                      <span>-${createdBill.discountAmount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  {createdBill.taxAmount > 0 && (
-                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                      <span>Tax:</span>
-                      <span>+${createdBill.taxAmount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-sm sm:text-base font-extrabold text-slate-900 dark:text-slate-100 pt-1.5 border-t border-slate-300 dark:border-slate-600">
-                    <span>Total Paid:</span>
-                    <span>${createdBill.grandTotal.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Digital Warranty QR Codes Section (Printed on Bill!) */}
-                {createdBill.items.some((item) => item.hasWarranty && item.qrToken) && (
-                  <div className="pt-4 border-t-2 border-dashed border-slate-300 dark:border-slate-600 space-y-3">
-                    <div className="text-center font-bold text-slate-900 dark:text-slate-100 font-sans uppercase text-[11px] sm:text-xs tracking-wider">
-                      Digital Warranty Passport QR Code
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {createdBill.items
-                        .filter((item) => item.hasWarranty && item.qrToken)
-                        .map((item, idx) => (
-                          <div key={idx} className="flex flex-col items-center text-center p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs space-y-1.5">
-                            <div className="p-1.5 bg-white rounded-md">
-                              <QRCodeSVG
-                                value={`${window.location.origin}/verify/${item.qrToken}`}
-                                size={100}
-                              />
-                            </div>
-                            <span className="text-[11px] font-bold text-slate-800 dark:text-slate-100 font-sans line-clamp-1">
-                              {item.productName}
-                            </span>
-                            <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-sans leading-tight">
-                              Scan to verify or claim<br/>
-                              (Valid till {item.warrantyExpiryDate})
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Footer */}
-                <div className="text-center text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-dashed border-slate-200 dark:border-slate-700 space-y-0.5">
-                  <p>Thank you for your business!</p>
-                  <p>Powered by WarranTrack &bull; Digital Warranty & Billing Platform</p>
-                </div>
-              </div>
+              <InvoiceReceipt
+                bill={createdBill}
+                receiptId="printable-pos-receipt"
+                receiptRef={receiptRef}
+              />
             </div>
 
             {/* Modal Actions */}

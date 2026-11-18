@@ -28,6 +28,8 @@ public class Warranty {
 
     private String productName;
 
+    private String serialNumber;
+
     private LocalDate startDate;
 
     private LocalDate expiryDate;
@@ -119,6 +121,14 @@ public class Warranty {
         this.productName = productName;
     }
 
+    public String getSerialNumber() {
+        return this.serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
     public LocalDate getStartDate() {
         return this.startDate;
     }
@@ -202,6 +212,7 @@ public class Warranty {
         private String customerId;
         private String productId;
         private String productName;
+        private String serialNumber;
         private LocalDate startDate;
         private LocalDate expiryDate;
         private WarrantyStatus status = WarrantyStatus.ACTIVE;
@@ -241,6 +252,11 @@ public class Warranty {
 
         public Builder productName(String productName) {
             this.productName = productName;
+            return this;
+        }
+
+        public Builder serialNumber(String serialNumber) {
+            this.serialNumber = serialNumber;
             return this;
         }
 
@@ -290,7 +306,9 @@ public class Warranty {
         }
 
         public Warranty build() {
-            return new Warranty(this.id, this.purchaseId, this.retailerId, this.customerId, this.productId, this.productName, this.startDate, this.expiryDate, this.status, this.termsSnapshot, this.warrantyDurationSnapshot, this.warrantyUnitSnapshot, this.qrToken, this.createdAt, this.updatedAt);
+            Warranty warranty = new Warranty(this.id, this.purchaseId, this.retailerId, this.customerId, this.productId, this.productName, this.startDate, this.expiryDate, this.status, this.termsSnapshot, this.warrantyDurationSnapshot, this.warrantyUnitSnapshot, this.qrToken, this.createdAt, this.updatedAt);
+            warranty.setSerialNumber(this.serialNumber);
+            return warranty;
         }
     }
 

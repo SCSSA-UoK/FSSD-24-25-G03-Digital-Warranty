@@ -16,6 +16,7 @@ public class ClaimResponse {
     private String customerName;
     private String customerEmail;
     private String productName;
+    private String serialNumber;
     private String issueDescription;
     private List<String> evidenceReferences;
     private ClaimStatus currentStatus;
@@ -132,6 +133,14 @@ public class ClaimResponse {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getSerialNumber() {
+        return this.serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
     }
 
     public String getIssueDescription() {
@@ -276,6 +285,7 @@ public class ClaimResponse {
         private String customerName;
         private String customerEmail;
         private String productName;
+        private String serialNumber;
         private String issueDescription;
         private List<String> evidenceReferences;
         private ClaimStatus currentStatus;
@@ -337,6 +347,11 @@ public class ClaimResponse {
 
         public Builder productName(String productName) {
             this.productName = productName;
+            return this;
+        }
+
+        public Builder serialNumber(String serialNumber) {
+            this.serialNumber = serialNumber;
             return this;
         }
 
@@ -422,6 +437,7 @@ public class ClaimResponse {
 
         public ClaimResponse build() {
             ClaimResponse response = new ClaimResponse(this.id, this.warrantyId, this.purchaseId, this.retailerId, this.retailerBusinessName, this.customerId, this.customerName, this.customerEmail, this.productName, this.issueDescription, this.evidenceReferences, this.currentStatus, this.decisionReason, this.decisionBy, this.decisionAt, this.resolutionType, this.resolutionNotes, this.cancellationReason, this.serviceNotes, this.statusHistory, this.createdAt, this.updatedAt);
+            response.setSerialNumber(this.serialNumber);
             response.setCustomerRating(this.customerRating);
             response.setCustomerFeedback(this.customerFeedback);
             response.setFeedbackSubmittedAt(this.feedbackSubmittedAt);

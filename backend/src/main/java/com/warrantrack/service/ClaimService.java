@@ -33,6 +33,7 @@ public class ClaimService {
     private final ClaimRepository claimRepository;
     private final ClaimStatusHistoryRepository historyRepository;
     private final WarrantyRepository warrantyRepository;
+    private final PurchaseRepository purchaseRepository;
     private final ProductRepository productRepository;
     private final RetailerRepository retailerRepository;
     private final UserRepository userRepository;
@@ -40,10 +41,11 @@ public class ClaimService {
     private final NotificationService notificationService;
     private final AuditService auditService;
 
-    public ClaimService(ClaimRepository claimRepository, ClaimStatusHistoryRepository historyRepository, WarrantyRepository warrantyRepository, ProductRepository productRepository, RetailerRepository retailerRepository, UserRepository userRepository, RetailerService retailerService, NotificationService notificationService, AuditService auditService) {
+    public ClaimService(ClaimRepository claimRepository, ClaimStatusHistoryRepository historyRepository, WarrantyRepository warrantyRepository, PurchaseRepository purchaseRepository, ProductRepository productRepository, RetailerRepository retailerRepository, UserRepository userRepository, RetailerService retailerService, NotificationService notificationService, AuditService auditService) {
         this.claimRepository = claimRepository;
         this.historyRepository = historyRepository;
         this.warrantyRepository = warrantyRepository;
+        this.purchaseRepository = purchaseRepository;
         this.productRepository = productRepository;
         this.retailerRepository = retailerRepository;
         this.userRepository = userRepository;
@@ -459,6 +461,10 @@ public class ClaimService {
 
     public ClaimResponse mapToResponse(Claim c) {
         Warranty warranty = warrantyRepository.findById(c.getWarrantyId()).orElse(null);
+        Purchase purchase = c.getPurchaseId() != null ? purchaseRepository.findById(c.getPurchaseId()).orElse(null) : null;
+        String serialNumber = (warranty != null && warranty.getSerialNumber() != null && !warranty.getSerialNumber().isBlank())
+                ? warranty.getSerialNumber()
+                : (purchase != null ? purchase.getSerialNumber() : null);
         Retailer retailer = retailerRepository.findById(c.getRetailerId()).orElse(null);
         User customer = userRepository.findById(c.getCustomerId()).orElse(null);
 
@@ -485,6 +491,7 @@ public class ClaimService {
                 .customerName(customer != null ? customer.getName() : "Customer")
                 .customerEmail(customer != null ? customer.getEmail() : "")
                 .productName(warranty != null ? warranty.getProductName() : "Product")
+                .serialNumber(serialNumber)
                 .issueDescription(c.getIssueDescription())
                 .evidenceReferences(c.getEvidenceReferences())
                 .currentStatus(c.getCurrentStatus())

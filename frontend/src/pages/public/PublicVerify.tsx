@@ -87,6 +87,11 @@ export const PublicVerify: React.FC = () => {
                 {warranty.productBrand} {warranty.productName}
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-400">Model: {warranty.productModel}</div>
+              {warranty.serialNumber && (
+                <div className="mt-1 inline-flex items-center text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                  S/N: {warranty.serialNumber}
+                </div>
+              )}
             </div>
           </div>
 

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 public class BillItemRequest {
 
     private String productId;
@@ -15,6 +17,7 @@ public class BillItemRequest {
     private String brand;
     private String category;
     private String serialNumber;
+    private List<String> serialNumbers;
 
     @Min(value = 1, message = "Quantity must be at least 1")
     private int quantity = 1;
@@ -70,6 +73,14 @@ public class BillItemRequest {
 
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
+    }
+
+    public List<String> getSerialNumbers() {
+        return serialNumbers;
+    }
+
+    public void setSerialNumbers(List<String> serialNumbers) {
+        this.serialNumbers = serialNumbers;
     }
 
     public int getQuantity() {

@@ -204,6 +204,9 @@ export const RetailerClaims: React.FC = () => {
                   <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{c.productName}</span>
                   {getStatusBadge(c.currentStatus)}
                 </div>
+                {c.serialNumber && (
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 mb-0.5">S/N: {c.serialNumber}</div>
+                )}
                 <div className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2">{c.issueDescription}</div>
                 <div className="flex items-center justify-between mt-2 text-[11px] text-slate-500 dark:text-slate-400">
                   <span>{c.customerName}</span>
@@ -223,8 +226,13 @@ export const RetailerClaims: React.FC = () => {
                 <div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Claim Detail</div>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{selectedClaim.productName}</h2>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">
-                    Customer: {selectedClaim.customerName} ({selectedClaim.customerEmail})
+                  <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 flex-wrap">
+                    <span>Customer: {selectedClaim.customerName} ({selectedClaim.customerEmail})</span>
+                    {selectedClaim.serialNumber && (
+                      <span className="font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        S/N: {selectedClaim.serialNumber}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div>{getStatusBadge(selectedClaim.currentStatus)}</div>

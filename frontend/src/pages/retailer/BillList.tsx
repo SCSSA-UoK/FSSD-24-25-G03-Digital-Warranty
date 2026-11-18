@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { billingApi } from '../../api';
 import { Bill } from '../../types';
-import { QRCodeSVG } from 'qrcode.react';
 import { 
   Receipt, 
   Search, 
@@ -14,6 +13,7 @@ import {
   Plus 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { InvoiceReceipt } from '../../components/InvoiceReceipt';
 
 export const BillList: React.FC = () => {
   const [bills, setBills] = useState<Bill[]>([]);
@@ -37,11 +37,20 @@ export const BillList: React.FC = () => {
     }
   };
 
-  const filteredBills = bills.filter((b) =>
-    b.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
-    (b.customerName && b.customerName.toLowerCase().includes(search.toLowerCase())) ||
-    (b.customerEmail && b.customerEmail.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredBills = bills.filter((b) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      b.invoiceNumber.toLowerCase().includes(q) ||
+      (b.customerName && b.customerName.toLowerCase().includes(q)) ||
+      (b.customerEmail && b.customerEmail.toLowerCase().includes(q)) ||
+      b.items.some(
+        (i) =>
+          (i.serialNumber && i.serialNumber.toLowerCase().includes(q)) ||
+          i.productName.toLowerCase().includes(q)
+      )
+    );
+  });
 
   const handlePrint = () => {
     window.print();
@@ -73,7 +82,7 @@ export const BillList: React.FC = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by invoice number, customer name, email..."
+          placeholder="Search by invoice #, customer, product, or serial #..."
           className="w-full pl-9 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -103,7 +112,13 @@ export const BillList: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredBills.map((bill) => {
-                  const warrantyItems = bill.items.filter((i) => i.hasWarranty);
+                  const totalUnits = bill.items.reduce((sum, i) => sum + Math.max(1, i.quantity || 1), 0);
+                  const warrantyUnits = bill.items
+                    .filter((i) => i.hasWarranty)
+                    .reduce((sum, i) => sum + Math.max(1, i.quantity || 1), 0);
+                  const serialNumbers = bill.items
+                    .map((i) => i.serialNumber)
+                    .filter((sn): sn is string => Boolean(sn && sn.trim()));
                   return (
                     <tr key={bill.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
                       <td className="px-6 py-4 font-mono font-bold text-slate-900 dark:text-slate-100">
@@ -117,14 +132,19 @@ export const BillList: React.FC = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span className="font-medium text-slate-700 dark:text-slate-300">
-                          {bill.items.length} {bill.items.length === 1 ? 'item' : 'items'}
+                          {totalUnits} {totalUnits === 1 ? 'unit' : 'units'}
                         </span>
+                        {serialNumbers.length > 0 && (
+                          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate max-w-[180px] mt-0.5" title={serialNumbers.join(', ')}>
+                            S/N: {serialNumbers.slice(0, 2).join(', ')}{serialNumbers.length > 2 ? ` +${serialNumbers.length - 2}` : ''}
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4">
-                        {warrantyItems.length > 0 ? (
+                        {warrantyUnits > 0 ? (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                            {warrantyItems.length} Warranty {warrantyItems.length === 1 ? 'item' : 'items'}
+                            {warrantyUnits} Warranty {warrantyUnits === 1 ? 'unit' : 'units'}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
@@ -173,129 +193,7 @@ export const BillList: React.FC = () => {
 
             {/* Scrollable Receipt Paper */}
             <div className="flex-1 overflow-y-auto pr-1 py-1">
-              <div
-                id="printable-bill-receipt"
-                className="p-4 sm:p-6 md:p-8 bg-slate-50 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 rounded-xl font-mono text-xs sm:text-sm text-slate-800 dark:text-slate-200 space-y-4 sm:space-y-6"
-              >
-                {/* Store Header */}
-                <div className="text-center space-y-1 border-b border-dashed border-slate-300 dark:border-slate-600 pb-3 sm:pb-4">
-                  <h2 className="text-base sm:text-lg md:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
-                    {selectedBill.retailerBusinessName || 'WarranTrack Retail Store'}
-                  </h2>
-                  {selectedBill.retailerAddress && (
-                    <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">{selectedBill.retailerAddress}</p>
-                  )}
-                  <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
-                    {selectedBill.retailerContactPhone && <span>Tel: {selectedBill.retailerContactPhone} &bull; </span>}
-                    {selectedBill.retailerContactEmail && <span>{selectedBill.retailerContactEmail}</span>}
-                  </div>
-                </div>
-
-                {/* Metadata */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] sm:text-xs border-b border-dashed border-slate-300 dark:border-slate-600 pb-3">
-                  <div className="space-y-0.5">
-                    <div><span className="text-slate-500 dark:text-slate-400">INV #:</span> <strong className="text-slate-900 dark:text-slate-100">{selectedBill.invoiceNumber}</strong></div>
-                    <div><span className="text-slate-500 dark:text-slate-400">Customer:</span> <strong className="text-slate-900 dark:text-slate-100">{selectedBill.customerName}</strong></div>
-                    {selectedBill.customerEmail && <div><span className="text-slate-500 dark:text-slate-400">Email:</span> {selectedBill.customerEmail}</div>}
-                  </div>
-                  <div className="sm:text-right space-y-0.5">
-                    <div><span className="text-slate-500 dark:text-slate-400">Date:</span> {new Date(selectedBill.createdAt).toLocaleDateString()} {new Date(selectedBill.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                    <div><span className="text-slate-500 dark:text-slate-400">Paid via:</span> <span className="font-semibold text-slate-900 dark:text-slate-100">{selectedBill.paymentMethod}</span></div>
-                  </div>
-                </div>
-
-                {/* Line Items */}
-                <div className="space-y-1.5 border-b border-dashed border-slate-300 dark:border-slate-600 pb-3 sm:pb-4">
-                  <div className="grid grid-cols-12 gap-2 font-bold text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 uppercase pb-1.5 border-b border-slate-200 dark:border-slate-700">
-                    <span className="col-span-6 sm:col-span-7">Item</span>
-                    <span className="col-span-2 sm:col-span-1 text-center">Qty</span>
-                    <span className="col-span-2 text-right">Price</span>
-                    <span className="col-span-2 text-right">Total</span>
-                  </div>
-                  {selectedBill.items.map((item, idx) => (
-                    <div key={idx} className="grid grid-cols-12 gap-2 py-1.5 items-start text-xs sm:text-sm border-b border-slate-200/50 dark:border-slate-700/60 last:border-b-0">
-                      <div className="col-span-6 sm:col-span-7 pr-1">
-                        <div className="font-bold text-slate-900 dark:text-slate-100 break-words">{item.productName}</div>
-                        {item.hasWarranty ? (
-                          <div className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 font-sans font-semibold mt-0.5">
-                            [✓ Warranty: {item.warrantyDuration} {item.warrantyUnit?.toLowerCase()} until {item.warrantyExpiryDate}]
-                          </div>
-                        ) : (
-                          <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-sans mt-0.5">
-                            [Non-Warranty Product]
-                          </div>
-                        )}
-                        {item.serialNumber && (
-                          <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">S/N: {item.serialNumber}</div>
-                        )}
-                      </div>
-                      <div className="col-span-2 sm:col-span-1 text-center font-medium">{item.quantity}</div>
-                      <div className="col-span-2 text-right font-medium">${item.unitPrice.toFixed(2)}</div>
-                      <div className="col-span-2 text-right font-bold text-slate-900 dark:text-slate-100">${item.lineTotal.toFixed(2)}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Totals */}
-                <div className="max-w-xs sm:max-w-sm ml-auto space-y-1 text-right text-xs sm:text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Subtotal:</span>
-                    <span>${selectedBill.subtotal.toFixed(2)}</span>
-                  </div>
-                  {selectedBill.discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-medium">
-                      <span>Discount:</span>
-                      <span>-${selectedBill.discountAmount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  {selectedBill.taxAmount > 0 && (
-                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                      <span>Tax:</span>
-                      <span>+${selectedBill.taxAmount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-sm sm:text-base font-extrabold text-slate-900 dark:text-slate-100 pt-1.5 border-t border-slate-300 dark:border-slate-600">
-                    <span>Total Paid:</span>
-                    <span>${selectedBill.grandTotal.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* QR Code for Warranties */}
-                {selectedBill.items.some((item) => item.hasWarranty && item.qrToken) && (
-                  <div className="pt-4 border-t-2 border-dashed border-slate-300 dark:border-slate-600 space-y-3">
-                    <div className="text-center font-bold text-slate-900 dark:text-slate-100 font-sans uppercase text-[11px] sm:text-xs tracking-wider">
-                      Digital Warranty QR Code
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {selectedBill.items
-                        .filter((item) => item.hasWarranty && item.qrToken)
-                        .map((item, idx) => (
-                          <div key={idx} className="flex flex-col items-center text-center p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs space-y-1.5">
-                            <div className="p-1.5 bg-white rounded-md">
-                              <QRCodeSVG
-                                value={`${window.location.origin}/verify/${item.qrToken}`}
-                                size={100}
-                              />
-                            </div>
-                            <span className="text-[11px] font-bold text-slate-800 dark:text-slate-100 font-sans line-clamp-1">
-                              {item.productName}
-                            </span>
-                            <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-sans leading-tight">
-                              Scan to verify or claim<br/>
-                              (Valid till {item.warrantyExpiryDate})
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Footer */}
-                <div className="text-center text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-dashed border-slate-200 dark:border-slate-700 space-y-0.5">
-                  <p>Thank you for your business!</p>
-                  <p>Powered by WarranTrack &bull; Digital Warranty & Billing Platform</p>
-                </div>
-              </div>
+              <InvoiceReceipt bill={selectedBill} receiptId="printable-bill-receipt" />
             </div>
 
             {/* Modal Actions */}

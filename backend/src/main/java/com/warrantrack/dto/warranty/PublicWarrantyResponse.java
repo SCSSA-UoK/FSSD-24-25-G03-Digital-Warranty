@@ -8,6 +8,7 @@ public class PublicWarrantyResponse {
     private String productName;
     private String productBrand;
     private String productModel;
+    private String serialNumber;
     private String retailerBusinessName;
     private LocalDate startDate;
     private LocalDate expiryDate;
@@ -62,6 +63,14 @@ public class PublicWarrantyResponse {
 
     public void setProductModel(String productModel) {
         this.productModel = productModel;
+    }
+
+    public String getSerialNumber() {
+        return this.serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
     }
 
     public String getRetailerBusinessName() {
@@ -121,6 +130,7 @@ public class PublicWarrantyResponse {
         private String productName;
         private String productBrand;
         private String productModel;
+        private String serialNumber;
         private String retailerBusinessName;
         private LocalDate startDate;
         private LocalDate expiryDate;
@@ -147,6 +157,11 @@ public class PublicWarrantyResponse {
 
         public Builder productModel(String productModel) {
             this.productModel = productModel;
+            return this;
+        }
+
+        public Builder serialNumber(String serialNumber) {
+            this.serialNumber = serialNumber;
             return this;
         }
 
@@ -181,7 +196,9 @@ public class PublicWarrantyResponse {
         }
 
         public PublicWarrantyResponse build() {
-            return new PublicWarrantyResponse(this.verificationStatus, this.productName, this.productBrand, this.productModel, this.retailerBusinessName, this.startDate, this.expiryDate, this.status, this.currentlyValid, this.termsSummary);
+            PublicWarrantyResponse res = new PublicWarrantyResponse(this.verificationStatus, this.productName, this.productBrand, this.productModel, this.retailerBusinessName, this.startDate, this.expiryDate, this.status, this.currentlyValid, this.termsSummary);
+            res.setSerialNumber(this.serialNumber);
+            return res;
         }
     }
 

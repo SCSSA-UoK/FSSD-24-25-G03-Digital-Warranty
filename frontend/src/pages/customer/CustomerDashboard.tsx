@@ -154,6 +154,11 @@ export const CustomerDashboard: React.FC = () => {
                   <div>
                     <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">{w.productName}</span>
                     <div className="text-xs text-slate-500 dark:text-slate-400">Retailer: {w.retailerBusinessName}</div>
+                    {w.serialNumber && (
+                      <div className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300 mt-0.5">
+                        S/N: {w.serialNumber}
+                      </div>
+                    )}
                   </div>
                   {w.eligibleForClaim ? (
                     <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-[10px] font-bold px-2 py-0.5 rounded-full">

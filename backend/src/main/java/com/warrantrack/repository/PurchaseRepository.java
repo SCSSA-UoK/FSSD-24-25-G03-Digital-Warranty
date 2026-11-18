@@ -25,6 +25,10 @@ public interface PurchaseRepository extends MongoRepository<Purchase, String> {
 
     boolean existsBySerialNumber(String serialNumber);
 
+    boolean existsBySerialNumberIgnoreCase(String serialNumber);
+
+    List<Purchase> findByBillId(String billId);
+
     Optional<Purchase> findBySerialNumber(String serialNumber);
 
     Optional<Purchase> findByRetailerIdAndProductIdAndSerialNumber(String retailerId, String productId, String serialNumber);

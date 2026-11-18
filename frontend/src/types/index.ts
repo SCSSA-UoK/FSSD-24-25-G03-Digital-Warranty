@@ -133,6 +133,8 @@ export interface Warranty {
   productName: string;
   productBrand?: string;
   productModel?: string;
+  serialNumber?: string;
+  invoiceNumber?: string;
   startDate: string;
   expiryDate: string;
   status: WarrantyStatus;
@@ -149,6 +151,7 @@ export interface PublicWarranty {
   productName: string;
   productBrand: string;
   productModel: string;
+  serialNumber?: string;
   retailerBusinessName: string;
   startDate: string;
   expiryDate: string;
@@ -183,6 +186,7 @@ export interface Claim {
   customerName?: string;
   customerEmail?: string;
   productName: string;
+  serialNumber?: string;
   issueDescription: string;
   evidenceReferences?: string[];
   currentStatus: ClaimStatus;
@@ -302,6 +306,7 @@ export interface BillItemRequest {
   brand?: string;
   category?: string;
   serialNumber?: string;
+  serialNumbers?: string[];
   quantity: number;
   unitPrice: number;
   hasWarranty?: boolean;

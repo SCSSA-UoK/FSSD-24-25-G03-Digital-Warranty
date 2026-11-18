@@ -15,6 +15,8 @@ public class WarrantyResponse {
     private String productName;
     private String productBrand;
     private String productModel;
+    private String serialNumber;
+    private String invoiceNumber;
     private LocalDate startDate;
     private LocalDate expiryDate;
     private WarrantyStatus status;
@@ -122,6 +124,22 @@ public class WarrantyResponse {
         this.productModel = productModel;
     }
 
+    public String getSerialNumber() {
+        return this.serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public String getInvoiceNumber() {
+        return this.invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
     public LocalDate getStartDate() {
         return this.startDate;
     }
@@ -208,6 +226,8 @@ public class WarrantyResponse {
         private String productName;
         private String productBrand;
         private String productModel;
+        private String serialNumber;
+        private String invoiceNumber;
         private LocalDate startDate;
         private LocalDate expiryDate;
         private WarrantyStatus status;
@@ -265,6 +285,16 @@ public class WarrantyResponse {
             return this;
         }
 
+        public Builder serialNumber(String serialNumber) {
+            this.serialNumber = serialNumber;
+            return this;
+        }
+
+        public Builder invoiceNumber(String invoiceNumber) {
+            this.invoiceNumber = invoiceNumber;
+            return this;
+        }
+
         public Builder startDate(LocalDate startDate) {
             this.startDate = startDate;
             return this;
@@ -311,7 +341,10 @@ public class WarrantyResponse {
         }
 
         public WarrantyResponse build() {
-            return new WarrantyResponse(this.id, this.purchaseId, this.retailerId, this.retailerBusinessName, this.customerId, this.productId, this.productName, this.productBrand, this.productModel, this.startDate, this.expiryDate, this.status, this.termsSnapshot, this.warrantyDurationSnapshot, this.warrantyUnitSnapshot, this.qrToken, this.eligibleForClaim, this.createdAt);
+            WarrantyResponse res = new WarrantyResponse(this.id, this.purchaseId, this.retailerId, this.retailerBusinessName, this.customerId, this.productId, this.productName, this.productBrand, this.productModel, this.startDate, this.expiryDate, this.status, this.termsSnapshot, this.warrantyDurationSnapshot, this.warrantyUnitSnapshot, this.qrToken, this.eligibleForClaim, this.createdAt);
+            res.setSerialNumber(this.serialNumber);
+            res.setInvoiceNumber(this.invoiceNumber);
+            return res;
         }
     }
 

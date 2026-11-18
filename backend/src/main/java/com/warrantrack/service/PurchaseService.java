@@ -100,7 +100,7 @@ public class PurchaseService {
         // 3. Serial Number duplicate check: enforce uniqueness per physical device
         if (request.getSerialNumber() != null && !request.getSerialNumber().isBlank()) {
             String trimmedSerial = request.getSerialNumber().trim();
-            if (purchaseRepository.existsBySerialNumber(trimmedSerial)) {
+            if (purchaseRepository.existsBySerialNumberIgnoreCase(trimmedSerial)) {
                 throw new DuplicateResourceException(String.format(
                         "A purchase with serial number '%s' already exists. Duplicate serial numbers are not allowed and this purchase cannot be completed.",
                         trimmedSerial));
@@ -230,6 +230,7 @@ public class PurchaseService {
                     .customerId(customerId)
                     .productId(product.getId())
                     .productName(product.getName())
+                    .serialNumber(purchase.getSerialNumber())
                     .startDate(startDate)
                     .expiryDate(expiryDate)
                     .status(WarrantyStatus.ACTIVE)

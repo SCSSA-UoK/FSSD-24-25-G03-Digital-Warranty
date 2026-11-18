@@ -34,8 +34,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -107,55 +109,108 @@ public class BillingService {
 
         PaymentMethod paymentMethod = request.getPaymentMethod() != null ? request.getPaymentMethod() : PaymentMethod.CASH;
 
-        // 3. Process each line item
+        // 3. Validate inventory stock availability and serial numbers BEFORE persisting anything
+        Map<String, Product> productMap = new HashMap<>();
+        Map<String, Integer> requestedStockByProduct = new HashMap<>();
+
+        for (BillItemRequest itemReq : request.getItems()) {
+            int requestedQty = Math.max(1, itemReq.getQuantity());
+            if (itemReq.getProductId() != null && !itemReq.getProductId().isBlank()) {
+                Product product = productMap.computeIfAbsent(
+                        itemReq.getProductId(),
+                        pid -> productRepository.findById(pid).orElse(null)
+                );
+                if (product != null) {
+                    if (!retailerId.equals(product.getRetailerId())) {
+                        throw new BadRequestException("Product '" + product.getName() + "' does not belong to your business.");
+                    }
+                    requestedStockByProduct.merge(product.getId(), requestedQty, Integer::sum);
+                }
+            }
+        }
+
+        for (Map.Entry<String, Integer> entry : requestedStockByProduct.entrySet()) {
+            Product product = productMap.get(entry.getKey());
+            int totalRequestedQty = entry.getValue();
+            int availableStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+            if (availableStock <= 0) {
+                throw new BadRequestException("Product '" + product.getName() + "' is out of stock.");
+            }
+            if (availableStock < totalRequestedQty) {
+                throw new BadRequestException("Requested quantity (" + totalRequestedQty + ") for product '"
+                        + product.getName() + "' exceeds available stock (" + availableStock + ").");
+            }
+        }
+
+        // Validate serial numbers: exact count matching quantity + no intra-bill or existing DB duplicates
+        Set<String> seenSerials = new HashSet<>();
+        List<List<String>> resolvedSerialsPerItem = new ArrayList<>();
+
+        for (BillItemRequest itemReq : request.getItems()) {
+            int qty = Math.max(1, itemReq.getQuantity());
+            Product product = (itemReq.getProductId() != null && !itemReq.getProductId().isBlank())
+                    ? productMap.get(itemReq.getProductId())
+                    : null;
+
+            boolean itemHasWarranty = !Boolean.FALSE.equals(itemReq.getHasWarranty());
+            if (product != null && !product.isHasWarranty()) {
+                itemHasWarranty = false;
+            }
+
+            List<String> rawSerials = new ArrayList<>();
+            if (itemReq.getSerialNumbers() != null && !itemReq.getSerialNumbers().isEmpty()) {
+                for (String s : itemReq.getSerialNumbers()) {
+                    rawSerials.add(s != null ? s.trim() : "");
+                }
+            } else if (itemReq.getSerialNumber() != null && !itemReq.getSerialNumber().isBlank()) {
+                rawSerials.add(itemReq.getSerialNumber().trim());
+            }
+
+            long nonBlankCount = rawSerials.stream().filter(s -> !s.isBlank()).count();
+            String itemLabel = itemReq.getProductName() != null ? itemReq.getProductName().trim() : "Product";
+
+            if (itemHasWarranty) {
+                if (rawSerials.size() != qty || nonBlankCount != qty) {
+                    throw new BadRequestException(String.format(
+                            "Please enter all %d serial number(s) for '%s' (entered %d of %d). Each unit requires its actual manually entered serial number.",
+                            qty, itemLabel, nonBlankCount, qty));
+                }
+            } else if (nonBlankCount > 0 && (rawSerials.size() != qty || nonBlankCount != qty)) {
+                throw new BadRequestException(String.format(
+                        "Serial number count for '%s' (%d entered) must match purchased quantity (%d), or leave all blank for non-warranty items.",
+                        itemLabel, nonBlankCount, qty));
+            }
+
+            for (String sn : rawSerials) {
+                if (!sn.isBlank()) {
+                    if (!seenSerials.add(sn.toLowerCase())) {
+                        throw new BadRequestException("Duplicate serial number '" + sn + "' found in this bill. Each physical unit must have a unique serial number.");
+                    }
+                    if (purchaseRepository.existsBySerialNumberIgnoreCase(sn)) {
+                        throw new DuplicateResourceException("A purchase with serial number '" + sn + "' already exists. Duplicate serial numbers are not allowed.");
+                    }
+                }
+            }
+
+            resolvedSerialsPerItem.add(rawSerials);
+        }
+
+        // 4. Process each line item and store every physical unit separately under the same invoiceNumber
         List<BillItem> billItems = new ArrayList<>();
         List<Purchase> createdPurchases = new ArrayList<>();
-        // Validate inventory stock availability before processing sale
-        for (BillItemRequest itemReq : request.getItems()) {
-            if (itemReq.getProductId() != null && !itemReq.getProductId().isBlank()) {
-                Product product = productRepository.findById(itemReq.getProductId()).orElse(null);
-                if (product != null) {
-                    int requestedQty = Math.max(1, itemReq.getQuantity());
-                    int availableStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
-                    if (availableStock <= 0) {
-                        throw new BadRequestException("Product '" + product.getName() + "' is out of stock.");
-                    }
-                    if (availableStock < requestedQty) {
-                        throw new BadRequestException("Requested quantity (" + requestedQty + ") for product '" 
-                                + product.getName() + "' exceeds available stock (" + availableStock + ").");
-                    }
-                }
-            }
-        }
-
-        // Validate serial number uniqueness: intra-bill duplicates and existing purchases
-        Set<String> seenSerials = new HashSet<>();
-        for (BillItemRequest itemReq : request.getItems()) {
-            if (itemReq.getSerialNumber() != null && !itemReq.getSerialNumber().isBlank()) {
-                String sn = itemReq.getSerialNumber().trim();
-                if (!seenSerials.add(sn.toLowerCase())) {
-                    throw new BadRequestException("Duplicate serial number '" + sn + "' found in this bill. Each physical item must have a unique serial number.");
-                }
-                if (purchaseRepository.existsBySerialNumber(sn)) {
-                    throw new DuplicateResourceException("A purchase with serial number '" + sn + "' already exists. Purchase cannot be completed with duplicate serial number.");
-                }
-            }
-        }
-
         double subtotal = 0.0;
         int warrantyCount = 0;
 
-        for (BillItemRequest itemReq : request.getItems()) {
+        for (int itemIdx = 0; itemIdx < request.getItems().size(); itemIdx++) {
+            BillItemRequest itemReq = request.getItems().get(itemIdx);
+            List<String> itemSerials = resolvedSerialsPerItem.get(itemIdx);
+
             double unitPrice = itemReq.getUnitPrice() != null ? itemReq.getUnitPrice() : 0.0;
             int qty = Math.max(1, itemReq.getQuantity());
-            double lineTotal = Math.round(unitPrice * qty * 100.0) / 100.0;
-            subtotal += lineTotal;
 
-            // Product lookup if provided
-            Product product = null;
-            if (itemReq.getProductId() != null && !itemReq.getProductId().isBlank()) {
-                product = productRepository.findById(itemReq.getProductId()).orElse(null);
-            }
+            Product product = (itemReq.getProductId() != null && !itemReq.getProductId().isBlank())
+                    ? productMap.get(itemReq.getProductId())
+                    : null;
 
             // Determine if warranty applies
             boolean itemHasWarranty = !Boolean.FALSE.equals(itemReq.getHasWarranty());
@@ -163,15 +218,11 @@ public class BillingService {
                 itemHasWarranty = false;
             }
 
-            String purchaseId = null;
-            String warrantyId = null;
-            String qrToken = null;
+            LocalDate startDate = LocalDate.now();
             LocalDate expiryDate = null;
             Integer duration = null;
             WarrantyUnit unit = null;
             String terms = null;
-
-            LocalDate startDate = LocalDate.now();
 
             if (itemHasWarranty) {
                 duration = (itemReq.getWarrantyDuration() != null && itemReq.getWarrantyDuration() > 0)
@@ -187,109 +238,124 @@ public class BillingService {
                         : (product != null && product.getWarrantyTerms() != null ? product.getWarrantyTerms() : "Standard manufacturer warranty");
 
                 expiryDate = DateCalculator.calculateExpiryDate(startDate, duration, unit);
-                qrToken = UUID.randomUUID().toString();
             }
 
             String productIdToSave = (product != null) ? product.getId() : "item-" + UUID.randomUUID().toString().substring(0, 8);
-            String serialNum = (itemReq.getSerialNumber() != null && !itemReq.getSerialNumber().isBlank())
-                    ? itemReq.getSerialNumber().trim() : null;
             String pName = itemReq.getProductName().trim();
             String pBrand = itemReq.getBrand() != null ? itemReq.getBrand().trim() : (product != null ? product.getBrand() : "");
             String pModel = product != null ? product.getModel() : "";
+            String pCategory = itemReq.getCategory() != null ? itemReq.getCategory().trim() : (product != null ? product.getCategory() : null);
 
-            // Create Purchase record for every line item (unified sales registry)
-            Purchase purchase = Purchase.builder()
-                    .retailerId(retailerId)
-                    .productId(productIdToSave)
-                    .productName(pName)
-                    .productBrand(pBrand)
-                    .productModel(pModel)
-                    .unitPrice(unitPrice)
-                    .quantity(qty)
-                    .hasWarranty(itemHasWarranty)
-                    .paymentMethod(paymentMethod.name())
-                    .customerId(customerId)
-                    .customerEmail(customerEmail != null ? customerEmail : "")
-                    .customerEmailNormalized(normalizedCustomerEmail != null ? normalizedCustomerEmail : "")
-                    .purchaseDate(startDate)
-                    .serialNumber(serialNum)
-                    .invoiceNumber(invoiceNumber)
-                    .purchaseReference(generatePurchaseReference())
-                    .linkingStatus(linkingStatus)
-                    .registeredBy(userId)
-                    .createdAt(Instant.now())
-                    .updatedAt(Instant.now())
-                    .build();
+            for (int unitIdx = 0; unitIdx < qty; unitIdx++) {
+                String unitSerial = (unitIdx < itemSerials.size() && !itemSerials.get(unitIdx).isBlank())
+                        ? itemSerials.get(unitIdx)
+                        : null;
+                double unitLineTotal = Math.round(unitPrice * 100.0) / 100.0;
+                subtotal += unitLineTotal;
 
-            purchase = purchaseRepository.save(purchase);
-            purchaseId = purchase.getId();
-            createdPurchases.add(purchase);
-
-            // Deduct inventory stock if catalog product
-            if (product != null && product.getStockQuantity() != null && product.getStockQuantity() > 0) {
-                product.setStockQuantity(Math.max(0, product.getStockQuantity() - qty));
-                productRepository.save(product);
-            }
-
-            if (itemHasWarranty) {
-                // Create Warranty record
-                Warranty warranty = Warranty.builder()
-                        .purchaseId(purchase.getId())
+                // Create an individual Purchase record for each physical unit (sharing the same invoiceNumber)
+                Purchase purchase = Purchase.builder()
                         .retailerId(retailerId)
-                        .customerId(customerId)
                         .productId(productIdToSave)
                         .productName(pName)
-                        .startDate(startDate)
-                        .expiryDate(expiryDate)
-                        .status(WarrantyStatus.ACTIVE)
-                        .termsSnapshot(terms)
-                        .warrantyDurationSnapshot(duration)
-                        .warrantyUnitSnapshot(unit)
-                        .qrToken(qrToken)
+                        .productBrand(pBrand)
+                        .productModel(pModel)
+                        .unitPrice(unitPrice)
+                        .quantity(1)
+                        .hasWarranty(itemHasWarranty)
+                        .paymentMethod(paymentMethod.name())
+                        .customerId(customerId)
+                        .customerEmail(customerEmail != null ? customerEmail : "")
+                        .customerEmailNormalized(normalizedCustomerEmail != null ? normalizedCustomerEmail : "")
+                        .purchaseDate(startDate)
+                        .serialNumber(unitSerial)
+                        .invoiceNumber(invoiceNumber)
+                        .purchaseReference(generatePurchaseReference(retailerId))
+                        .linkingStatus(linkingStatus)
+                        .registeredBy(userId)
                         .createdAt(Instant.now())
                         .updatedAt(Instant.now())
                         .build();
 
-                warranty = warrantyRepository.save(warranty);
-                warrantyId = warranty.getId();
-                warrantyCount++;
+                purchase = purchaseRepository.save(purchase);
+                createdPurchases.add(purchase);
 
-                // Notify linked customer
-                if (customerId != null) {
-                    notificationService.sendNotification(
-                            customerId,
-                            NotificationType.PURCHASE_LINKED,
-                            String.format("New purchase '%s' with warranty until %s has been added to your account (Invoice: %s).",
-                                    pName, expiryDate, invoiceNumber),
-                            warranty.getId(),
-                            "Warranty"
-                    );
+                String warrantyId = null;
+                String qrToken = null;
+
+                if (itemHasWarranty) {
+                    qrToken = UUID.randomUUID().toString();
+
+                    // Create an individual Warranty record linked to this specific unit
+                    Warranty warranty = Warranty.builder()
+                            .purchaseId(purchase.getId())
+                            .retailerId(retailerId)
+                            .customerId(customerId)
+                            .productId(productIdToSave)
+                            .productName(pName)
+                            .serialNumber(unitSerial)
+                            .startDate(startDate)
+                            .expiryDate(expiryDate)
+                            .status(WarrantyStatus.ACTIVE)
+                            .termsSnapshot(terms)
+                            .warrantyDurationSnapshot(duration)
+                            .warrantyUnitSnapshot(unit)
+                            .qrToken(qrToken)
+                            .createdAt(Instant.now())
+                            .updatedAt(Instant.now())
+                            .build();
+
+                    warranty = warrantyRepository.save(warranty);
+                    warrantyId = warranty.getId();
+                    warrantyCount++;
+
+                    // Notify linked customer with serial number for clear unit identification
+                    if (customerId != null) {
+                        String serialSuffix = unitSerial != null ? " (S/N: " + unitSerial + ")" : "";
+                        notificationService.sendNotification(
+                                customerId,
+                                NotificationType.PURCHASE_LINKED,
+                                String.format("New purchase '%s'%s with warranty until %s has been added to your account (Invoice: %s).",
+                                        pName, serialSuffix, expiryDate, invoiceNumber),
+                                warranty.getId(),
+                                "Warranty"
+                        );
+                    }
                 }
+
+                BillItem billItem = BillItem.builder()
+                        .productId(itemReq.getProductId())
+                        .productName(pName)
+                        .brand(pBrand)
+                        .category(pCategory)
+                        .serialNumber(unitSerial)
+                        .quantity(1)
+                        .unitPrice(unitPrice)
+                        .lineTotal(unitLineTotal)
+                        .hasWarranty(itemHasWarranty)
+                        .warrantyDuration(duration)
+                        .warrantyUnit(unit)
+                        .warrantyTerms(terms)
+                        .purchaseId(purchase.getId())
+                        .warrantyId(warrantyId)
+                        .qrToken(qrToken)
+                        .warrantyExpiryDate(expiryDate)
+                        .build();
+
+                billItems.add(billItem);
             }
-
-            BillItem billItem = BillItem.builder()
-                    .productId(itemReq.getProductId())
-                    .productName(pName)
-                    .brand(pBrand)
-                    .category(itemReq.getCategory() != null ? itemReq.getCategory().trim() : (product != null ? product.getCategory() : null))
-                    .serialNumber(serialNum)
-                    .quantity(qty)
-                    .unitPrice(unitPrice)
-                    .lineTotal(lineTotal)
-                    .hasWarranty(itemHasWarranty)
-                    .warrantyDuration(duration)
-                    .warrantyUnit(unit)
-                    .warrantyTerms(terms)
-                    .purchaseId(purchaseId)
-                    .warrantyId(warrantyId)
-                    .qrToken(qrToken)
-                    .warrantyExpiryDate(expiryDate)
-                    .build();
-
-            billItems.add(billItem);
         }
 
-        // 4. Calculate totals
+        // Deduct inventory stock once per catalog product using aggregated quantities
+        for (Map.Entry<String, Integer> entry : requestedStockByProduct.entrySet()) {
+            Product product = productMap.get(entry.getKey());
+            if (product != null && product.getStockQuantity() != null && product.getStockQuantity() > 0) {
+                product.setStockQuantity(Math.max(0, product.getStockQuantity() - entry.getValue()));
+                productRepository.save(product);
+            }
+        }
+
+        // 5. Calculate totals
         subtotal = Math.round(subtotal * 100.0) / 100.0;
         double discount = request.getDiscountAmount() != null ? Math.max(0.0, request.getDiscountAmount()) : 0.0;
         double tax = request.getTaxAmount() != null ? Math.max(0.0, request.getTaxAmount()) : 0.0;
@@ -423,8 +489,12 @@ public class BillingService {
         return invoiceNumber;
     }
 
-    private String generatePurchaseReference() {
-        return "PUR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    private String generatePurchaseReference(String retailerId) {
+        String ref;
+        do {
+            ref = "PUR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        } while (purchaseRepository.existsByRetailerIdAndPurchaseReference(retailerId, ref));
+        return ref;
     }
 }
 
