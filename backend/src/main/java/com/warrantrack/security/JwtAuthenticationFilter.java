@@ -43,6 +43,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
+                if (userDetails instanceof UserPrincipal userPrincipal
+                        && "CUSTOMER".equals(userPrincipal.getRole())
+                        && !userPrincipal.isEmailVerified()
+                        && !isEmailVerificationRequest(request)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Please verify your email address before accessing your account.\"}");
+                    return;
+                }
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -54,6 +64,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isEmailVerificationRequest(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return "/api/auth/verify-email".equals(path) || "/api/auth/resend-otp".equals(path);
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {

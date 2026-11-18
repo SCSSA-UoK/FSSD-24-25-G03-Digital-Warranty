@@ -7,9 +7,11 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
 
 @Service
 public class EmailService {
@@ -28,9 +30,7 @@ public class EmailService {
         JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
 
         if (mailUsername == null || mailUsername.isBlank() || mailSender == null) {
-            log.info("=================================================================");
-            log.info("📧 [Dev Mode / No SMTP Configured] {} OTP for {}: {}", purpose, toEmail, otp);
-            log.info("=================================================================");
+            log.error("SMTP is not configured. Cannot send {} email to {}", purpose, toEmail);
             return false;
         }
 
@@ -60,10 +60,9 @@ public class EmailService {
             mailSender.send(message);
             log.info("✅ Verification email successfully sent to {}", toEmail);
             return true;
-        } catch (Exception e) {
+        } catch (MessagingException | MailException e) {
             String cause = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-            log.warn("⚠️ SMTP failed to send email to {}: {}. Root cause: {}. Falling back to dev mode.", toEmail, e.getMessage(), cause);
-            log.info("🔐 [Fallback] OTP for {}: {}", toEmail, otp);
+            log.error("SMTP failed to send email to {}: {}. Root cause: {}", toEmail, e.getMessage(), cause);
             return false;
         }
     }

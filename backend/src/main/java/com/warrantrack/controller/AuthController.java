@@ -46,11 +46,7 @@ public class AuthController {
     @PostMapping("/resend-otp")
     public ResponseEntity<ApiResponse<String>> resendOtp(@RequestParam String email) {
         AuthService.OtpResult result = authService.sendEmailVerificationOtp(email);
-        if (result.isEmailSent()) {
-            return ResponseEntity.ok(ApiResponse.success("A verification OTP has been sent to your email address: " + email, null));
-        } else {
-            return ResponseEntity.ok(ApiResponse.success("Verification OTP generated. [SMTP not configured - Demo Code: " + result.getRawOtp() + "]", result.getRawOtp()));
-        }
+        return ResponseEntity.ok(ApiResponse.success("A verification OTP has been sent to your email address: " + email, null));
     }
 
     @PostMapping("/forgot-password")

@@ -6,16 +6,14 @@ import { CheckCircle2, Mail, AlertCircle, RefreshCw } from 'lucide-react';
 import { extractErrorMessage } from '../../utils/error';
 
 export const VerifyEmail: React.FC = () => {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const emailFromState = (location.state as any)?.email;
-  const devOtpFromState = (location.state as any)?.devOtp;
   const email = emailFromState || user?.email || '';
 
   const [otp, setOtp] = useState('');
-  const [devOtp, setDevOtp] = useState<string | null>(devOtpFromState || null);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -29,10 +27,9 @@ export const VerifyEmail: React.FC = () => {
 
     try {
       await authApi.verifyEmail(email, otp);
-      await refreshUser();
       setMessage('Email verified successfully! Redirecting...');
       setTimeout(() => {
-        navigate(user?.role === 'CUSTOMER' ? '/customer' : '/');
+        navigate('/login', { state: { email, message: 'Email verified successfully. Please sign in.' } });
       }, 1500);
     } catch (err: any) {
       setError(extractErrorMessage(err, 'Invalid or expired OTP. Please try again.'));
@@ -47,11 +44,7 @@ export const VerifyEmail: React.FC = () => {
     setResending(true);
     try {
       const res: any = await authApi.resendOtp(email);
-      const code = res?.data?.data || res?.data;
-      if (typeof code === 'string' && /^\d{6}$/.test(code)) {
-        setDevOtp(code);
-      }
-      setMessage(res?.data?.message || 'A fresh 6-digit OTP has been generated.');
+      setMessage(res?.data?.message || 'A fresh verification OTP has been sent to your email.');
     } catch (err: any) {
       setError(extractErrorMessage(err, 'Could not resend OTP. Please wait before retrying.'));
     } finally {
@@ -81,32 +74,6 @@ export const VerifyEmail: React.FC = () => {
         <div className="mb-4 p-3 bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-800/60 text-red-700 dark:text-rose-300 rounded-lg text-sm flex items-start gap-2 text-left">
           <AlertCircle className="w-4 h-4 shrink-0 text-red-600 dark:text-rose-400 mt-0.5" />
           <span className="break-words">{error}</span>
-        </div>
-      )}
-
-      {devOtp && (
-        <div className="mb-5 p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-left">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
-              Prototype / Demo OTP
-            </span>
-            <button
-              type="button"
-              onClick={() => setOtp(devOtp)}
-              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 underline cursor-pointer"
-            >
-              Auto-fill Code
-            </button>
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xs text-slate-600 dark:text-slate-300">Verification Code:</span>
-            <span className="font-mono text-2xl font-bold tracking-widest text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 px-3 py-0.5 rounded border border-amber-200 dark:border-amber-800/60">
-              {devOtp}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-            Real SMTP is not configured. Use this code or check your backend terminal console.
-          </p>
         </div>
       )}
 
