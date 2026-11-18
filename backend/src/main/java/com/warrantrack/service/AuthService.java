@@ -89,23 +89,14 @@ public class AuthService {
         user = userRepository.save(user);
 
         // Generate and send verification OTP
-        OtpResult otpResult = sendEmailVerificationOtp(user);
-
-        String token = tokenProvider.generateToken(user.getId(), user.getEmail(), user.getRole().name());
-
-        // Automatically sync and link any purchases registered with this verified email
-        if (user.isEmailVerified() && user.getRole() == Role.CUSTOMER) {
-            customerLinkingService.autoLinkPurchasesForUser(user);
-        }
+        sendEmailVerificationOtp(user);
 
         return AuthResponse.builder()
-                .token(token)
                 .userId(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .emailVerified(user.isEmailVerified())
-                .devOtp(otpResult.isEmailSent() ? null : otpResult.getRawOtp())
                 .build();
     }
 
@@ -257,9 +248,9 @@ public class AuthService {
 
         boolean emailSent = emailService.sendOtpEmail(user.getEmail(), rawOtp, "Account Email Verification");
 
-        log.info("=================================================");
-        log.info("🔐 VERIFICATION OTP FOR {}: {} (Real email sent: {})", user.getEmail(), rawOtp, emailSent);
-        log.info("=================================================");
+        if (!emailSent) {
+            throw new BadRequestException("We could not send the verification email. Please try again later.");
+        }
 
         return new OtpResult(rawOtp, emailSent);
     }

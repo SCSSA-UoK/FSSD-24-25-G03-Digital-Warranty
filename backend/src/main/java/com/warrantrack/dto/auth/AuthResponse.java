@@ -16,14 +16,13 @@ public class AuthResponse {
     private ApprovalStatus retailerApprovalStatus;
     private AccountStatus accountStatus;
     private String statusReason;
-    private String devOtp;
 
     public AuthResponse() {
     }
 
     public AuthResponse(String token, String tokenType, String userId, String name, String email, Role role,
             boolean emailVerified, String retailerId, ApprovalStatus retailerApprovalStatus,
-            AccountStatus accountStatus, String statusReason, String devOtp) {
+            AccountStatus accountStatus, String statusReason) {
         this.token = token;
         this.tokenType = tokenType;
         this.userId = userId;
@@ -35,12 +34,11 @@ public class AuthResponse {
         this.retailerApprovalStatus = retailerApprovalStatus;
         this.accountStatus = accountStatus;
         this.statusReason = statusReason;
-        this.devOtp = devOtp;
     }
 
     public AuthResponse(String token, String tokenType, String userId, String name, String email, Role role,
-            boolean emailVerified, String retailerId, ApprovalStatus retailerApprovalStatus, String devOtp) {
-        this(token, tokenType, userId, name, email, role, emailVerified, retailerId, retailerApprovalStatus, AccountStatus.ACTIVE, null, devOtp);
+            boolean emailVerified, String retailerId, ApprovalStatus retailerApprovalStatus) {
+        this(token, tokenType, userId, name, email, role, emailVerified, retailerId, retailerApprovalStatus, AccountStatus.ACTIVE, null);
     }
 
     public String getToken() {
@@ -131,14 +129,6 @@ public class AuthResponse {
         this.statusReason = statusReason;
     }
 
-    public String getDevOtp() {
-        return this.devOtp;
-    }
-
-    public void setDevOtp(String devOtp) {
-        this.devOtp = devOtp;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
@@ -155,7 +145,6 @@ public class AuthResponse {
         private ApprovalStatus retailerApprovalStatus;
         private AccountStatus accountStatus = AccountStatus.ACTIVE;
         private String statusReason;
-        private String devOtp;
 
         public Builder() {
         }
@@ -215,15 +204,10 @@ public class AuthResponse {
             return this;
         }
 
-        public Builder devOtp(String devOtp) {
-            this.devOtp = devOtp;
-            return this;
-        }
-
         public AuthResponse build() {
             return new AuthResponse(this.token, this.tokenType, this.userId, this.name, this.email, this.role,
                     this.emailVerified, this.retailerId, this.retailerApprovalStatus,
-                    this.accountStatus, this.statusReason, this.devOtp);
+                    this.accountStatus, this.statusReason);
         }
     }
 }

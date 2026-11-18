@@ -22,8 +22,8 @@ export const RegisterCustomer: React.FC = () => {
     setLoading(true);
 
     try {
-      const res: any = await registerCustomer({ name, email, phone, password });
-      navigate('/verify-email', { state: { email, devOtp: res?.data?.devOtp } });
+      await registerCustomer({ name, email, phone, password });
+      navigate('/verify-email', { state: { email } });
     } catch (err: any) {
       setError(extractErrorMessage(err, 'Registration failed. Please check your details.'));
     } finally {
