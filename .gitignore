@@ -1,19 +1,23 @@
+# Dependency and build output
+node_modules/
+dist/
+dist-ssr/
+target/
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.local
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-.env
-.env.*
-target
 
 # Editor directories and files
 .vscode/*
