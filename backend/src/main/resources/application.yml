@@ -1,0 +1,56 @@
+spring:
+  config:
+    import: optional:file:.env[.properties],optional:file:backend/.env[.properties]
+
+  application:
+    name: warrantrack
+
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/warrantrack_db}
+      database: warrantrack_db
+      auto-index-creation: true
+
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+server:
+  port: 8080
+
+# JWT & Bootstrap Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:warrantrack-super-secret-key-that-is-at-least-256-bits-long-for-hs256}
+    expiration-ms: 86400000  # 24 hours (1 day)
+
+  initial-admin:
+    password: ${INITIAL_ADMIN_PASSWORD:admin123}
+
+  otp:
+    expiry-minutes: 5
+    max-attempts: 5
+    resend-cooldown-seconds: 60
+
+  cors:
+    allowed-origins: http://localhost:5173
+
+logging:
+  level:
+    com.warrantrack: DEBUG
+    org.springframework.security: DEBUG
+
