@@ -53,9 +53,15 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authService.requestPasswordReset(request);
         return ResponseEntity.ok(ApiResponse.success(
-                "A password reset token has been sent to " + request.getEmail() + ". Please check your inbox (and spam folder).",
+                "A 6-digit password reset verification code has been sent to your primary registered email address: " + request.getEmail() + ". Please check your inbox.",
                 null
         ));
+    }
+
+    @PostMapping("/verify-reset-otp")
+    public ResponseEntity<ApiResponse<VerifyResetOtpResponse>> verifyResetOtp(@Valid @RequestBody VerifyResetOtpRequest request) {
+        VerifyResetOtpResponse response = authService.verifyPasswordResetOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("OTP verified successfully. You may now enter your new password.", response));
     }
 
     @PostMapping("/reset-password")

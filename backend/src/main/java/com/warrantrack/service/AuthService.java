@@ -13,6 +13,7 @@ import com.warrantrack.model.User;
 import com.warrantrack.model.enums.AccountStatus;
 import com.warrantrack.model.enums.ApprovalStatus;
 import com.warrantrack.model.enums.Role;
+import com.warrantrack.repository.PurchaseRepository;
 import com.warrantrack.repository.RetailerRepository;
 import com.warrantrack.repository.UserRepository;
 import com.warrantrack.security.JwtTokenProvider;
@@ -34,6 +35,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RetailerRepository retailerRepository;
+    private final PurchaseRepository purchaseRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final AuditService auditService;
@@ -42,6 +44,7 @@ public class AuthService {
 
     public AuthService(UserRepository userRepository,
                        RetailerRepository retailerRepository,
+                       PurchaseRepository purchaseRepository,
                        PasswordEncoder passwordEncoder,
                        JwtTokenProvider tokenProvider,
                        AuditService auditService,
@@ -49,6 +52,7 @@ public class AuthService {
                        CustomerLinkingService customerLinkingService) {
         this.userRepository = userRepository;
         this.retailerRepository = retailerRepository;
+        this.purchaseRepository = purchaseRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.auditService = auditService;
@@ -295,39 +299,145 @@ public class AuthService {
 
     public void requestPasswordReset(ForgotPasswordRequest request) {
         String normalizedEmail = EmailNormalizer.normalize(request.getEmail());
-        User user = userRepository.findByEmailNormalized(normalizedEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("No account found with email: " + request.getEmail()));
 
-        String resetToken = UUID.randomUUID().toString().replace("-", "");
-        user.setResetToken(resetToken);
-        user.setResetTokenExpiresAt(Instant.now().plus(Duration.ofMinutes(15)));
+        // 1. Explicitly disallow secondary, alternative, or purchase-linked emails from receiving password reset OTPs
+        if (userRepository.existsBySecondaryEmailsEmailNormalized(normalizedEmail)) {
+            throw new BadRequestException("Password reset is only permitted using your primary registered account email address. Secondary and alternative email addresses cannot receive password reset OTPs.");
+        }
+
+        // 2. Validate email against registered user account primary email
+        java.util.Optional<User> userOpt = userRepository.findByEmailNormalized(normalizedEmail);
+        if (userOpt.isEmpty()) {
+            if (purchaseRepository.existsByCustomerEmailNormalized(normalizedEmail)) {
+                throw new BadRequestException("The provided email is associated with retail purchases but has no registered primary user account. Password reset OTPs can only be sent to registered account primary email addresses.");
+            }
+            throw new ResourceNotFoundException("No registered account found with primary email: " + request.getEmail());
+        }
+
+        User user = userOpt.get();
+
+        // 3. Check account status
+        if (user.getAccountStatus() == AccountStatus.SUSPENDED) {
+            throw new BadRequestException("Your account is currently suspended. Please contact support.");
+        }
+
+        // 4. Enforce rate limiting / resend cooldown (60 seconds)
+        Instant now = Instant.now();
+        if (user.getLastPasswordResetOtpSentAt() != null &&
+                Duration.between(user.getLastPasswordResetOtpSentAt(), now).getSeconds() < 60) {
+            long remainingCooldown = 60 - Duration.between(user.getLastPasswordResetOtpSentAt(), now).getSeconds();
+            throw new BadRequestException("Please wait " + remainingCooldown + " seconds before requesting another password reset OTP.");
+        }
+
+        // 5. Generate 6-digit numeric OTP and configure expiration & retry limits
+        String rawOtp = OtpUtil.generateOtp();
+        user.setPasswordResetOtpHash(passwordEncoder.encode(rawOtp));
+        user.setPasswordResetOtpExpiresAt(now.plus(Duration.ofMinutes(5))); // 5-minute expiration
+        user.setPasswordResetOtpAttempts(0); // reset retry limit counter
+        user.setLastPasswordResetOtpSentAt(now);
+        user.setPasswordResetVerified(false);
+        user.setResetToken(null);
+        user.setResetTokenExpiresAt(null);
         userRepository.save(user);
 
-        emailService.sendPasswordResetEmail(user.getEmail(), resetToken);
+        // 6. Send OTP strictly to the primary registered email address (X)
+        emailService.sendPasswordResetOtpEmail(user.getEmail(), rawOtp);
+
+        auditService.logAction(user.getId(), user.getEmail(), "PASSWORD_RESET_OTP_REQUESTED", "USER", user.getId(),
+                "Password reset OTP generated and sent to primary registered email: " + user.getEmail());
 
         log.info("=================================================");
-        log.info("🔑 PASSWORD RESET TOKEN GENERATED FOR {}: {}", user.getEmail(), resetToken);
+        log.info("🔑 [FORGOT PASSWORD] 6-digit OTP generated for primary email {}: {}", user.getEmail(), rawOtp);
         log.info("=================================================");
+    }
+
+    public VerifyResetOtpResponse verifyPasswordResetOtp(VerifyResetOtpRequest request) {
+        String normalizedEmail = EmailNormalizer.normalize(request.getEmail());
+
+        // Reject secondary emails
+        if (userRepository.existsBySecondaryEmailsEmailNormalized(normalizedEmail)) {
+            throw new BadRequestException("Password reset is only permitted using your primary registered account email address.");
+        }
+
+        User user = userRepository.findByEmailNormalized(normalizedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("No registered account found with primary email: " + request.getEmail()));
+
+        Instant now = Instant.now();
+
+        // Enforce OTP expiration (5 minutes)
+        if (user.getPasswordResetOtpExpiresAt() == null || now.isAfter(user.getPasswordResetOtpExpiresAt())) {
+            throw new BadRequestException("Password reset OTP has expired. Please request a new code.");
+        }
+
+        // Enforce OTP retry limits (max 5 attempts)
+        int maxAttempts = 5;
+        if (user.getPasswordResetOtpAttempts() >= maxAttempts) {
+            throw new BadRequestException("Maximum OTP verification attempts (" + maxAttempts + ") exceeded. Please request a new password reset code.");
+        }
+
+        user.setPasswordResetOtpAttempts(user.getPasswordResetOtpAttempts() + 1);
+
+        // Validate OTP hash
+        if (user.getPasswordResetOtpHash() == null || !passwordEncoder.matches(request.getOtp().trim(), user.getPasswordResetOtpHash())) {
+            userRepository.save(user);
+            int remaining = Math.max(0, maxAttempts - user.getPasswordResetOtpAttempts());
+            if (remaining == 0) {
+                throw new BadRequestException("Invalid OTP code. Maximum verification attempts reached. Please request a new code.");
+            }
+            throw new BadRequestException("Invalid OTP code. " + remaining + " attempt(s) remaining.");
+        }
+
+        // OTP successfully verified: generate a verified single-use reset authorization token
+        String resetToken = UUID.randomUUID().toString().replace("-", "");
+        user.setPasswordResetOtpHash(null);
+        user.setPasswordResetOtpExpiresAt(null);
+        user.setPasswordResetOtpAttempts(0);
+        user.setPasswordResetVerified(true);
+        user.setResetToken(resetToken);
+        user.setResetTokenExpiresAt(now.plus(Duration.ofMinutes(15))); // Valid for 15 minutes after verification
+        userRepository.save(user);
+
+        auditService.logAction(user.getId(), user.getEmail(), "PASSWORD_RESET_OTP_VERIFIED", "USER", user.getId(),
+                "Password reset OTP successfully verified for primary email: " + user.getEmail());
+        log.info("✅ Password reset OTP successfully verified for primary email: {}", user.getEmail());
+
+        return new VerifyResetOtpResponse(resetToken, "OTP verified successfully. You may now set your new password.");
     }
 
     public void resetPassword(ResetPasswordRequest request) {
         if (request.getToken() == null || request.getToken().isBlank()) {
-            throw new BadRequestException("Password reset token is required.");
+            throw new BadRequestException("Password reset authorization token is required.");
         }
 
-        User user = userRepository.findByResetToken(request.getToken().trim())
-                .orElseThrow(() -> new BadRequestException("Invalid or expired password reset token."));
+        String token = request.getToken().trim();
+        User user = userRepository.findByResetToken(token)
+                .orElseThrow(() -> new BadRequestException("Invalid or expired password reset session. Please verify your OTP code again."));
+
+        // ENFORCE: Allow password resets ONLY after successful OTP verification
+        if (!user.isPasswordResetVerified()) {
+            throw new BadRequestException("Password reset requires successful OTP verification. Please verify your OTP code first.");
+        }
 
         if (user.getResetTokenExpiresAt() == null || Instant.now().isAfter(user.getResetTokenExpiresAt())) {
-            throw new BadRequestException("Password reset token has expired. Please request a new reset token.");
+            user.setPasswordResetVerified(false);
+            user.setResetToken(null);
+            user.setResetTokenExpiresAt(null);
+            userRepository.save(user);
+            throw new BadRequestException("Password reset session has expired. Please request a new password reset OTP.");
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         user.setResetToken(null);
         user.setResetTokenExpiresAt(null);
+        user.setPasswordResetVerified(false);
+        user.setPasswordResetOtpHash(null);
+        user.setPasswordResetOtpExpiresAt(null);
+        user.setPasswordResetOtpAttempts(0);
         userRepository.save(user);
 
-        log.info("Password successfully reset for: {}", user.getEmail());
+        auditService.logAction(user.getId(), user.getEmail(), "PASSWORD_RESET_SUCCESS", "USER", user.getId(),
+                "Password successfully reset after verified OTP for primary email: " + user.getEmail());
+        log.info("🔒 Password successfully reset after verified OTP for primary email: {}", user.getEmail());
     }
 
     public UserResponse getCurrentUser(String userId) {
