@@ -326,3 +326,71 @@ export interface CreateBillRequest {
   paymentNotes?: string;
 }
 
+// Find & Link Purchases via Alternative Email
+export type AltPurchaseLinkingStatus = 'AVAILABLE_TO_LINK' | 'ALREADY_LINKED' | 'LINKED_TO_OTHER';
+
+export interface AltPurchaseWarrantySummary {
+  id: string;
+  status: string;
+  startDate: string;
+  expiryDate: string;
+  duration: number;
+  unit?: string;
+  qrToken?: string;
+}
+
+export interface AltPurchaseItem {
+  id: string;
+  retailerId?: string;
+  retailerBusinessName?: string;
+  productId?: string;
+  productName: string;
+  productBrand?: string;
+  productModel?: string;
+  unitPrice?: number;
+  quantity?: number;
+  purchaseDate: string;
+  invoiceNumber?: string;
+  purchaseReference: string;
+  serialNumber?: string;
+  hasWarranty: boolean;
+  customerEmail: string;
+  linkingStatus: AltPurchaseLinkingStatus;
+  statusLabel: string;
+  statusDescription: string;
+  canLink: boolean;
+  warranty?: AltPurchaseWarrantySummary;
+}
+
+export interface FindPurchasesResult {
+  email: string;
+  isSavedSecondary: boolean;
+  totalCount: number;
+  availableCount: number;
+  alreadyLinkedCount: number;
+  linkedToOtherCount: number;
+  purchases: AltPurchaseItem[];
+}
+
+export interface AltEmailOtpResponse {
+  email: string;
+  message: string;
+  cooldownSeconds: number;
+  expiryMinutes: number;
+}
+
+export interface AltEmailVerificationResponse {
+  email: string;
+  verificationToken: string;
+  savedAsSecondary: boolean;
+  message: string;
+}
+
+export interface SecondaryEmailRecord {
+  email: string;
+  verifiedAt: string;
+  linkedPurchasesCount: number;
+  availablePurchasesCount: number;
+}
+
+

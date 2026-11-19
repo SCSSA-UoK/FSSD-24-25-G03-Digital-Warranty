@@ -91,6 +91,32 @@ export const CustomerDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* Quick Action: Find & Link Purchases */}
+      <div className="p-5 bg-gradient-to-r from-indigo-50/80 via-white to-slate-50 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/60 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-2xs">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-2xs shrink-0">
+            <Link2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+              <span>Bought an item using a different email address?</span>
+              <span className="text-[10px] font-semibold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full">
+                New
+              </span>
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Search purchases made with alternative emails, verify ownership via OTP, and link them to your wallet.
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/customer/find-purchases"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 self-start sm:self-auto shrink-0 shadow-2xs"
+        >
+          Find & Link Purchases <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">

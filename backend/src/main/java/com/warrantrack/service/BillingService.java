@@ -96,6 +96,9 @@ public class BillingService {
 
         if (normalizedCustomerEmail != null) {
             Optional<User> matchingCustomer = userRepository.findByEmailNormalized(normalizedCustomerEmail);
+            if (matchingCustomer.isEmpty()) {
+                matchingCustomer = userRepository.findBySecondaryEmailsEmailNormalized(normalizedCustomerEmail);
+            }
             if (matchingCustomer.isPresent()) {
                 User customer = matchingCustomer.get();
                 if (customer.isEmailVerified()) {

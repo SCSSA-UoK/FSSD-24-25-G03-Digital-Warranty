@@ -122,6 +122,9 @@ public class PurchaseService {
         String normalizedCustomerEmail = EmailNormalizer.normalize(customerEmail);
 
         Optional<User> matchingCustomer = userRepository.findByEmailNormalized(normalizedCustomerEmail);
+        if (matchingCustomer.isEmpty()) {
+            matchingCustomer = userRepository.findBySecondaryEmailsEmailNormalized(normalizedCustomerEmail);
+        }
         String customerId = null;
         LinkingStatus linkingStatus = LinkingStatus.UNCLAIMED;
 

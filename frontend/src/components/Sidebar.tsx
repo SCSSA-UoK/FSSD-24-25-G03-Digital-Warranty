@@ -13,6 +13,7 @@ import {
   Building2,
   ShieldCheck,
   Send,
+  Link2,
   Bell,
   CreditCard,
   Receipt,
@@ -79,6 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
   const customerLinks = [
     { to: '/customer', label: 'My Dashboard', icon: LayoutDashboard },
     { to: '/customer/warranties', label: 'Digital Warranties', icon: ShieldCheck },
+    { to: '/customer/find-purchases', label: 'Find & Link Purchases', icon: Link2 },
     { to: '/customer/submit-claim', label: 'Submit Claim', icon: Send },
     { to: '/customer/claims', label: 'My Claims & Tracking', icon: FileText },
     { to: '/notifications', label: 'Notifications', icon: Bell },

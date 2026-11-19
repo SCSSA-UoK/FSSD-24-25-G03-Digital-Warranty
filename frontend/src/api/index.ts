@@ -20,6 +20,10 @@ import {
   ClaimStatus,
   ResolutionType,
   CustomerLookupResult,
+  AltEmailOtpResponse,
+  AltEmailVerificationResponse,
+  FindPurchasesResult,
+  SecondaryEmailRecord,
 } from '../types';
 
 export const authApi = {
@@ -206,6 +210,58 @@ export const customerLinkingApi = {
   },
   verifyAndLink: async (purchaseId: string, otp?: string) => {
     const res = await apiClient.post<ApiResponse<Purchase>>(`/customer/purchases/${purchaseId}/verify-link`, { otp });
+    return res.data.data;
+  },
+
+  // Find & Link Purchases via Alternative Email
+  sendAltEmailOtp: async (email: string) => {
+    const res = await apiClient.post<ApiResponse<AltEmailOtpResponse>>('/customer/purchases/find/send-otp', { email });
+    return res.data.data;
+  },
+  verifyAltEmailOtp: async (email: string, otp: string, saveAsSecondary = true) => {
+    const res = await apiClient.post<ApiResponse<AltEmailVerificationResponse>>('/customer/purchases/find/verify-otp', {
+      email,
+      otp,
+      saveAsSecondary,
+    });
+    return res.data.data;
+  },
+  getFoundPurchases: async (email: string, token?: string) => {
+    const params = new URLSearchParams({ email });
+    if (token) params.append('token', token);
+    const res = await apiClient.get<ApiResponse<FindPurchasesResult>>(`/customer/purchases/find/results?${params.toString()}`);
+    return res.data.data;
+  },
+  linkAltPurchase: async (purchaseId: string, email: string, verificationToken?: string) => {
+    const res = await apiClient.post<ApiResponse<Purchase>>('/customer/purchases/find/link', {
+      purchaseId,
+      email,
+      verificationToken,
+    });
+    return res.data.data;
+  },
+  linkAllAltPurchases: async (email: string, verificationToken?: string) => {
+    const res = await apiClient.post<ApiResponse<number>>('/customer/purchases/find/link-all', {
+      email,
+      verificationToken,
+    });
+    return res.data.data;
+  },
+
+  // Secondary Emails Management
+  getSecondaryEmails: async () => {
+    const res = await apiClient.get<ApiResponse<SecondaryEmailRecord[]>>('/customer/purchases/secondary-emails');
+    return res.data.data;
+  },
+  saveSecondaryEmail: async (email: string, verificationToken?: string) => {
+    const res = await apiClient.post<ApiResponse<string>>('/customer/purchases/secondary-emails', {
+      email,
+      verificationToken,
+    });
+    return res.data.data;
+  },
+  removeSecondaryEmail: async (email: string) => {
+    const res = await apiClient.delete<ApiResponse<string>>(`/customer/purchases/secondary-emails?email=${encodeURIComponent(email)}`);
     return res.data.data;
   },
 };
