@@ -45,6 +45,11 @@ public class User {
     // Password reset fields
     private String resetToken;
     private Instant resetTokenExpiresAt;
+    private String passwordResetOtpHash;
+    private Instant passwordResetOtpExpiresAt;
+    private int passwordResetOtpAttempts = 0;
+    private Instant lastPasswordResetOtpSentAt;
+    private boolean passwordResetVerified = false;
 
     // Verified secondary emails for purchase matching
     private java.util.List<SecondaryEmail> secondaryEmails = new java.util.ArrayList<>();
@@ -221,6 +226,46 @@ public class User {
 
     public void setResetTokenExpiresAt(Instant resetTokenExpiresAt) {
         this.resetTokenExpiresAt = resetTokenExpiresAt;
+    }
+
+    public String getPasswordResetOtpHash() {
+        return this.passwordResetOtpHash;
+    }
+
+    public void setPasswordResetOtpHash(String passwordResetOtpHash) {
+        this.passwordResetOtpHash = passwordResetOtpHash;
+    }
+
+    public Instant getPasswordResetOtpExpiresAt() {
+        return this.passwordResetOtpExpiresAt;
+    }
+
+    public void setPasswordResetOtpExpiresAt(Instant passwordResetOtpExpiresAt) {
+        this.passwordResetOtpExpiresAt = passwordResetOtpExpiresAt;
+    }
+
+    public int getPasswordResetOtpAttempts() {
+        return this.passwordResetOtpAttempts;
+    }
+
+    public void setPasswordResetOtpAttempts(int passwordResetOtpAttempts) {
+        this.passwordResetOtpAttempts = passwordResetOtpAttempts;
+    }
+
+    public Instant getLastPasswordResetOtpSentAt() {
+        return this.lastPasswordResetOtpSentAt;
+    }
+
+    public void setLastPasswordResetOtpSentAt(Instant lastPasswordResetOtpSentAt) {
+        this.lastPasswordResetOtpSentAt = lastPasswordResetOtpSentAt;
+    }
+
+    public boolean isPasswordResetVerified() {
+        return this.passwordResetVerified;
+    }
+
+    public void setPasswordResetVerified(boolean passwordResetVerified) {
+        this.passwordResetVerified = passwordResetVerified;
     }
 
     public Instant getCreatedAt() {

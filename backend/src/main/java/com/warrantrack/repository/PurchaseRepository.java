@@ -19,6 +19,8 @@ public interface PurchaseRepository extends MongoRepository<Purchase, String> {
 
     List<Purchase> findByCustomerEmailNormalized(String customerEmailNormalized);
 
+    boolean existsByCustomerEmailNormalized(String customerEmailNormalized);
+
     List<Purchase> findByCustomerEmailNormalizedAndLinkingStatus(String customerEmailNormalized, LinkingStatus linkingStatus);
 
     boolean existsByRetailerIdAndPurchaseReference(String retailerId, String purchaseReference);
