@@ -92,6 +92,9 @@ public class AuthService {
 
         user = userRepository.save(user);
 
+        auditService.logAction(user.getId(), user.getEmail(), "CUSTOMER_REGISTERED", "User", user.getId(),
+                "Customer registered account: " + user.getName() + " (" + user.getEmail() + ")");
+
         // Generate and send verification OTP
         sendEmailVerificationOtp(user);
 
@@ -168,19 +171,25 @@ public class AuthService {
         String normalizedEmail = EmailNormalizer.normalize(request.getEmail());
 
         User user = userRepository.findByEmailNormalized(normalizedEmail)
-                .orElseThrow(() -> new BadRequestException("Invalid email or password"));
+                .orElse(null);
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            auditService.logAction(user != null ? user.getId() : "ANONYMOUS", request.getEmail(), "USER_LOGIN_FAILED", "User", user != null ? user.getId() : "UNKNOWN",
+                    "Failed login attempt with email: " + request.getEmail());
             throw new BadRequestException("Invalid email or password");
         }
 
         if (user.getAccountStatus() == AccountStatus.SUSPENDED) {
             String reasonMsg = (user.getStatusReason() != null && !user.getStatusReason().isBlank())
                     ? " Reason: " + user.getStatusReason() : "";
+            auditService.logAction(user.getId(), user.getEmail(), "USER_LOGIN_BLOCKED", "User", user.getId(),
+                    "Login blocked due to suspended account status." + reasonMsg);
             throw new UnauthorizedException("Your account has been suspended by an administrator." + reasonMsg + " Please contact platform administration.");
         }
 
         if (user.getAccountStatus() == AccountStatus.INACTIVE || user.getAccountStatus() == AccountStatus.DEACTIVATED) {
+            auditService.logAction(user.getId(), user.getEmail(), "USER_LOGIN_INACTIVE", "User", user.getId(),
+                    "Login attempted for inactive or deactivated account.");
             throw new BadRequestException("ACCOUNT_INACTIVE: Your account is currently inactive. Would you like to reactivate it?");
         }
 
@@ -201,6 +210,9 @@ public class AuthService {
         if (user.isEmailVerified() && user.getRole() == Role.CUSTOMER) {
             customerLinkingService.autoLinkPurchasesForUser(user);
         }
+
+        auditService.logAction(user.getId(), user.getEmail(), "USER_LOGIN_SUCCESS", "User", user.getId(),
+                "User successfully authenticated with role: " + user.getRole());
 
         return AuthResponse.builder()
                 .token(token)
@@ -290,6 +302,9 @@ public class AuthService {
         userRepository.save(user);
 
         log.info("Email verified successfully for: {}", user.getEmail());
+
+        auditService.logAction(user.getId(), user.getEmail(), "EMAIL_VERIFIED", "User", user.getId(),
+                "Email address successfully verified via OTP for: " + user.getEmail());
 
         // Automatically link all purchases associated with this verified email
         if (user.getRole() == Role.CUSTOMER) {

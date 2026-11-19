@@ -244,6 +244,9 @@ public class ClaimService {
 
         recordHistory(claim.getId(), prev, ClaimStatus.CANCELLED, "Customer", "Cancelled by customer: " + request.getReason());
 
+        auditService.logAction(customerId, "CUSTOMER", "CLAIM_CANCELLED", "Claim", claim.getId(),
+                "Claim cancelled by customer: " + request.getReason().trim());
+
         return mapToResponse(claim);
     }
 
@@ -288,6 +291,9 @@ public class ClaimService {
 
         recordHistory(claim.getId(), prev, nextStatus, retailer.getContactEmail(), note);
 
+        auditService.logAction(userId, retailer.getContactEmail(), "CLAIM_DECIDED_" + nextStatus, "Claim", claim.getId(),
+                note);
+
         notifyCustomer(claim, (nextStatus == ClaimStatus.APPROVED)
                 ? "Great news! Your claim has been approved for " + claim.getResolutionType()
                 : "Your warranty claim was rejected: " + claim.getDecisionReason());
@@ -313,6 +319,9 @@ public class ClaimService {
 
         recordHistory(claim.getId(), prev, ClaimStatus.ADDITIONAL_INFO_REQUIRED, retailer.getContactEmail(),
                 "Info requested: " + request.getReason().trim());
+
+        auditService.logAction(userId, retailer.getContactEmail(), "CLAIM_INFO_REQUESTED", "Claim", claim.getId(),
+                "Retailer requested additional info: " + request.getReason().trim());
 
         notifyCustomer(claim, "Action needed: Retailer requested additional information for your claim: " + request.getReason().trim());
 
@@ -347,6 +356,9 @@ public class ClaimService {
 
         recordHistory(claim.getId(), prev, ClaimStatus.UNDER_REVIEW, "Customer",
                 "Customer provided response: " + request.getResponse().trim());
+
+        auditService.logAction(customerId, "CUSTOMER", "CLAIM_INFO_REPLIED", "Claim", claim.getId(),
+                "Customer responded to additional info request: " + request.getResponse().trim());
 
         // Notify retailer
         Retailer retailer = retailerRepository.findById(claim.getRetailerId()).orElse(null);
@@ -384,6 +396,9 @@ public class ClaimService {
 
         notifyCustomer(claim, "Service update on your claim: " + request.getNote());
 
+        auditService.logAction(userId, retailer.getContactEmail(), "CLAIM_PROGRESS_UPDATED", "Claim", claim.getId(),
+                "Service progress updated: " + request.getNote().trim());
+
         return mapToResponse(claim);
     }
 
@@ -406,6 +421,9 @@ public class ClaimService {
 
         recordHistory(claim.getId(), prev, ClaimStatus.COMPLETED, retailer.getContactEmail(),
                 "Claim completed. Resolution: " + request.getResolutionNotes());
+
+        auditService.logAction(userId, retailer.getContactEmail(), "CLAIM_COMPLETED", "Claim", claim.getId(),
+                "Claim completed. Resolution: " + request.getResolutionNotes().trim());
 
         notifyCustomer(claim, "Your warranty service has been completed! Resolution: " + request.getResolutionNotes());
 
