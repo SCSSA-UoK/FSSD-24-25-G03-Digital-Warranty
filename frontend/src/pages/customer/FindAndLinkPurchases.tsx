@@ -383,7 +383,7 @@ export const FindAndLinkPurchases: React.FC = () => {
                   className={`p-3.5 rounded-xl border transition flex items-center justify-between gap-3 ${
                     isSelected
                       ? 'border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/30'
-                      : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/60 dark:hover:bg-slate-800/80'
+                      : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800'
                   }`}
                 >
                   <div className="min-w-0 space-y-1">
@@ -662,7 +662,7 @@ export const FindAndLinkPurchases: React.FC = () => {
               <button
                 type="button"
                 onClick={handleStartOver}
-                className="px-3.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition cursor-pointer"
+                className="px-3.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/60 dark:hover:text-indigo-200 transition cursor-pointer"
               >
                 Search Another Email
               </button>
@@ -798,10 +798,10 @@ export const FindAndLinkPurchases: React.FC = () => {
                     key={purchase.id}
                     className={`p-5 sm:p-6 transition flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 ${
                       isAvailable
-                        ? 'hover:bg-slate-50/70 dark:hover:bg-slate-800/40'
+                        ? 'hover:bg-slate-50/80 dark:hover:bg-slate-800/70'
                         : isAlreadyLinked
-                        ? 'bg-slate-50/30 dark:bg-slate-800/20'
-                        : 'bg-slate-50/60 dark:bg-slate-800/30 opacity-80'
+                        ? 'bg-slate-50/30 dark:bg-slate-800/20 hover:bg-slate-50/60 dark:hover:bg-slate-800/40'
+                        : 'bg-slate-50/60 dark:bg-slate-800/30 opacity-80 hover:opacity-100 hover:bg-slate-100/50 dark:hover:bg-slate-800/50'
                     }`}
                   >
                     <div className="space-y-3 min-w-0 flex-1">
@@ -943,7 +943,7 @@ export const FindAndLinkPurchases: React.FC = () => {
                       {isAlreadyLinked && (
                         <Link
                           to="/customer/warranties"
-                          className="w-full sm:w-auto px-3.5 py-2 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 rounded-xl text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                          className="w-full sm:w-auto px-3.5 py-2 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 rounded-xl text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/80 dark:hover:text-indigo-200 transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
                         >
                           View in Wallet <ExternalLink className="w-3 h-3" />
                         </Link>
