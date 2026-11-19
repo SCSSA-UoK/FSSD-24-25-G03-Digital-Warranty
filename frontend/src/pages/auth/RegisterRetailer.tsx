@@ -105,28 +105,6 @@ export const RegisterRetailer: React.FC = () => {
     }
   };
 
-  const getPasswordStrength = (pwd: string) => {
-    if (!pwd) return { score: 0, label: '', color: '', textColor: '', percent: 0 };
-    let score = 0;
-    if (pwd.length >= 8) score += 1;
-    if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score += 1;
-    if (/[0-9]/.test(pwd)) score += 1;
-    if (/[^A-Za-z0-9]/.test(pwd) || pwd.length >= 12) score += 1;
-
-    switch (score) {
-      case 1:
-        return { score: 1, label: 'Weak', color: 'bg-rose-500', textColor: 'text-rose-600 dark:text-rose-400', percent: 25 };
-      case 2:
-        return { score: 2, label: 'Fair', color: 'bg-amber-500', textColor: 'text-amber-600 dark:text-amber-400', percent: 50 };
-      case 3:
-        return { score: 3, label: 'Good', color: 'bg-blue-500', textColor: 'text-blue-600 dark:text-blue-400', percent: 75 };
-      case 4:
-        return { score: 4, label: 'Strong', color: 'bg-emerald-500', textColor: 'text-emerald-600 dark:text-emerald-400', percent: 100 };
-      default:
-        return { score: 0, label: 'Too short', color: 'bg-rose-400', textColor: 'text-rose-500', percent: 15 };
-    }
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
@@ -208,8 +186,6 @@ export const RegisterRetailer: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const pwdStrength = getPasswordStrength(formData.password);
 
   return (
     <div className="w-full max-w-xl mx-auto my-6 sm:my-12 bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
@@ -297,16 +273,9 @@ export const RegisterRetailer: React.FC = () => {
         {/* Password & Confirm Password */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
-                Account Password
-              </label>
-              {formData.password && (
-                <span className={`text-[10px] font-bold ${pwdStrength.textColor}`}>
-                  {pwdStrength.label}
-                </span>
-              )}
-            </div>
+            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
+              Account Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -332,16 +301,6 @@ export const RegisterRetailer: React.FC = () => {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {formData.password && (
-              <div className="mt-1.5 space-y-0.5">
-                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex gap-1">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${pwdStrength.color}`}
-                    style={{ width: `${pwdStrength.percent}%` }}
-                  />
-                </div>
-              </div>
-            )}
             {touched.password && errors.password && (
               <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 flex items-center gap-1 font-medium animate-in fade-in">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />

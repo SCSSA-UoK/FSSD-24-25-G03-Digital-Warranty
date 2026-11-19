@@ -72,28 +72,6 @@ export const RegisterCustomer: React.FC = () => {
     }
   };
 
-  const getPasswordStrength = (pwd: string) => {
-    if (!pwd) return { score: 0, label: '', color: '', textColor: '', percent: 0 };
-    let score = 0;
-    if (pwd.length >= 8) score += 1;
-    if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score += 1;
-    if (/[0-9]/.test(pwd)) score += 1;
-    if (/[^A-Za-z0-9]/.test(pwd) || pwd.length >= 12) score += 1;
-
-    switch (score) {
-      case 1:
-        return { score: 1, label: 'Weak', color: 'bg-rose-500', textColor: 'text-rose-600 dark:text-rose-400', percent: 25 };
-      case 2:
-        return { score: 2, label: 'Fair', color: 'bg-amber-500', textColor: 'text-amber-600 dark:text-amber-400', percent: 50 };
-      case 3:
-        return { score: 3, label: 'Good', color: 'bg-blue-500', textColor: 'text-blue-600 dark:text-blue-400', percent: 75 };
-      case 4:
-        return { score: 4, label: 'Strong', color: 'bg-emerald-500', textColor: 'text-emerald-600 dark:text-emerald-400', percent: 100 };
-      default:
-        return { score: 0, label: 'Too short', color: 'bg-rose-400', textColor: 'text-rose-500', percent: 15 };
-    }
-  };
-
   const handleBlur = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
     let val = '';
@@ -173,8 +151,6 @@ export const RegisterCustomer: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const pwdStrength = getPasswordStrength(password);
 
   return (
     <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
@@ -300,16 +276,9 @@ export const RegisterCustomer: React.FC = () => {
 
         {/* Password */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
-              Password
-            </label>
-            {password && (
-              <span className={`text-[11px] font-bold ${pwdStrength.textColor}`}>
-                Strength: {pwdStrength.label}
-              </span>
-            )}
-          </div>
+          <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
+            Password
+          </label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -334,21 +303,6 @@ export const RegisterCustomer: React.FC = () => {
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-
-          {/* Password Strength Visual Meter */}
-          {password && (
-            <div className="mt-2 space-y-1">
-              <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex gap-1">
-                <div
-                  className={`h-full rounded-full transition-all duration-300 ${pwdStrength.color}`}
-                  style={{ width: `${pwdStrength.percent}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Must be at least 8 characters with uppercase, lowercase, and a number.
-              </p>
-            </div>
-          )}
 
           {touched.password && errors.password && (
             <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 flex items-center gap-1 font-medium animate-in fade-in">
