@@ -46,6 +46,9 @@ public class User {
     private String resetToken;
     private Instant resetTokenExpiresAt;
 
+    // Verified secondary emails for purchase matching
+    private java.util.List<SecondaryEmail> secondaryEmails = new java.util.ArrayList<>();
+
     @CreatedDate
     private Instant createdAt;
 
@@ -234,6 +237,42 @@ public class User {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public java.util.List<SecondaryEmail> getSecondaryEmails() {
+        if (this.secondaryEmails == null) {
+            this.secondaryEmails = new java.util.ArrayList<>();
+        }
+        return this.secondaryEmails;
+    }
+
+    public void setSecondaryEmails(java.util.List<SecondaryEmail> secondaryEmails) {
+        this.secondaryEmails = secondaryEmails != null ? secondaryEmails : new java.util.ArrayList<>();
+    }
+
+    public boolean hasSecondaryEmail(String emailNormalized) {
+        if (emailNormalized == null || this.secondaryEmails == null) {
+            return false;
+        }
+        return this.secondaryEmails.stream()
+                .anyMatch(s -> emailNormalized.equalsIgnoreCase(s.getEmailNormalized()));
+    }
+
+    public void addSecondaryEmail(String email, String emailNormalized) {
+        if (emailNormalized == null) return;
+        if (this.secondaryEmails == null) {
+            this.secondaryEmails = new java.util.ArrayList<>();
+        }
+        if (!hasSecondaryEmail(emailNormalized)) {
+            this.secondaryEmails.add(new SecondaryEmail(email, emailNormalized, Instant.now()));
+        }
+    }
+
+    public boolean removeSecondaryEmail(String emailNormalized) {
+        if (emailNormalized == null || this.secondaryEmails == null) {
+            return false;
+        }
+        return this.secondaryEmails.removeIf(s -> emailNormalized.equalsIgnoreCase(s.getEmailNormalized()));
     }
 
     public static Builder builder() {

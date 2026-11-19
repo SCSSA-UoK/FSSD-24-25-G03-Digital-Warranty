@@ -35,6 +35,7 @@ import { RetailerProfile } from './pages/retailer/RetailerProfile';
 // Customer pages
 import { CustomerDashboard } from './pages/customer/CustomerDashboard';
 import { CustomerWarranties } from './pages/customer/CustomerWarranties';
+import { FindAndLinkPurchases } from './pages/customer/FindAndLinkPurchases';
 import { SubmitClaim } from './pages/customer/SubmitClaim';
 import { CustomerClaims } from './pages/customer/CustomerClaims';
 import { CustomerProfile } from './pages/customer/CustomerProfile';
@@ -173,8 +174,20 @@ export const App: React.FC = () => {
                 }
               />
               <Route
+                path="/customer/find-purchases"
+                element={
+                  <ProtectedRoute allowedRoles={['CUSTOMER']}>
+                    <FindAndLinkPurchases />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/customer/claim-purchase"
-                element={<Navigate to="/customer/warranties" replace />}
+                element={
+                  <ProtectedRoute allowedRoles={['CUSTOMER']}>
+                    <FindAndLinkPurchases />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/customer/submit-claim"

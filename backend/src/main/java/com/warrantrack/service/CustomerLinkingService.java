@@ -62,64 +62,77 @@ public class CustomerLinkingService {
             return 0;
         }
 
-        List<Purchase> matchingPurchases = purchaseRepository.findByCustomerEmailNormalized(normalizedEmail);
+        List<String> targetEmails = new java.util.ArrayList<>();
+        targetEmails.add(normalizedEmail);
+        if (user.getSecondaryEmails() != null) {
+            for (com.warrantrack.model.SecondaryEmail sec : user.getSecondaryEmails()) {
+                if (sec.getEmailNormalized() != null && !sec.getEmailNormalized().isBlank()) {
+                    targetEmails.add(sec.getEmailNormalized());
+                }
+            }
+        }
+
         int linkedCount = 0;
 
-        for (Purchase purchase : matchingPurchases) {
-            // Secure ownership validation:
-            // 1. Normalized customer email must match authenticated user's verified email
-            if (!normalizedEmail.equalsIgnoreCase(purchase.getCustomerEmailNormalized())) {
-                continue;
+        for (String emailToMatch : targetEmails) {
+            List<Purchase> matchingPurchases = purchaseRepository.findByCustomerEmailNormalized(emailToMatch);
+
+            for (Purchase purchase : matchingPurchases) {
+                // Secure ownership validation:
+                // 1. Normalized customer email must match one of authenticated user's verified emails
+                if (!emailToMatch.equalsIgnoreCase(purchase.getCustomerEmailNormalized())) {
+                    continue;
+                }
+
+                // 2. Prevent claiming if already owned by another customer account
+                if (purchase.getCustomerId() != null && !purchase.getCustomerId().equals(user.getId())) {
+                    continue;
+                }
+
+                // If already fully linked to this user, skip
+                if (LinkingStatus.LINKED.equals(purchase.getLinkingStatus()) && user.getId().equals(purchase.getCustomerId())) {
+                    continue;
+                }
+
+                // Link purchase to customer
+                purchase.setCustomerId(user.getId());
+                purchase.setLinkingStatus(LinkingStatus.LINKED);
+                purchase.setUpdatedAt(Instant.now());
+                purchaseRepository.save(purchase);
+
+                // Link matching warranty certificate if present
+                Warranty warranty = warrantyRepository.findByPurchaseId(purchase.getId()).orElse(null);
+                if (warranty != null) {
+                    warranty.setCustomerId(user.getId());
+                    warranty.setUpdatedAt(Instant.now());
+                    warrantyRepository.save(warranty);
+
+                    notificationService.sendNotification(
+                            user.getId(),
+                            NotificationType.PURCHASE_LINKED,
+                            String.format("Purchase '%s' (%s) and digital warranty certificate have been automatically linked to your account.",
+                                    purchase.getPurchaseReference(),
+                                    purchase.getProductName() != null ? purchase.getProductName() : "Product"),
+                            warranty.getId(),
+                            "Warranty"
+                    );
+                } else {
+                    notificationService.sendNotification(
+                            user.getId(),
+                            NotificationType.PURCHASE_LINKED,
+                            String.format("Purchase '%s' (%s) has been automatically linked to your account.",
+                                    purchase.getPurchaseReference(),
+                                    purchase.getProductName() != null ? purchase.getProductName() : "Product"),
+                            purchase.getId(),
+                            "Purchase"
+                    );
+                }
+
+                auditService.logAction(user.getId(), user.getEmail(), "PURCHASE_AUTO_LINKED", "Purchase", purchase.getId(),
+                        "Automatically linked purchase to verified customer account: " + purchase.getPurchaseReference());
+
+                linkedCount++;
             }
-
-            // 2. Prevent claiming if already owned by another customer account
-            if (purchase.getCustomerId() != null && !purchase.getCustomerId().equals(user.getId())) {
-                continue;
-            }
-
-            // If already fully linked to this user, skip
-            if (LinkingStatus.LINKED.equals(purchase.getLinkingStatus()) && user.getId().equals(purchase.getCustomerId())) {
-                continue;
-            }
-
-            // Link purchase to customer
-            purchase.setCustomerId(user.getId());
-            purchase.setLinkingStatus(LinkingStatus.LINKED);
-            purchase.setUpdatedAt(Instant.now());
-            purchaseRepository.save(purchase);
-
-            // Link matching warranty certificate if present
-            Warranty warranty = warrantyRepository.findByPurchaseId(purchase.getId()).orElse(null);
-            if (warranty != null) {
-                warranty.setCustomerId(user.getId());
-                warranty.setUpdatedAt(Instant.now());
-                warrantyRepository.save(warranty);
-
-                notificationService.sendNotification(
-                        user.getId(),
-                        NotificationType.PURCHASE_LINKED,
-                        String.format("Purchase '%s' (%s) and digital warranty certificate have been automatically linked to your account.",
-                                purchase.getPurchaseReference(),
-                                purchase.getProductName() != null ? purchase.getProductName() : "Product"),
-                        warranty.getId(),
-                        "Warranty"
-                );
-            } else {
-                notificationService.sendNotification(
-                        user.getId(),
-                        NotificationType.PURCHASE_LINKED,
-                        String.format("Purchase '%s' (%s) has been automatically linked to your account.",
-                                purchase.getPurchaseReference(),
-                                purchase.getProductName() != null ? purchase.getProductName() : "Product"),
-                        purchase.getId(),
-                        "Purchase"
-                );
-            }
-
-            auditService.logAction(user.getId(), user.getEmail(), "PURCHASE_AUTO_LINKED", "Purchase", purchase.getId(),
-                    "Automatically linked purchase to verified customer account: " + purchase.getPurchaseReference());
-
-            linkedCount++;
         }
 
         if (linkedCount > 0) {
@@ -152,11 +165,22 @@ public class CustomerLinkingService {
             autoLinkPurchasesForUser(user);
         }
 
-        String normalizedEmail = user.getEmailNormalized();
+        List<String> targetEmails = new java.util.ArrayList<>();
+        targetEmails.add(user.getEmailNormalized());
+        if (user.getSecondaryEmails() != null) {
+            for (com.warrantrack.model.SecondaryEmail sec : user.getSecondaryEmails()) {
+                if (sec.getEmailNormalized() != null && !sec.getEmailNormalized().isBlank()) {
+                    targetEmails.add(sec.getEmailNormalized());
+                }
+            }
+        }
 
-        List<Purchase> purchases = purchaseRepository.findByCustomerEmailNormalized(normalizedEmail).stream()
-                .filter(p -> p.getLinkingStatus() != LinkingStatus.LINKED || p.getCustomerId() == null)
-                .toList();
+        List<Purchase> purchases = new java.util.ArrayList<>();
+        for (String email : targetEmails) {
+            purchases.addAll(purchaseRepository.findByCustomerEmailNormalized(email).stream()
+                    .filter(p -> p.getLinkingStatus() != LinkingStatus.LINKED || p.getCustomerId() == null)
+                    .toList());
+        }
 
         return purchases.stream()
                 .map(purchaseService::mapToResponse)
