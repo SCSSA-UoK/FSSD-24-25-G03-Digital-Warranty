@@ -64,5 +64,13 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("Product deactivated successfully",
                 productService.deactivateProduct(principal.getId(), id)));
     }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<ApiResponse<ProductResponse>> activateProduct(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success("Product activated successfully",
+                productService.activateProduct(principal.getId(), id)));
+    }
 }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { productApi } from '../../api';
 import { Product, WarrantyUnit } from '../../types';
-import { Package, Plus, Edit2, Ban, Search, CheckCircle2, Info, AlertTriangle, Layers, X } from 'lucide-react';
+import { Package, Plus, Edit2, Ban, Search, CheckCircle2, Info, AlertTriangle, X } from 'lucide-react';
 
 export const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,6 +10,16 @@ export const ProductManagement: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+  const [statusConfirm, setStatusConfirm] = useState<{
+    type: 'ACTIVATE' | 'DEACTIVATE';
+    product: Product;
+  } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [statusFeedback, setStatusFeedback] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const defaultFormData = {
     name: '',
@@ -48,6 +58,7 @@ export const ProductManagement: React.FC = () => {
     setEditingProduct(null);
     setFormData(defaultFormData);
     setInitialFormData(defaultFormData);
+    setFormError(null);
     setShowDiscardConfirm(false);
     setShowModal(true);
   };
@@ -69,6 +80,7 @@ export const ProductManagement: React.FC = () => {
     };
     setFormData(editData);
     setInitialFormData(editData);
+    setFormError(null);
     setShowDiscardConfirm(false);
     setShowModal(true);
   };
@@ -103,9 +115,9 @@ export const ProductManagement: React.FC = () => {
     setEditingProduct(null);
   };
 
-  // Lock body scroll when modal is open
+  // Lock body scroll when any modal is open
   useEffect(() => {
-    if (showModal) {
+    if (showModal || statusConfirm || showDiscardConfirm) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -113,47 +125,94 @@ export const ProductManagement: React.FC = () => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showModal]);
+  }, [showModal, statusConfirm, showDiscardConfirm]);
 
-  // Handle Escape key to close modal safely
+  // Handle Escape key to close modals safely
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && showModal) {
-        if (showDiscardConfirm) {
+      if (e.key === 'Escape') {
+        if (statusConfirm && !actionLoading) {
+          setStatusConfirm(null);
+        } else if (showDiscardConfirm) {
           setShowDiscardConfirm(false);
-        } else {
+        } else if (showModal) {
           handleCloseAttempt();
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showModal, showDiscardConfirm, formData, initialFormData]);
+  }, [showModal, showDiscardConfirm, statusConfirm, actionLoading, formData, initialFormData]);
+
+  useEffect(() => {
+    if (statusFeedback) {
+      const timer = setTimeout(() => {
+        setStatusFeedback(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [statusFeedback]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
     try {
       if (editingProduct) {
         await productApi.updateProduct(editingProduct.id, formData);
+        setStatusFeedback({
+          type: 'success',
+          message: `Product "${formData.name}" was updated successfully.`,
+        });
       } else {
         await productApi.createProduct(formData);
+        setStatusFeedback({
+          type: 'success',
+          message: `Product "${formData.name}" was added to your catalog.`,
+        });
       }
       setShowModal(false);
       fetchProducts();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Error saving product.');
+      setFormError(err.response?.data?.message || 'Error saving product. Please check your inputs.');
     }
   };
 
-  const handleDeactivate = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to deactivate "${name}"? Historical purchases and warranties will remain intact.`)) {
-      return;
-    }
+  const promptDeactivate = (product: Product) => {
+    setStatusConfirm({ type: 'DEACTIVATE', product });
+  };
+
+  const promptActivate = (product: Product) => {
+    setStatusConfirm({ type: 'ACTIVATE', product });
+  };
+
+  const executeStatusChange = async () => {
+    if (!statusConfirm) return;
+    const { type, product } = statusConfirm;
+    setActionLoading(true);
     try {
-      await productApi.deactivateProduct(id);
-      fetchProducts();
+      if (type === 'ACTIVATE') {
+        await productApi.activateProduct(product.id);
+        setStatusFeedback({
+          type: 'success',
+          message: `Product "${product.name}" has been reactivated and is now active for sales.`,
+        });
+      } else {
+        await productApi.deactivateProduct(product.id);
+        setStatusFeedback({
+          type: 'success',
+          message: `Product "${product.name}" has been deactivated. Historical records remain intact.`,
+        });
+      }
+      setStatusConfirm(null);
+      await fetchProducts();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Error deactivating product.');
+      setStatusFeedback({
+        type: 'error',
+        message: err.response?.data?.message || `Failed to ${type.toLowerCase()} product. Please try again.`,
+      });
+      setStatusConfirm(null);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -193,6 +252,35 @@ export const ProductManagement: React.FC = () => {
         />
       </div>
 
+      {/* Status Feedback Notification */}
+      {statusFeedback && (
+        <div
+          role="alert"
+          className={`p-3.5 rounded-xl border flex items-center justify-between text-xs font-medium animate-in fade-in duration-200 ${
+            statusFeedback.type === 'success'
+              ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800/60'
+              : 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-800/60'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            {statusFeedback.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            )}
+            <span>{statusFeedback.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setStatusFeedback(null)}
+            className="p-1 hover:bg-black/5 dark:hover:bg-white/10 rounded-md transition text-slate-500 dark:text-slate-400 cursor-pointer"
+            aria-label="Dismiss notification"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
         {loading ? (
@@ -204,16 +292,16 @@ export const ProductManagement: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse table-auto lg:table-fixed text-slate-600 dark:text-slate-300">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 select-none">
-                <tr>
-                  <th scope="col" className="px-5 py-3.5 w-[28%] min-w-[220px]">Product & Model</th>
-                  <th scope="col" className="px-5 py-3.5 w-[13%] min-w-[110px] whitespace-nowrap">Category</th>
-                  <th scope="col" className="px-5 py-3.5 w-[12%] min-w-[100px] whitespace-nowrap">Price</th>
-                  <th scope="col" className="px-5 py-3.5 w-[14%] min-w-[130px] whitespace-nowrap">Inventory</th>
-                  <th scope="col" className="px-5 py-3.5 w-[18%] min-w-[160px]">Warranty Policy</th>
-                  <th scope="col" className="px-5 py-3.5 w-[9%] min-w-[95px] whitespace-nowrap">Status</th>
-                  <th scope="col" className="px-5 py-3.5 w-[6%] min-w-[80px] text-right whitespace-nowrap">Actions</th>
+            <table className="w-full min-w-[650px] lg:min-w-full text-left border-collapse text-slate-600 dark:text-slate-300">
+              <thead className="bg-slate-50 dark:bg-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 select-none">
+                <tr className="bg-slate-50 dark:bg-slate-800">
+                  <th scope="col" className="px-5 py-3.5 w-[24%] bg-slate-50 dark:bg-slate-800">Product & Model</th>
+                  <th scope="col" className="px-5 py-3.5 w-[11%] bg-slate-50 dark:bg-slate-800 whitespace-nowrap">Category</th>
+                  <th scope="col" className="px-5 py-3.5 w-[9%] bg-slate-50 dark:bg-slate-800 whitespace-nowrap">Price</th>
+                  <th scope="col" className="px-5 py-3.5 w-[13%] bg-slate-50 dark:bg-slate-800 whitespace-nowrap">Inventory</th>
+                  <th scope="col" className="px-5 py-3.5 w-[30%] bg-slate-50 dark:bg-slate-800">Warranty Policy</th>
+                  <th scope="col" className="px-5 py-3.5 w-[8%] bg-slate-50 dark:bg-slate-800 whitespace-nowrap">Status</th>
+                  <th scope="col" className="px-5 py-3.5 w-[5%] bg-slate-50 dark:bg-slate-800 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -223,7 +311,7 @@ export const ProductManagement: React.FC = () => {
                     className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors duration-150"
                   >
                     {/* Product & Model */}
-                    <td className="px-5 py-3.5 align-middle">
+                    <td className="px-5 py-4 align-middle">
                       <div className="font-bold text-sm text-slate-900 dark:text-slate-100 leading-snug">
                         {p.brand ? `${p.brand} ` : ''}{p.name}
                       </div>
@@ -234,21 +322,21 @@ export const ProductManagement: React.FC = () => {
                     </td>
 
                     {/* Category */}
-                    <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                    <td className="px-5 py-4 align-middle whitespace-nowrap">
                       <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
                         {p.category}
                       </span>
                     </td>
 
                     {/* Price */}
-                    <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                    <td className="px-5 py-4 align-middle whitespace-nowrap">
                       <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums">
                         ${(p.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </td>
 
                     {/* Inventory */}
-                    <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                    <td className="px-5 py-4 align-middle whitespace-nowrap">
                       {(p.stockQuantity ?? 0) > 5 ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -268,39 +356,33 @@ export const ProductManagement: React.FC = () => {
                     </td>
 
                     {/* Warranty Policy */}
-                    <td className="px-5 py-3.5 align-middle">
+                    <td className="px-5 py-4 align-middle">
                       {p.hasWarranty !== false ? (
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 shrink-0">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             {p.warrantyDuration} {p.warrantyUnit?.toLowerCase()}
                           </span>
                           {p.warrantyTerms && (
-                            <p
-                              className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[200px]"
-                              title={p.warrantyTerms}
-                            >
+                            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed break-words whitespace-normal">
                               {p.warrantyTerms}
                             </p>
                           )}
                         </div>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0">
                             No Warranty
                           </span>
-                          <p
-                            className="text-xs text-slate-400 dark:text-slate-500 truncate max-w-[200px]"
-                            title="Bill & receipt only, no digital warranty issued"
-                          >
-                            Bill & receipt only
+                          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed break-words whitespace-normal">
+                            Bill & receipt only (no warranty issued)
                           </p>
                         </div>
                       )}
                     </td>
 
                     {/* Status */}
-                    <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                    <td className="px-5 py-4 align-middle whitespace-nowrap">
                       {p.active ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -315,27 +397,34 @@ export const ProductManagement: React.FC = () => {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-5 py-3.5 align-middle text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <td className="px-5 py-4 align-middle text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => openEditModal(p)}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition cursor-pointer border border-transparent hover:border-blue-200 dark:hover:border-blue-800/60"
+                          className="w-9 h-9 rounded-lg flex items-center justify-center bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border border-slate-200/90 hover:border-blue-300 dark:bg-slate-800 dark:hover:bg-blue-950/60 dark:text-slate-200 dark:hover:text-blue-400 dark:border-slate-700 dark:hover:border-blue-700/80 transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer"
                           title="Edit Product"
                           aria-label="Edit product"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-4.5 h-4.5" />
                         </button>
                         {p.active ? (
                           <button
-                            onClick={() => handleDeactivate(p.id, p.name)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition cursor-pointer border border-transparent hover:border-rose-200 dark:hover:border-rose-800/60"
+                            onClick={() => promptDeactivate(p)}
+                            className="w-9 h-9 rounded-lg flex items-center justify-center bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200/90 hover:border-rose-300 dark:bg-slate-800 dark:hover:bg-rose-950/60 dark:text-slate-200 dark:hover:text-rose-400 dark:border-slate-700 dark:hover:border-rose-700/80 transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer"
                             title="Deactivate Product"
                             aria-label="Deactivate product"
                           >
-                            <Ban className="w-4 h-4" />
+                            <Ban className="w-4.5 h-4.5" />
                           </button>
                         ) : (
-                          <div className="w-8 h-8" aria-hidden="true" />
+                          <button
+                            onClick={() => promptActivate(p)}
+                            className="w-9 h-9 rounded-lg flex items-center justify-center bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-600 border border-slate-200/90 hover:border-emerald-300 dark:bg-slate-800 dark:hover:bg-emerald-950/60 dark:text-slate-200 dark:hover:text-emerald-400 dark:border-slate-700 dark:hover:border-emerald-700/80 transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer"
+                            title="Reactivate Product"
+                            aria-label="Reactivate product"
+                          >
+                            <CheckCircle2 className="w-4.5 h-4.5" />
+                          </button>
                         )}
                       </div>
                     </td>
@@ -392,6 +481,12 @@ export const ProductManagement: React.FC = () => {
             {/* Modal Body & Form */}
             <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
               <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+                {formError && (
+                  <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800/60 rounded-xl text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                    <span>{formError}</span>
+                  </div>
+                )}
                 <div>
                   <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Product Name</label>
                   <input
@@ -626,6 +721,97 @@ export const ProductManagement: React.FC = () => {
                 className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs"
               >
                 Discard & Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Dialog for Product Activation / Deactivation */}
+      {statusConfirm && (
+        <div
+          className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-60 animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !actionLoading) {
+              setStatusConfirm(null);
+            }
+          }}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3.5">
+              <div
+                className={`p-2.5 rounded-xl shrink-0 ${
+                  statusConfirm.type === 'ACTIVATE'
+                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                    : 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                }`}
+              >
+                {statusConfirm.type === 'ACTIVATE' ? (
+                  <CheckCircle2 className="w-5 h-5" />
+                ) : (
+                  <Ban className="w-5 h-5" />
+                )}
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  {statusConfirm.type === 'ACTIVATE' ? 'Reactivate Product?' : 'Deactivate Product?'}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  {statusConfirm.type === 'ACTIVATE' ? (
+                    <>
+                      Are you sure you want to reactivate{' '}
+                      <strong className="text-slate-900 dark:text-slate-100">
+                        {statusConfirm.product.brand ? `${statusConfirm.product.brand} ` : ''}
+                        {statusConfirm.product.name}
+                      </strong>
+                      ? It will become active and available for retail sales and warranty registrations.
+                    </>
+                  ) : (
+                    <>
+                      Are you sure you want to deactivate{' '}
+                      <strong className="text-slate-900 dark:text-slate-100">
+                        {statusConfirm.product.brand ? `${statusConfirm.product.brand} ` : ''}
+                        {statusConfirm.product.name}
+                      </strong>
+                      ? Historical purchases and warranties will remain intact, but it will be hidden from new POS sales.
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={() => setStatusConfirm(null)}
+                className="px-3.5 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={executeStatusChange}
+                className={`px-4 py-2 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs flex items-center gap-1.5 disabled:opacity-60 ${
+                  statusConfirm.type === 'ACTIVATE'
+                    ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
+                    : 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800'
+                }`}
+              >
+                {actionLoading && (
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                )}
+                {statusConfirm.type === 'ACTIVATE'
+                  ? actionLoading
+                    ? 'Reactivating...'
+                    : 'Reactivate Product'
+                  : actionLoading
+                  ? 'Deactivating...'
+                  : 'Deactivate Product'}
               </button>
             </div>
           </div>

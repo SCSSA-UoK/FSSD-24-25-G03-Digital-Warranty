@@ -155,6 +155,22 @@ public class ProductService {
         return mapToResponse(product);
     }
 
+    public ProductResponse activateProduct(String userId, String productId) {
+        Retailer retailer = retailerService.getApprovedRetailerByUserId(userId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
+
+        if (!product.getRetailerId().equals(retailer.getId())) {
+            throw new UnauthorizedException("Cannot activate product belonging to another retailer.");
+        }
+
+        product.setActive(true);
+        product.setUpdatedAt(Instant.now());
+        product = productRepository.save(product);
+
+        return mapToResponse(product);
+    }
+
     public Product getProductEntity(String productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));

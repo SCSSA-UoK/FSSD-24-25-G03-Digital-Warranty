@@ -166,6 +166,10 @@ export const productApi = {
     const res = await apiClient.patch<ApiResponse<Product>>(`/products/${id}/deactivate`);
     return res.data.data;
   },
+  activateProduct: async (id: string) => {
+    const res = await apiClient.patch<ApiResponse<Product>>(`/products/${id}/activate`);
+    return res.data.data;
+  },
 };
 
 export const purchaseApi = {
