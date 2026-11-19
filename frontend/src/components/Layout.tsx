@@ -19,7 +19,7 @@ export const Layout: React.FC = () => {
       {/* Role / Status Alerts */}
       {user && user.role === 'CUSTOMER' && !user.emailVerified && (
         <div className="bg-amber-500 text-white px-3 sm:px-4 py-2.5 text-xs sm:text-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 max-w-7xl mx-auto w-full">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] mx-auto w-full">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <span>
@@ -38,7 +38,7 @@ export const Layout: React.FC = () => {
 
       {user && user.role === 'RETAILER' && user.retailerApprovalStatus === 'PENDING' && (
         <div className="bg-blue-600 text-white px-3 sm:px-4 py-2.5 text-xs sm:text-sm">
-          <div className="max-w-7xl mx-auto w-full flex items-center gap-2">
+          <div className="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] mx-auto w-full flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
             <span>
               <strong>Application Pending:</strong> Your retailer registration is currently under review by the platform administrator. Product creation and purchase registration will be unlocked once approved.
@@ -49,7 +49,7 @@ export const Layout: React.FC = () => {
 
       {user && user.role === 'RETAILER' && user.retailerApprovalStatus === 'SUSPENDED' && (
         <div className="bg-red-600 text-white px-3 sm:px-4 py-2.5 text-xs sm:text-sm">
-          <div className="max-w-7xl mx-auto w-full flex items-center gap-2">
+          <div className="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] mx-auto w-full flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
             <span>
               <strong>Account Suspended:</strong> Your retailer business account has been suspended by the administrator. Operations are restricted.
@@ -59,14 +59,14 @@ export const Layout: React.FC = () => {
       )}
 
       {/* Main Body */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto min-w-0">
+      <div className="flex-1 flex max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] w-full mx-auto min-w-0">
         {user && (
           <Sidebar
             mobileOpen={mobileNavOpen}
             onClose={() => setMobileNavOpen(false)}
           />
         )}
-        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 overflow-x-hidden min-w-0">
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-6 xl:p-8 2xl:p-10 overflow-x-hidden min-w-0">
           <Outlet />
         </main>
       </div>

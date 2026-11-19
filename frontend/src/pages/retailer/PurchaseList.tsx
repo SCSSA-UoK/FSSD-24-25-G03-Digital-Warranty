@@ -211,44 +211,44 @@ export const PurchaseList: React.FC = () => {
       </div>
 
       {/* Overview Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0">
-            <ShoppingCart className="w-5 h-5" />
+      <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3.5 xl:gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-3.5 xl:p-4 shadow-xs flex items-center gap-3.5 min-w-0">
+          <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0">
+            <ShoppingCart className="w-4 h-4 xl:w-5 xl:h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-none">{totalCount}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Total Purchases</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 truncate">Total Purchases</div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-            <ShieldCheck className="w-5 h-5" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-3.5 xl:p-4 shadow-xs flex items-center gap-3.5 min-w-0">
+          <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+            <ShieldCheck className="w-4 h-4 xl:w-5 xl:h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-xl font-bold text-emerald-700 dark:text-emerald-400 leading-none">{warrantyCount}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Digital Warranties</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 truncate">Digital Warranties</div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-            <CheckCircle2 className="w-5 h-5" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-3.5 xl:p-4 shadow-xs flex items-center gap-3.5 min-w-0">
+          <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+            <CheckCircle2 className="w-4 h-4 xl:w-5 xl:h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-xl font-bold text-indigo-700 dark:text-indigo-400 leading-none">{linkedCount}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Linked Customers</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 truncate">Linked Customers</div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-            <Receipt className="w-5 h-5" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-3.5 xl:p-4 shadow-xs flex items-center gap-3.5 min-w-0">
+          <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+            <Receipt className="w-4 h-4 xl:w-5 xl:h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-xl font-bold text-amber-700 dark:text-amber-400 leading-none">{unclaimedCount}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Unclaimed Cards</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 truncate">Unclaimed Cards</div>
           </div>
         </div>
       </div>

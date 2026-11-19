@@ -92,22 +92,22 @@ export const RetailerDashboard: React.FC = () => {
       </div>
 
       {/* Grid of Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-5">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
             <Link
               key={card.title}
               to={card.to}
-              className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition flex items-start justify-between"
+              className="bg-white dark:bg-slate-900 p-4 xl:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition flex items-start justify-between min-w-0"
             >
-              <div>
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">{card.title}</span>
+              <div className="min-w-0 pr-2">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block truncate">{card.title}</span>
                 <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-1">{card.value}</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{card.sub}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">{card.sub}</div>
               </div>
-              <div className={`p-3 rounded-xl ${card.color}`}>
-                <Icon className="w-6 h-6" />
+              <div className={`p-2.5 xl:p-3 rounded-xl shrink-0 ${card.color}`}>
+                <Icon className="w-5 h-5 xl:w-6 xl:h-6" />
               </div>
             </Link>
           );
@@ -115,8 +115,8 @@ export const RetailerDashboard: React.FC = () => {
       </div>
 
       {/* Quick Action Banner */}
-      <div className="bg-gradient-to-r from-indigo-700 via-blue-600 to-indigo-800 text-white rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="space-y-1 text-center sm:text-left">
+      <div className="bg-gradient-to-r from-indigo-700 via-blue-600 to-indigo-800 text-white rounded-2xl p-5 xl:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 xl:gap-6">
+        <div className="space-y-1 text-center md:text-left">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-semibold text-white mb-1">
             <CreditCard className="w-3.5 h-3.5" /> Point of Sale & Checkout
           </div>

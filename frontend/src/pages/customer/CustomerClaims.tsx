@@ -130,9 +130,9 @@ export const CustomerClaims: React.FC = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6">
         {/* Left List */}
-        <div className="lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 max-h-72 lg:max-h-[80vh] overflow-y-auto">
+        <div className="lg:col-span-5 xl:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 max-h-72 lg:max-h-[80vh] overflow-y-auto">
           {loading ? (
             <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">Loading your claims...</div>
           ) : claims.length === 0 ? (
@@ -167,7 +167,7 @@ export const CustomerClaims: React.FC = () => {
         </div>
 
         {/* Right Detail */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs p-6 space-y-6">
+        <div className="lg:col-span-7 xl:col-span-8 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs p-5 xl:p-6 space-y-6">
           {selectedClaim ? (
             <>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">

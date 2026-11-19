@@ -109,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
 
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-colors">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] mx-auto px-3 sm:px-6 lg:px-8 2xl:px-10 h-16 flex items-center justify-between">
         {/* Left: Mobile Nav Hamburger + Brand */}
         <div className="flex items-center gap-1 sm:gap-2">
           {user && (
@@ -346,11 +346,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
                 <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200/60 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-bold text-xs shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition">
                   <UserIcon className="w-4 h-4" />
                 </div>
-                <div className="hidden sm:flex flex-col text-left">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition leading-tight">
+                <div className="hidden sm:flex flex-col text-left min-w-0">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition leading-tight truncate max-w-[120px] md:max-w-[160px] xl:max-w-[220px]">
                     {user.name}
                   </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight truncate max-w-[120px] md:max-w-[160px] xl:max-w-[220px]">
                     {user.email}
                   </span>
                 </div>

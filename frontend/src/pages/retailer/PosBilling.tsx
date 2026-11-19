@@ -442,13 +442,13 @@ export const PosBilling: React.FC = () => {
       )}
 
       {/* Main Layout: 2 Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Product Selection (7 cols) */}
-        <div className="lg:col-span-7 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6 items-start">
+        {/* Left Column: Product Selection (7 cols on lg/xl, 8 on 2xl) */}
+        <div className="lg:col-span-7 xl:col-span-7 2xl:col-span-8 space-y-4">
           <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+            <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-2.5 xl:gap-3 items-stretch sm:items-center lg:items-stretch xl:items-center justify-between">
               {/* Search input */}
-              <div className="relative w-full sm:max-w-xs">
+              <div className="relative w-full sm:max-w-xs lg:max-w-none xl:max-w-xs">
                 <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400 dark:text-slate-500" />
                 <input
                   type="text"
@@ -460,10 +460,10 @@ export const PosBilling: React.FC = () => {
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs w-full sm:w-auto justify-center">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs w-full sm:w-auto lg:w-full xl:w-auto justify-center">
                 <button
                   onClick={() => setFilterType('ALL')}
-                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer flex-1 sm:flex-initial lg:flex-1 xl:flex-initial text-center ${
                     filterType === 'ALL' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
@@ -471,7 +471,7 @@ export const PosBilling: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setFilterType('WARRANTY')}
-                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer flex-1 sm:flex-initial lg:flex-1 xl:flex-initial text-center ${
                     filterType === 'WARRANTY' ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-400 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
@@ -479,7 +479,7 @@ export const PosBilling: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setFilterType('NON_WARRANTY')}
-                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer flex-1 sm:flex-initial lg:flex-1 xl:flex-initial text-center ${
                     filterType === 'NON_WARRANTY' ? 'bg-white dark:bg-slate-700 text-amber-700 dark:text-amber-400 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
@@ -490,7 +490,7 @@ export const PosBilling: React.FC = () => {
               {/* Custom Item Button */}
               <button
                 onClick={() => setShowCustomModal(true)}
-                className="w-full sm:w-auto px-3 py-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition shrink-0 cursor-pointer"
+                className="w-full sm:w-auto lg:w-full xl:w-auto px-3 py-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition shrink-0 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Custom Item
@@ -505,7 +505,7 @@ export const PosBilling: React.FC = () => {
                 No matching products found. Try a different search or click "+ Custom Item".
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[520px] overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2.5 max-h-[520px] 2xl:max-h-[640px] overflow-y-auto pr-1">
                 {filteredProducts.map((p) => {
                   const hasW = p.hasWarranty !== false;
                   const isOutOfStock = (p.stockQuantity ?? 0) <= 0;
@@ -579,9 +579,9 @@ export const PosBilling: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Checkout & Cart (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+        {/* Right Column: Checkout & Cart (5 cols on lg/xl, 4 on 2xl) */}
+        <div className="lg:col-span-5 xl:col-span-5 2xl:col-span-4 space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
             {/* Customer Information with Auto-Lookup & Fill */}
             <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
               <CustomerLookupInput
@@ -616,7 +616,7 @@ export const PosBilling: React.FC = () => {
                   Cart is empty. Select products from the left or add a custom item.
                 </div>
               ) : (
-                <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                <div className="space-y-2.5 max-h-[380px] 2xl:max-h-[460px] overflow-y-auto pr-1">
                   {cart.map((item) => {
                     const linkedProduct = item.productId ? products.find((p) => p.id === item.productId) : null;
                     const availableStock = linkedProduct ? (linkedProduct.stockQuantity ?? 0) : null;
@@ -832,7 +832,7 @@ export const PosBilling: React.FC = () => {
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 Payment Method
               </span>
-              <div className="grid grid-cols-3 gap-1.5 text-xs">
+              <div className="grid grid-cols-3 xl:grid-cols-5 gap-1.5 text-xs">
                 {(['CASH', 'CARD', 'ONLINE', 'UPI', 'OTHER'] as PaymentMethod[]).map((method) => (
                   <button
                     key={method}

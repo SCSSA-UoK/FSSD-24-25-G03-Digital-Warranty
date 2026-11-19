@@ -144,32 +144,32 @@ export const CustomerList: React.FC = () => {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3.5 xl:gap-4">
+        <div className="bg-white dark:bg-slate-900 p-3.5 xl:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Listed</span>
-            <Users className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">Total Listed</span>
+            <Users className="w-4 h-4 xl:w-5 xl:h-5 text-slate-400 dark:text-slate-500 shrink-0" />
           </div>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-2">{customers.length}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 p-3.5 xl:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Active Access</span>
-            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 truncate">Active Access</span>
+            <CheckCircle2 className="w-4 h-4 xl:w-5 xl:h-5 text-emerald-500 shrink-0" />
           </div>
           <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">{activeCount}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 p-3.5 xl:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Inactive</span>
-            <PauseCircle className="w-5 h-5 text-amber-500" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 truncate">Inactive</span>
+            <PauseCircle className="w-4 h-4 xl:w-5 xl:h-5 text-amber-500 shrink-0" />
           </div>
           <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-2">{inactiveCount}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 p-3.5 xl:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 dark:text-rose-400">Suspended</span>
-            <ShieldAlert className="w-5 h-5 text-rose-500" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 dark:text-rose-400 truncate">Suspended</span>
+            <ShieldAlert className="w-4 h-4 xl:w-5 xl:h-5 text-rose-500 shrink-0" />
           </div>
           <p className="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-2">{suspendedCount}</p>
         </div>
