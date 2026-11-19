@@ -644,12 +644,15 @@ export const PurchaseList: React.FC = () => {
 
             {/* QR Code Container */}
             <div className="text-center p-4 bg-slate-50/50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
-              <div className="inline-block p-3 bg-white rounded-xl border border-slate-200 dark:border-slate-600 shadow-xs">
-                <QRCodeSVG
-                  value={`${window.location.origin}/verify/${selectedPurchase.warranty.qrToken}`}
-                  size={140}
-                  level="H"
-                />
+              <div className="flex justify-center">
+                <div className="p-3 bg-white rounded-xl border border-slate-200 dark:border-slate-600 shadow-xs flex items-center justify-center">
+                  <QRCodeSVG
+                    value={`${window.location.origin}/verify/${selectedPurchase.warranty.qrToken}`}
+                    size={140}
+                    level="H"
+                    className="block"
+                  />
+                </div>
               </div>
               <div className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
                 Scan with smartphone camera to verify authenticity

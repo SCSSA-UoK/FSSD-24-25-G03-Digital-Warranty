@@ -217,7 +217,7 @@ export const InvoiceReceipt: React.FC<InvoiceReceiptProps> = ({ bill, receiptId,
           <div className="text-center font-bold text-slate-900 dark:text-slate-100 font-sans uppercase text-[11px] sm:text-xs tracking-wider">
             Digital Warranty Passport QR {qrUnits.length > 1 ? `Codes (${qrUnits.length} Units)` : 'Code'}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className={qrUnits.length === 1 ? 'flex justify-center' : 'grid grid-cols-1 sm:grid-cols-2 gap-3'}>
             {qrUnits.map((item, idx) => {
               const totalForProduct = productCounts.get(item.productName) || 1;
               const currentUnitIdx = (productRunningIdx.get(item.productName) || 0) + 1;
@@ -226,17 +226,20 @@ export const InvoiceReceipt: React.FC<InvoiceReceiptProps> = ({ bill, receiptId,
               return (
                 <div
                   key={`${item.warrantyId || item.qrToken}-${idx}`}
-                  className="flex flex-col items-center text-center p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs space-y-1.5"
+                  className={`flex flex-col items-center text-center p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs space-y-1.5 ${
+                    qrUnits.length === 1 ? 'w-full max-w-xs' : ''
+                  }`}
                 >
                   {totalForProduct > 1 && (
                     <span className="text-[10px] font-sans font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60">
                       Unit {currentUnitIdx} of {totalForProduct}
                     </span>
                   )}
-                  <div className="p-1.5 bg-white rounded-md">
+                  <div className="p-2 bg-white rounded-md border border-slate-100 flex items-center justify-center shrink-0">
                     <QRCodeSVG
                       value={`${window.location.origin}/verify/${item.qrToken}`}
                       size={100}
+                      className="block"
                     />
                   </div>
                   <span className="text-[11px] font-bold text-slate-800 dark:text-slate-100 font-sans line-clamp-1">
