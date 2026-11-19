@@ -183,30 +183,43 @@ export const CustomerWarranties: React.FC = () => {
                       {w.termsSnapshot}
                     </p>
                   </div>
+
+                  {/* Digital Warranty Passport QR Snapshot */}
+                  <div className="flex items-center justify-between gap-3 p-2.5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/60">
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                        <QrCode className="w-3.5 h-3.5 shrink-0" /> Digital Passport QR
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">Scan or click to enlarge verification code</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setQrModalWarranty(w)}
+                      className="p-1.5 bg-white rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500/20 transition shrink-0 cursor-pointer flex items-center justify-center group"
+                      title="Click to enlarge QR Code"
+                    >
+                      <QRCodeSVG
+                        value={`${window.location.origin}/verify/${w.qrToken}`}
+                        size={48}
+                        className="block group-hover:scale-105 transition-transform"
+                      />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Card Footer */}
                 <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setQrModalWarranty(w)}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
-                    >
-                      <QrCode className="w-4 h-4" /> QR Code
-                    </button>
-                    <span className="text-slate-300 dark:text-slate-600">&bull;</span>
-                    <button
-                      onClick={() => setCertModalWarranty(w)}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition cursor-pointer"
-                    >
-                      <Printer className="w-3.5 h-3.5" /> Certificate
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setCertModalWarranty(w)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5" /> View Certificate
+                  </button>
 
                   {w.eligibleForClaim ? (
                     <button
                       onClick={() => navigate('/customer/submit-claim', { state: { warrantyId: w.id } })}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition cursor-pointer shadow-2xs"
                     >
                       <Send className="w-3.5 h-3.5" /> Submit Claim
                     </button>
@@ -234,11 +247,14 @@ export const CustomerWarranties: React.FC = () => {
               </div>
             )}
 
-            <div className="p-4 bg-white rounded-xl inline-block border border-slate-200 dark:border-slate-700 shadow-xs">
-              <QRCodeSVG
-                value={`${window.location.origin}/verify/${qrModalWarranty.qrToken}`}
-                size={180}
-              />
+            <div className="flex justify-center">
+              <div className="p-4 bg-white rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-center">
+                <QRCodeSVG
+                  value={`${window.location.origin}/verify/${qrModalWarranty.qrToken}`}
+                  size={180}
+                  className="block"
+                />
+              </div>
             </div>
 
             <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -350,11 +366,11 @@ export const CustomerWarranties: React.FC = () => {
 
               {/* QR Verification Footer */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-amber-200/60 dark:border-amber-700/40 print:border-amber-200/60">
-                <div className="text-left text-xs space-y-1">
-                  <div className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-bold print:text-emerald-700">
-                    <CheckCircle2 className="w-4 h-4" /> Cryptographically Validated
+                <div className="text-center sm:text-left text-xs space-y-1">
+                  <div className="flex items-center justify-center sm:justify-start gap-1 text-emerald-700 dark:text-emerald-400 font-bold print:text-emerald-700">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" /> Cryptographically Validated
                   </div>
-                  <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 break-all max-w-xs print:text-slate-400">
+                  <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 break-all max-w-xs mx-auto sm:mx-0 print:text-slate-400">
                     Verification ID: {certModalWarranty.qrToken}
                   </div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 print:text-slate-500">
@@ -362,10 +378,11 @@ export const CustomerWarranties: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-2 bg-white rounded-lg border border-slate-300 dark:border-slate-600 shadow-xs shrink-0">
+                <div className="p-2.5 bg-white rounded-lg border border-slate-300 dark:border-slate-600 shadow-xs shrink-0 flex items-center justify-center">
                   <QRCodeSVG
                     value={`${window.location.origin}/verify/${certModalWarranty.qrToken}`}
                     size={100}
+                    className="block"
                   />
                 </div>
               </div>
