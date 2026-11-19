@@ -105,7 +105,7 @@ export const CustomerWarranties: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-6 print:hidden">
           {filtered.map((w) => {
             const prog = getWarrantyProgress(w.startDate, w.expiryDate);
             return (

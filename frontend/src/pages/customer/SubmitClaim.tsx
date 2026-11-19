@@ -84,7 +84,7 @@ export const SubmitClaim: React.FC = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-6">
+    <div className="max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Submit Warranty Service Claim</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">

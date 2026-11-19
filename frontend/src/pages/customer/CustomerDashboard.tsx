@@ -118,43 +118,43 @@ export const CustomerDashboard: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Active Warranties</span>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 xl:gap-5">
+        <div className="bg-white dark:bg-slate-900 p-4 xl:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between min-w-0">
+          <div className="min-w-0 pr-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block truncate">Active Warranties</span>
             <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-1">{activeWarrantiesCount}</div>
-            <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Eligible for service claims</div>
+            <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium truncate">Eligible for service claims</div>
           </div>
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded-xl">
-            <ShieldCheck className="w-6 h-6" />
+          <div className="p-2.5 xl:p-3 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded-xl shrink-0">
+            <ShieldCheck className="w-5 h-5 xl:w-6 xl:h-6" />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Warranties</span>
+        <div className="bg-white dark:bg-slate-900 p-4 xl:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between min-w-0">
+          <div className="min-w-0 pr-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block truncate">Total Warranties</span>
             <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-1">{warranties.length}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Multi-retailer records</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">Multi-retailer records</div>
           </div>
-          <div className="p-3 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 rounded-xl">
-            <Store className="w-6 h-6" />
+          <div className="p-2.5 xl:p-3 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 rounded-xl shrink-0">
+            <Store className="w-5 h-5 xl:w-6 xl:h-6" />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Warranty Claims</span>
+        <div className="bg-white dark:bg-slate-900 p-4 xl:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between min-w-0">
+          <div className="min-w-0 pr-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block truncate">Warranty Claims</span>
             <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mt-1">{claims.length}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Tracked in real-time</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">Tracked in real-time</div>
           </div>
-          <div className="p-3 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 rounded-xl">
-            <FileText className="w-6 h-6" />
+          <div className="p-2.5 xl:p-3 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 rounded-xl shrink-0">
+            <FileText className="w-5 h-5 xl:w-6 xl:h-6" />
           </div>
         </div>
       </div>
 
       {/* Recent Digital Warranties */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs p-6 space-y-4">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs p-5 xl:p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Your Active Digital Warranties</h2>
           <Link
@@ -170,7 +170,7 @@ export const CustomerDashboard: React.FC = () => {
             No digital warranties linked yet. Any retail purchases made with your email are automatically synced to your account.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4">
             {warranties.map((w) => (
               <div
                 key={w.id}
