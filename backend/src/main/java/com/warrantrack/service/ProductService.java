@@ -20,10 +20,12 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final RetailerService retailerService;
+    private final AuditService auditService;
 
-    public ProductService(ProductRepository productRepository, RetailerService retailerService) {
+    public ProductService(ProductRepository productRepository, RetailerService retailerService, AuditService auditService) {
         this.productRepository = productRepository;
         this.retailerService = retailerService;
+        this.auditService = auditService;
     }
 
     public ProductResponse createProduct(String userId, ProductRequest request) {
@@ -57,6 +59,10 @@ public class ProductService {
                 .build();
 
         product = productRepository.save(product);
+
+        auditService.logAction(userId, retailer.getContactEmail(), "PRODUCT_CREATED", "Product", product.getId(),
+                "Product created: " + product.getName() + " (" + product.getBrand() + " " + product.getModel() + ")");
+
         return mapToResponse(product);
     }
 
@@ -135,6 +141,10 @@ public class ProductService {
         product.setUpdatedAt(Instant.now());
 
         product = productRepository.save(product);
+
+        auditService.logAction(userId, retailer.getContactEmail(), "PRODUCT_UPDATED", "Product", product.getId(),
+                "Product updated: " + product.getName() + " (" + product.getBrand() + ")");
+
         return mapToResponse(product);
     }
 
@@ -152,6 +162,9 @@ public class ProductService {
         product.setUpdatedAt(Instant.now());
         product = productRepository.save(product);
 
+        auditService.logAction(userId, retailer.getContactEmail(), "PRODUCT_DEACTIVATED", "Product", product.getId(),
+                "Product deactivated: " + product.getName());
+
         return mapToResponse(product);
     }
 
@@ -167,6 +180,9 @@ public class ProductService {
         product.setActive(true);
         product.setUpdatedAt(Instant.now());
         product = productRepository.save(product);
+
+        auditService.logAction(userId, retailer.getContactEmail(), "PRODUCT_ACTIVATED", "Product", product.getId(),
+                "Product reactivated: " + product.getName());
 
         return mapToResponse(product);
     }

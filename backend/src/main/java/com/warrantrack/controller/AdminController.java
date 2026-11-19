@@ -2,6 +2,7 @@ package com.warrantrack.controller;
 
 import com.warrantrack.dto.ApiResponse;
 import com.warrantrack.dto.PagedResponse;
+import com.warrantrack.dto.admin.AuditLogResponse;
 import com.warrantrack.dto.admin.CustomerStatusUpdateRequest;
 import com.warrantrack.dto.analytics.PlatformAnalyticsResponse;
 import com.warrantrack.dto.auth.UserResponse;
@@ -13,6 +14,7 @@ import com.warrantrack.model.enums.ApprovalStatus;
 import com.warrantrack.model.enums.ClaimStatus;
 import com.warrantrack.security.UserPrincipal;
 import com.warrantrack.service.AdminService;
+import com.warrantrack.service.AuditService;
 import com.warrantrack.service.ClaimService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -29,10 +33,12 @@ public class AdminController {
 
     private final AdminService adminService;
     private final ClaimService claimService;
+    private final AuditService auditService;
 
-    public AdminController(AdminService adminService, ClaimService claimService) {
+    public AdminController(AdminService adminService, ClaimService claimService, AuditService auditService) {
         this.adminService = adminService;
         this.claimService = claimService;
+        this.auditService = auditService;
     }
 
     @GetMapping("/dashboard")
@@ -85,6 +91,25 @@ public class AdminController {
             @RequestParam(required = false) ClaimStatus status,
             @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(claimService.getAllClaimsForAdmin(status, pageable)));
+    }
+
+    @GetMapping("/audit-logs")
+    public ResponseEntity<ApiResponse<PagedResponse<AuditLogResponse>>> getAuditLogs(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) String entityType,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(auditService.getAuditLogs(search, action, entityType, pageable)));
+    }
+
+    @GetMapping("/audit-logs/actions")
+    public ResponseEntity<ApiResponse<List<String>>> getAuditLogActions() {
+        return ResponseEntity.ok(ApiResponse.success(auditService.getDistinctActions()));
+    }
+
+    @GetMapping("/audit-logs/entity-types")
+    public ResponseEntity<ApiResponse<List<String>>> getAuditLogEntityTypes() {
+        return ResponseEntity.ok(ApiResponse.success(auditService.getDistinctEntityTypes()));
     }
 }
 

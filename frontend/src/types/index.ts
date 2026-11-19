@@ -393,4 +393,15 @@ export interface SecondaryEmailRecord {
   availablePurchasesCount: number;
 }
 
+export interface AuditLog {
+  id: string;
+  actorId: string;
+  actorEmail: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  timestamp: string;
+  details?: string;
+}
+
 

@@ -18,6 +18,7 @@ import {
   CreditCard,
   Receipt,
   User,
+  History,
   X,
   LogOut,
 } from 'lucide-react';
@@ -63,6 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
     { to: '/admin/retailers', label: 'Retailer Approvals', icon: Store },
     { to: '/admin/customers', label: 'Registered Customers', icon: Users },
     { to: '/admin/claims', label: 'Platform Claims', icon: FileText },
+    { to: '/admin/audit-logs', label: 'Security & Audit Logs', icon: History },
     { to: '/notifications', label: 'Notifications', icon: Bell },
   ];
 

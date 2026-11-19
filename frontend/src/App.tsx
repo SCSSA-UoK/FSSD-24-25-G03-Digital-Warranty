@@ -22,6 +22,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { RetailerApplications } from './pages/admin/RetailerApplications';
 import { CustomerList } from './pages/admin/CustomerList';
 import { PlatformClaims } from './pages/admin/PlatformClaims';
+import { AuditLogs } from './pages/admin/AuditLogs';
 
 // Retailer pages
 import { RetailerDashboard } from './pages/retailer/RetailerDashboard';
@@ -90,6 +91,14 @@ export const App: React.FC = () => {
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN']}>
                     <PlatformClaims />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/audit-logs"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <AuditLogs />
                   </ProtectedRoute>
                 }
               />

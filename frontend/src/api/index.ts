@@ -24,6 +24,7 @@ import {
   AltEmailVerificationResponse,
   FindPurchasesResult,
   SecondaryEmailRecord,
+  AuditLog,
 } from '../types';
 
 export const authApi = {
@@ -118,6 +119,24 @@ export const adminApi = {
     const params = new URLSearchParams({ page: String(page), size: String(size) });
     if (status) params.append('status', status);
     const res = await apiClient.get<ApiResponse<PagedResponse<Claim>>>(`/admin/claims?${params.toString()}`);
+    return res.data.data;
+  },
+  getAuditLogs: async (filter?: { search?: string; action?: string; entityType?: string; page?: number; size?: number }) => {
+    const params = new URLSearchParams();
+    if (filter?.page !== undefined) params.append('page', String(filter.page));
+    if (filter?.size !== undefined) params.append('size', String(filter.size));
+    if (filter?.search) params.append('search', filter.search.trim());
+    if (filter?.action) params.append('action', filter.action);
+    if (filter?.entityType) params.append('entityType', filter.entityType);
+    const res = await apiClient.get<ApiResponse<PagedResponse<AuditLog>>>(`/admin/audit-logs?${params.toString()}`);
+    return res.data.data;
+  },
+  getAuditActions: async () => {
+    const res = await apiClient.get<ApiResponse<string[]>>('/admin/audit-logs/actions');
+    return res.data.data;
+  },
+  getAuditEntityTypes: async () => {
+    const res = await apiClient.get<ApiResponse<string[]>>('/admin/audit-logs/entity-types');
     return res.data.data;
   },
 };
