@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { warrantyApi } from '../../api';
 import { Warranty } from '../../types';
 import { QRCodeSVG } from 'qrcode.react';
-import { ShieldCheck, QrCode, Search, Send, ExternalLink, Printer, Award, Calendar, Store, CheckCircle2, RefreshCw } from 'lucide-react';
+import { ShieldCheck, QrCode, Search, Send, ExternalLink, Printer, Award, Calendar, Store, CheckCircle2, RefreshCw, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const CustomerWarranties: React.FC = () => {
@@ -265,10 +265,9 @@ export const CustomerWarranties: React.FC = () => {
             <div className="flex flex-col gap-2 pt-2">
               <Link
                 to={`/verify/${qrModalWarranty.qrToken}`}
-                target="_blank"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-1"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-1.5"
               >
-                Open Verification Page <ExternalLink className="w-3 h-3" />
+                Open Verification Page <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <button
                 type="button"

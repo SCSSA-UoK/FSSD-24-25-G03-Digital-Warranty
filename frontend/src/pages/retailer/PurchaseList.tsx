@@ -535,9 +535,8 @@ export const PurchaseList: React.FC = () => {
                             </button>
                             <Link
                               to={`/verify/${p.warranty.qrToken}`}
-                              target="_blank"
                               className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
-                              title="Open public verification page in new tab"
+                              title="Open verification page"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                             </Link>
@@ -666,10 +665,9 @@ export const PurchaseList: React.FC = () => {
             <div className="flex items-center gap-2 pt-1">
               <Link
                 to={`/verify/${selectedPurchase.warranty.qrToken}`}
-                target="_blank"
                 className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-1.5 shadow-xs"
               >
-                Verify in New Tab <ExternalLink className="w-3.5 h-3.5" />
+                Open Verification Page <ExternalLink className="w-3.5 h-3.5" />
               </Link>
               <button
                 type="button"
