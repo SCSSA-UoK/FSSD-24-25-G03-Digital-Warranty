@@ -5,6 +5,11 @@ spring:
   application:
     name: warrantrack
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
