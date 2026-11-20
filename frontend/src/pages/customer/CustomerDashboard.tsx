@@ -201,7 +201,6 @@ export const CustomerDashboard: React.FC = () => {
                   <span>Expires: <strong className="text-slate-700 dark:text-slate-300">{w.expiryDate}</strong></span>
                   <Link
                     to={`/verify/${w.qrToken}`}
-                    target="_blank"
                     className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
                   >
                     View QR Token &rarr;

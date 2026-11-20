@@ -1,14 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { warrantyApi } from '../../api';
 import { PublicWarranty } from '../../types';
-import { ShieldCheck, ShieldAlert, CheckCircle2, Clock, Calendar, Store, Package } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { ShieldAlert, CheckCircle2, Clock, Calendar, Store, Package, X } from 'lucide-react';
 
 export const PublicVerify: React.FC = () => {
   const { qrToken } = useParams<{ qrToken: string }>();
   const [warranty, setWarranty] = useState<PublicWarranty | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleClose = () => {
+    // If navigated from within the app, go back to previous screen
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+      navigate(-1);
+    } else if (user) {
+      if (user.role === 'CUSTOMER') {
+        navigate('/customer/warranties');
+      } else if (user.role === 'RETAILER') {
+        navigate('/retailer/purchases');
+      } else if (user.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } else {
+      if (window.opener) {
+        window.close();
+      } else {
+        navigate('/');
+      }
+    }
+  };
 
   useEffect(() => {
     const verify = async () => {
@@ -28,8 +56,9 @@ export const PublicVerify: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 gap-3">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Validating warranty verification token...</p>
       </div>
     );
   }
@@ -37,18 +66,36 @@ export const PublicVerify: React.FC = () => {
   if (error || !warranty) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12 px-4 transition-colors">
-        <div className="max-w-md mx-auto p-8 bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-rose-800/60 shadow-sm text-center space-y-4">
+        <div className="max-w-md mx-auto p-8 bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-rose-800/60 shadow-sm text-center space-y-4 relative">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition cursor-pointer"
+            title="Close"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
           <div className="bg-red-100 dark:bg-rose-950/60 text-red-600 dark:text-rose-400 w-14 h-14 rounded-full mx-auto flex items-center justify-center">
             <ShieldAlert className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Verification Failed</h2>
           <p className="text-sm text-slate-600 dark:text-slate-400">{error}</p>
-          <Link
-            to="/"
-            className="inline-block mt-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
-          >
-            Return to Home
-          </Link>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
+            >
+              Close
+            </button>
+            <Link
+              to="/"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition"
+            >
+              Return to Home
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -56,12 +103,24 @@ export const PublicVerify: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-6 sm:py-12 px-3 sm:px-4 transition-colors">
-      <div className="max-w-lg mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md overflow-hidden">
+      <div className="max-w-lg mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md overflow-hidden relative">
         {/* Header Banner */}
         <div
-          className={`p-5 sm:p-6 text-white text-center flex flex-col items-center gap-2 ${warranty.currentlyValid ? 'bg-emerald-600' : 'bg-amber-600'
-            }`}
+          className={`relative p-5 sm:p-6 text-white text-center flex flex-col items-center gap-2 ${
+            warranty.currentlyValid ? 'bg-emerald-600' : 'bg-amber-600'
+          }`}
         >
+          {/* Top-right corner close button */}
+          <button
+            type="button"
+            onClick={handleClose}
+            className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-black/20 hover:bg-black/35 text-white/90 hover:text-white transition cursor-pointer flex items-center justify-center"
+            title="Close verification"
+            aria-label="Close verification"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
           {warranty.currentlyValid ? (
             <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12" />
           ) : (
@@ -117,8 +176,9 @@ export const PublicVerify: React.FC = () => {
                 <Clock className="w-3.5 h-3.5" /> Expiry Date (Inclusive)
               </div>
               <div
-                className={`font-semibold mt-1 ${warranty.currentlyValid ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-rose-400'
-                  }`}
+                className={`font-semibold mt-1 ${
+                  warranty.currentlyValid ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-rose-400'
+                }`}
               >
                 {warranty.expiryDate}
               </div>
