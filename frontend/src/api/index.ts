@@ -327,8 +327,11 @@ export const claimApi = {
     const res = await apiClient.post<ApiResponse<Claim>>(`/claims/${id}/request-info`, { reason });
     return res.data.data;
   },
-  replyInfo: async (id: string, response: string, additionalEvidence?: string[]) => {
-    const res = await apiClient.post<ApiResponse<Claim>>(`/claims/${id}/provide-info`, { response, additionalEvidence });
+  replyInfo: async (id: string, response?: string, additionalEvidence?: string[]) => {
+    const res = await apiClient.post<ApiResponse<Claim>>(`/claims/${id}/provide-info`, {
+      response: response?.trim() || '',
+      additionalEvidence,
+    });
     return res.data.data;
   },
   cancelClaim: async (id: string, reason: string) => {

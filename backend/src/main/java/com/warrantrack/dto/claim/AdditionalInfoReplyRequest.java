@@ -1,10 +1,8 @@
 package com.warrantrack.dto.claim;
 
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public class AdditionalInfoReplyRequest {
-    @NotBlank(message = "Response details are required")
     private String response;
 
     private List<String> additionalEvidence;
