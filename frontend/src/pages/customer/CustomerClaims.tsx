@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-import React, { useEffect, useRef, useState } from 'react';
-=======
-import React, { useEffect, useState, useMemo } from 'react';
->>>>>>> Stashed changes
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { claimApi } from '../../api';
 import { Claim, ClaimStatus } from '../../types';
 import {
@@ -15,12 +11,24 @@ import {
   Send,
   CheckCircle2,
   Star,
-<<<<<<< Updated upstream
-  Upload,
+  Search,
+  Copy,
+  Check,
+  User,
+  Store,
+  Calendar,
+  Package,
+  AlertTriangle,
+  Layers,
+  CheckCheck,
+  Activity,
+  ArrowUpRight,
   X,
+  ArrowLeft,
+  Upload,
   Loader2,
   Plus,
-  AlertCircle,
+  AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -44,26 +52,8 @@ const formatFileSize = (bytes: number): string => {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 };
-=======
-  Search,
-  Copy,
-  Check,
-  User,
-  Store,
-  Calendar,
-  Package,
-  AlertTriangle,
-  Layers,
-  CheckCheck,
-  Activity,
-  ArrowUpRight,
-  X,
-  ArrowLeft
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 type CustomerTabFilter = 'ALL' | 'IN_REVIEW' | 'ACTION_REQUIRED' | 'IN_SERVICE' | 'COMPLETED';
->>>>>>> Stashed changes
 
 export const CustomerClaims: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -79,10 +69,11 @@ export const CustomerClaims: React.FC = () => {
   // Mobile View Switcher (for small screens < lg)
   const [mobileView, setMobileView] = useState<'LIST' | 'DETAIL'>('LIST');
 
-  // Modals
+  // Cancel Modal
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
 
+  // Reply Modal & Image Upload State
   const [replyModal, setReplyModal] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [replyImages, setReplyImages] = useState<SelectedImage[]>([]);
@@ -91,6 +82,13 @@ export const CustomerClaims: React.FC = () => {
   const replyFileInputRef = useRef<HTMLInputElement | null>(null);
   const replyImagesRef = useRef<SelectedImage[]>([]);
   replyImagesRef.current = replyImages;
+
+  // Feedback Modal
+  const [feedbackModal, setFeedbackModal] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [feedbackText, setFeedbackText] = useState('');
+
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -119,12 +117,12 @@ export const CustomerClaims: React.FC = () => {
       const isMimeAllowed = ALLOWED_MIME_TYPES.includes(file.type);
 
       if (!isExtAllowed || (!isMimeAllowed && file.type)) {
-        errors.push(`"${file.name}" is not a supported format. Only JPG, JPEG, and PNG are allowed.`);
+        errors.push(`"${file.name}" is not supported. Only JPG, JPEG, and PNG are allowed.`);
         return;
       }
 
       if (file.size > MAX_FILE_SIZE) {
-        errors.push(`"${file.name}" exceeds the 5 MB maximum size limit (${formatFileSize(file.size)}).`);
+        errors.push(`"${file.name}" exceeds the 5 MB maximum limit (${formatFileSize(file.size)}).`);
         return;
       }
 
@@ -148,7 +146,7 @@ export const CustomerClaims: React.FC = () => {
 
     setReplyImages((prev) => [...prev, ...newItems]);
 
-    // Securely upload each image file to the Spring Boot backend
+    // Upload each image file to the backend
     newItems.forEach(async (item) => {
       try {
         const res = await claimApi.uploadEvidence(item.file);
@@ -177,12 +175,6 @@ export const CustomerClaims: React.FC = () => {
       return prev.filter((img) => img.id !== id);
     });
   };
-
-  const [feedbackModal, setFeedbackModal] = useState(false);
-  const [rating, setRating] = useState(5);
-  const [feedbackText, setFeedbackText] = useState('');
-
-  const [submitting, setSubmitting] = useState(false);
 
   const fetchClaims = async (silent = false) => {
     try {
@@ -253,7 +245,6 @@ export const CustomerClaims: React.FC = () => {
 
     setSubmitting(true);
     try {
-<<<<<<< Updated upstream
       const evidenceUrls = replyImages
         .map((img) => img.serverUrl)
         .filter((url): url is string => Boolean(url));
@@ -266,16 +257,7 @@ export const CustomerClaims: React.FC = () => {
 
       setSelectedClaim(updated);
       closeReplyModal();
-      fetchClaims();
-=======
-      const evidenceList = additionalEvidence.trim() ? [additionalEvidence.trim()] : undefined;
-      const updated = await claimApi.replyInfo(selectedClaim.id, replyText.trim(), evidenceList);
-      setSelectedClaim(updated);
-      setReplyModal(false);
-      setReplyText('');
-      setAdditionalEvidence('');
       await fetchClaims(true);
->>>>>>> Stashed changes
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error sending reply.');
     } finally {
@@ -873,10 +855,10 @@ export const CustomerClaims: React.FC = () => {
               <div className="p-4 sm:p-5 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   {selectedClaim.currentStatus === 'ADDITIONAL_INFO_REQUIRED' ? (
-                    <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center justify-between w-full gap-3 flex-wrap sm:flex-nowrap">
                       <div className="flex items-center gap-2 text-xs font-semibold text-purple-800 dark:text-purple-300">
-                        <MessageSquare className="w-4 h-4 text-purple-600" />
-                        The retailer needs additional information or photos from you.
+                        <MessageSquare className="w-4 h-4 text-purple-600 shrink-0" />
+                        <span>The retailer needs additional information or photos from you.</span>
                       </div>
                       <button
                         type="button"
@@ -900,15 +882,15 @@ export const CustomerClaims: React.FC = () => {
                       </button>
                     </div>
                   ) : selectedClaim.currentStatus === 'COMPLETED' ? (
-                    <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center justify-between w-full gap-3 flex-wrap sm:flex-nowrap">
                       <span className="text-xs font-semibold text-teal-700 dark:text-teal-400 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4" /> Service completed! Your unit is ready.
+                        <CheckCircle2 className="w-4 h-4 shrink-0" /> Service completed! Your unit is ready.
                       </span>
                       {!selectedClaim.customerRating && (
                         <button
                           type="button"
                           onClick={() => setFeedbackModal(true)}
-                          className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1"
+                          className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1 shrink-0"
                         >
                           <Star className="w-3.5 h-3.5 fill-current" /> Rate Service Experience
                         </button>
@@ -933,6 +915,39 @@ export const CustomerClaims: React.FC = () => {
                     "{selectedClaim.issueDescription}"
                   </div>
                 </div>
+
+                {/* Supporting Images / Evidence References */}
+                {selectedClaim.evidenceReferences && selectedClaim.evidenceReferences.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Supporting Images / Evidence ({selectedClaim.evidenceReferences.length})
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                      {selectedClaim.evidenceReferences.map((ref, idx) => (
+                        <a
+                          key={idx}
+                          href={ref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative block rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 aspect-video hover:opacity-90 transition shadow-2xs"
+                        >
+                          <img
+                            src={ref}
+                            alt={`Evidence ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                          <div className="p-1.5 text-[10px] text-slate-600 dark:text-slate-300 truncate bg-white/90 dark:bg-slate-900/90 absolute bottom-0 inset-x-0 flex items-center justify-between">
+                            <span className="truncate">{ref.split('/').pop() || `Attachment ${idx + 1}`}</span>
+                            <ArrowUpRight className="w-3 h-3 shrink-0 ml-1 opacity-70" />
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Final Resolution Notes if completed */}
                 {selectedClaim.resolutionNotes && (
@@ -978,56 +993,6 @@ export const CustomerClaims: React.FC = () => {
                     <Wrench className="w-3.5 h-3.5 text-indigo-500" /> Service Workshop Updates
                   </span>
 
-<<<<<<< Updated upstream
-              {/* Issue Description */}
-              <div>
-                <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-semibold">Reported Issue</span>
-                <p className="mt-1 text-sm text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
-                  {selectedClaim.issueDescription}
-                </p>
-              </div>
-
-              {/* Supporting Images / Evidence References */}
-              {selectedClaim.evidenceReferences && selectedClaim.evidenceReferences.length > 0 && (
-                <div>
-                  <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-semibold">Supporting Images / Evidence</span>
-                  <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {selectedClaim.evidenceReferences.map((ref, idx) => (
-                      <a
-                        key={idx}
-                        href={ref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative block rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 aspect-video hover:opacity-90 transition shadow-xs"
-                      >
-                        <img
-                          src={ref}
-                          alt={`Evidence ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = 'none';
-                          }}
-                        />
-                        <div className="p-1.5 text-[10px] text-slate-600 dark:text-slate-300 truncate bg-white/90 dark:bg-slate-900/90 absolute bottom-0 inset-x-0">
-                          {ref.split('/').pop() || `Attachment ${idx + 1}`}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Service Updates */}
-              {selectedClaim.serviceNotes && selectedClaim.serviceNotes.length > 0 && (
-                <div>
-                  <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-semibold">Service Updates</span>
-                  <div className="mt-2 space-y-2">
-                    {selectedClaim.serviceNotes.map((sn, idx) => (
-                      <div key={idx} className="text-xs p-3 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg border border-indigo-100 dark:border-indigo-800/50">
-                        <div className="font-semibold text-indigo-900 dark:text-indigo-200">{sn.note}</div>
-                        <div className="text-[10px] text-indigo-500 dark:text-indigo-400 mt-1">
-                          {new Date(sn.addedAt).toLocaleString()}
-=======
                   {selectedClaim.serviceNotes && selectedClaim.serviceNotes.length > 0 ? (
                     <div className="space-y-2.5">
                       {selectedClaim.serviceNotes.map((sn, idx) => (
@@ -1039,7 +1004,6 @@ export const CustomerClaims: React.FC = () => {
                           <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
                             <span>{new Date(sn.addedAt).toLocaleString()}</span>
                           </div>
->>>>>>> Stashed changes
                         </div>
                       ))}
                     </div>
@@ -1137,58 +1101,38 @@ export const CustomerClaims: React.FC = () => {
         </div>
       )}
 
-      {/* Reply Modal */}
+      {/* Reply Modal with Drag & Drop Image Uploads */}
       {replyModal && selectedClaim && (
-<<<<<<< Updated upstream
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Provide Additional Information</h3>
-=======
         <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Provide Requested Information</h3>
->>>>>>> Stashed changes
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Provide the details requested by the retailer. Your claim will automatically return to <strong>UNDER_REVIEW</strong>.
             </p>
 
             <form onSubmit={handleReplySubmit} className="space-y-4">
               <div>
-<<<<<<< Updated upstream
-                <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
-                  Response Details (Optional)
-=======
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-                  Response Details <span className="text-rose-500">*</span>
->>>>>>> Stashed changes
+                  Response Details (Optional)
                 </label>
                 <textarea
                   rows={3}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-<<<<<<< Updated upstream
-                  placeholder="Explain the required details (optional)..."
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-=======
                   placeholder="Explain the required details..."
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
->>>>>>> Stashed changes
                 />
               </div>
 
-              {/* Upload Supporting Images (Optional) */}
+              {/* Upload Supporting Images */}
               <div>
-<<<<<<< Updated upstream
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                     Upload Supporting Images (Optional)
                   </label>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                    JPG, JPEG, PNG (Max 5 MB each)
-                  </span>
+                  <span className="text-[11px] text-slate-400">JPG, PNG (Max 5 MB each)</span>
                 </div>
 
-                {/* Drag & Drop / Click Upload Container */}
                 <div
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -1202,11 +1146,10 @@ export const CustomerClaims: React.FC = () => {
                       processReplyFiles(Array.from(e.dataTransfer.files));
                     }
                   }}
-                  onClick={() => replyFileInputRef.current?.click()}
-                  className={`border-2 border-dashed rounded-xl p-4 transition cursor-pointer ${
+                  className={`border-2 border-dashed rounded-xl transition-all ${
                     isDragging
                       ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-950/20'
-                      : 'border-slate-300 dark:border-slate-700 hover:border-purple-500 dark:hover:border-purple-500 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      : 'border-slate-300 dark:border-slate-700 hover:border-purple-400 bg-slate-50/50 dark:bg-slate-800/40'
                   }`}
                 >
                   <input
@@ -1217,92 +1160,60 @@ export const CustomerClaims: React.FC = () => {
                     onChange={(e) => {
                       if (e.target.files && e.target.files.length > 0) {
                         processReplyFiles(Array.from(e.target.files));
-                        e.target.value = '';
                       }
+                      e.target.value = '';
                     }}
                     className="hidden"
                   />
 
                   {replyImages.length === 0 ? (
-                    /* Empty State: Upload Instructions */
-                    <div className="flex flex-col items-center justify-center gap-2 py-3 text-center">
-                      <div className="w-9 h-9 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 flex items-center justify-center">
-                        <Upload className="w-4 h-4" />
+                    <div
+                      onClick={() => replyFileInputRef.current?.click()}
+                      className="p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-2"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                        <Upload className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                          <span className="text-purple-600 dark:text-purple-400 font-semibold underline">Click to upload</span> or drag and drop images
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                          Select multiple photos showing additional evidence
-                        </p>
+                        <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline">
+                          Click to upload
+                        </span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400"> or drag and drop</span>
                       </div>
+                      <p className="text-[11px] text-slate-400">Supports JPG, JPEG, and PNG</p>
                     </div>
                   ) : (
-                    /* Image previews INSIDE the dashed upload area */
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200 dark:border-slate-700/60">
-                        <span className="font-medium text-slate-700 dark:text-slate-300">
-                          {replyImages.length} {replyImages.length === 1 ? 'image' : 'images'} selected
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            replyFileInputRef.current?.click();
-                          }}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-100/50 dark:hover:bg-purple-950/40 rounded-lg transition cursor-pointer"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Add More</span>
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="p-3 space-y-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         {replyImages.map((img) => (
                           <div
                             key={img.id}
-                            onClick={(e) => e.stopPropagation()}
-                            className="relative group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-xs flex flex-col cursor-default"
+                            className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xs"
                           >
-                            <div className="relative h-24 sm:h-28 w-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden">
-                              <img
-                                src={img.previewUrl}
-                                alt={img.name}
-                                className="w-full h-full object-cover"
-                              />
+                            <div className="aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
+                              <img src={img.previewUrl} alt={img.name} className="w-full h-full object-cover" />
                               {img.uploading && (
-                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-1 text-white text-xs">
-                                  <Loader2 className="w-4 h-4 animate-spin text-purple-400" />
-                                  <span className="text-[10px] font-medium">Uploading...</span>
-                                </div>
-                              )}
-                              {img.error && (
-                                <div className="absolute inset-0 bg-rose-950/80 p-2 flex flex-col items-center justify-center text-center text-white text-[11px]">
-                                  <AlertCircle className="w-4 h-4 text-rose-400 mb-1" />
-                                  <span className="font-semibold text-[10px]">{img.error}</span>
+                                <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
+                                  <Loader2 className="w-5 h-5 text-white animate-spin" />
                                 </div>
                               )}
                               <button
                                 type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRemoveReplyImage(img.id);
-                                }}
-                                className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-slate-900/75 hover:bg-rose-600 text-white flex items-center justify-center shadow-sm transition cursor-pointer z-10"
+                                onClick={() => handleRemoveReplyImage(img.id)}
+                                className="absolute top-1 right-1 p-1 rounded-full bg-slate-900/70 text-white hover:bg-rose-600 transition cursor-pointer"
                                 title="Remove image"
                               >
                                 <X className="w-3 h-3" />
                               </button>
                             </div>
-                            <div className="p-1.5 text-left">
-                              <p className="text-[11px] font-medium text-slate-800 dark:text-slate-200 truncate" title={img.name}>
+                            <div className="p-2">
+                              <div className="text-[11px] font-medium text-slate-700 dark:text-slate-200 truncate">
                                 {img.name}
-                              </p>
-                              <div className="flex items-center justify-between mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+                              </div>
+                              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-0.5">
                                 <span>{img.sizeFormatted}</span>
                                 {img.serverUrl && (
-                                  <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-0.5">
+                                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
                                     <CheckCircle2 className="w-2.5 h-2.5" /> Ready
                                   </span>
                                 )}
@@ -1313,11 +1224,8 @@ export const CustomerClaims: React.FC = () => {
 
                         {/* Add More Tile */}
                         <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            replyFileInputRef.current?.click();
-                          }}
-                          className="h-full min-h-[120px] sm:min-h-[135px] border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl flex flex-col items-center justify-center gap-1 p-2 bg-white/50 dark:bg-slate-800/50 hover:bg-purple-50/50 dark:hover:bg-purple-950/20 text-slate-600 dark:text-slate-300 transition cursor-pointer text-center group"
+                          onClick={() => replyFileInputRef.current?.click()}
+                          className="min-h-[100px] border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-purple-500 rounded-xl flex flex-col items-center justify-center gap-1 p-2 bg-white/50 dark:bg-slate-800/50 hover:bg-purple-50/50 text-slate-600 dark:text-slate-300 transition cursor-pointer text-center group"
                         >
                           <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition">
                             <Plus className="w-3.5 h-3.5" />
@@ -1325,16 +1233,12 @@ export const CustomerClaims: React.FC = () => {
                           <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400">
                             Add More
                           </span>
-                          <span className="text-[9px] text-slate-400 dark:text-slate-500">
-                            or drop here
-                          </span>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* File Validation Error Banner */}
                 {replyUploadError && (
                   <div className="mt-2 p-2 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 rounded-lg text-xs flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5">
@@ -1344,52 +1248,26 @@ export const CustomerClaims: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setReplyUploadError(null)}
-                      className="text-rose-500 hover:text-rose-700 dark:text-rose-400 font-bold text-xs cursor-pointer"
+                      className="text-rose-500 hover:text-rose-700 font-bold text-xs cursor-pointer"
                     >
                       &times;
                     </button>
                   </div>
                 )}
-=======
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Additional Evidence Link or Cloud URL (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={additionalEvidence}
-                  onChange={(e) => setAdditionalEvidence(e.target.value)}
-                  placeholder="Link to photo or document"
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
->>>>>>> Stashed changes
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
-<<<<<<< Updated upstream
                   onClick={closeReplyModal}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
-=======
-                  onClick={() => {
-                    setReplyModal(false);
-                    setReplyText('');
-                    setAdditionalEvidence('');
-                  }}
                   className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
->>>>>>> Stashed changes
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-<<<<<<< Updated upstream
                   disabled={submitting || replyImages.some((img) => img.uploading)}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-semibold hover:bg-purple-700 disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shadow-xs"
-=======
-                  disabled={submitting || !replyText.trim()}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
->>>>>>> Stashed changes
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {submitting ? (
                     <>
