@@ -36,7 +36,10 @@ export function extractErrorMessage(err: any, fallbackMessage: string = 'An unex
 
   // 5. Network connection failures (backend server not running or unreachable)
   if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
-    return 'Cannot connect to backend server. Please verify the backend is running on http://localhost:8080.';
+    if (import.meta.env.DEV) {
+      console.warn('Backend server unreachable. Verify your API server is running on http://localhost:8080.');
+    }
+    return 'Unable to connect to the server. Please check your internet connection or try again in a few moments.';
   }
 
   if (err.code === 'ECONNABORTED' || err.message?.toLowerCase().includes('timeout')) {
