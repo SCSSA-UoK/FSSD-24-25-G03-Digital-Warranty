@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import React, { useEffect, useRef, useState } from 'react';
+=======
+import React, { useEffect, useState, useMemo } from 'react';
+>>>>>>> Stashed changes
 import { claimApi } from '../../api';
 import { Claim, ClaimStatus } from '../../types';
 import {
@@ -11,6 +15,7 @@ import {
   Send,
   CheckCircle2,
   Star,
+<<<<<<< Updated upstream
   Upload,
   X,
   Loader2,
@@ -39,11 +44,40 @@ const formatFileSize = (bytes: number): string => {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 };
+=======
+  Search,
+  Copy,
+  Check,
+  User,
+  Store,
+  Calendar,
+  Package,
+  AlertTriangle,
+  Layers,
+  CheckCheck,
+  Activity,
+  ArrowUpRight,
+  X,
+  ArrowLeft
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+type CustomerTabFilter = 'ALL' | 'IN_REVIEW' | 'ACTION_REQUIRED' | 'IN_SERVICE' | 'COMPLETED';
+>>>>>>> Stashed changes
 
 export const CustomerClaims: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
+
+  // Search & Filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<CustomerTabFilter>('ALL');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Mobile View Switcher (for small screens < lg)
+  const [mobileView, setMobileView] = useState<'LIST' | 'DETAIL'>('LIST');
 
   // Modals
   const [cancelModal, setCancelModal] = useState(false);
@@ -150,19 +184,29 @@ export const CustomerClaims: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchClaims = async () => {
+  const fetchClaims = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
+      else setIsRefreshing(true);
+
       const res = await claimApi.getCustomerClaims();
-      setClaims(res.content);
+      const list = res.content || [];
+      setClaims(list);
+
       if (selectedClaim) {
-        const updated = await claimApi.getClaimById(selectedClaim.id);
-        setSelectedClaim(updated);
+        const found = list.find((c) => c.id === selectedClaim.id);
+        if (found) {
+          const updated = await claimApi.getClaimById(found.id);
+          setSelectedClaim(updated);
+        }
+      } else if (list.length > 0) {
+        setSelectedClaim(list[0]);
       }
     } catch (err) {
-      console.error('Failed to load claims', err);
+      console.error('Failed to load customer claims', err);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -170,16 +214,22 @@ export const CustomerClaims: React.FC = () => {
     fetchClaims();
   }, []);
 
+  const handleCopy = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   const handleCancelSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedClaim) return;
     setSubmitting(true);
     try {
-      const updated = await claimApi.cancelClaim(selectedClaim.id, cancelReason);
+      const updated = await claimApi.cancelClaim(selectedClaim.id, cancelReason.trim());
       setSelectedClaim(updated);
       setCancelModal(false);
       setCancelReason('');
-      fetchClaims();
+      await fetchClaims(true);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error cancelling claim.');
     } finally {
@@ -203,6 +253,7 @@ export const CustomerClaims: React.FC = () => {
 
     setSubmitting(true);
     try {
+<<<<<<< Updated upstream
       const evidenceUrls = replyImages
         .map((img) => img.serverUrl)
         .filter((url): url is string => Boolean(url));
@@ -216,6 +267,15 @@ export const CustomerClaims: React.FC = () => {
       setSelectedClaim(updated);
       closeReplyModal();
       fetchClaims();
+=======
+      const evidenceList = additionalEvidence.trim() ? [additionalEvidence.trim()] : undefined;
+      const updated = await claimApi.replyInfo(selectedClaim.id, replyText.trim(), evidenceList);
+      setSelectedClaim(updated);
+      setReplyModal(false);
+      setReplyText('');
+      setAdditionalEvidence('');
+      await fetchClaims(true);
+>>>>>>> Stashed changes
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error sending reply.');
     } finally {
@@ -228,12 +288,16 @@ export const CustomerClaims: React.FC = () => {
     if (!selectedClaim) return;
     setSubmitting(true);
     try {
-      const updated = await claimApi.submitFeedback(selectedClaim.id, rating, feedbackText.trim() || undefined);
+      const updated = await claimApi.submitFeedback(
+        selectedClaim.id,
+        rating,
+        feedbackText.trim() || undefined
+      );
       setSelectedClaim(updated);
       setFeedbackModal(false);
       setFeedbackText('');
       setRating(5);
-      fetchClaims();
+      await fetchClaims(true);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error submitting feedback.');
     } finally {
@@ -241,149 +305,680 @@ export const CustomerClaims: React.FC = () => {
     }
   };
 
-  const getStatusBadge = (status: ClaimStatus) => {
-    const styles: Record<ClaimStatus, string> = {
-      SUBMITTED: 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60',
-      UNDER_REVIEW: 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60',
-      APPROVED: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60',
-      REJECTED: 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60',
-      ADDITIONAL_INFO_REQUIRED: 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60',
-      CANCELLED: 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700',
-      IN_PROGRESS: 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60',
-      COMPLETED: 'bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60',
-    };
+  // KPI Metrics Calculation
+  const stats = useMemo(() => {
+    const total = claims.length;
+    const inReview = claims.filter(
+      (c) => c.currentStatus === 'SUBMITTED' || c.currentStatus === 'UNDER_REVIEW'
+    ).length;
+    const actionRequired = claims.filter(
+      (c) => c.currentStatus === 'ADDITIONAL_INFO_REQUIRED'
+    ).length;
+    const inService = claims.filter(
+      (c) => c.currentStatus === 'APPROVED' || c.currentStatus === 'IN_PROGRESS'
+    ).length;
+    const completed = claims.filter((c) => c.currentStatus === 'COMPLETED').length;
+
+    return { total, inReview, actionRequired, inService, completed };
+  }, [claims]);
+
+  // Filtered Claims
+  const filteredClaims = useMemo(() => {
+    return claims.filter((c) => {
+      if (activeTab === 'IN_REVIEW' && c.currentStatus !== 'SUBMITTED' && c.currentStatus !== 'UNDER_REVIEW') {
+        return false;
+      }
+      if (activeTab === 'ACTION_REQUIRED' && c.currentStatus !== 'ADDITIONAL_INFO_REQUIRED') {
+        return false;
+      }
+      if (activeTab === 'IN_SERVICE' && c.currentStatus !== 'APPROVED' && c.currentStatus !== 'IN_PROGRESS') {
+        return false;
+      }
+      if (activeTab === 'COMPLETED' && c.currentStatus !== 'COMPLETED') {
+        return false;
+      }
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesProduct = c.productName?.toLowerCase().includes(q);
+        const matchesRetailer = c.retailerBusinessName?.toLowerCase().includes(q);
+        const matchesSerial = c.serialNumber?.toLowerCase().includes(q);
+        const matchesId = c.id?.toLowerCase().includes(q);
+        const matchesIssue = c.issueDescription?.toLowerCase().includes(q);
+        if (!matchesProduct && !matchesRetailer && !matchesSerial && !matchesId && !matchesIssue) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [claims, activeTab, searchQuery]);
+
+  // Keep selectedClaim in sync with activeTab and filter
+  useEffect(() => {
+    if (filteredClaims.length > 0) {
+      const stillPresent = filteredClaims.find((c) => c.id === selectedClaim?.id);
+      if (!stillPresent) {
+        setSelectedClaim(filteredClaims[0]);
+      }
+    } else {
+      setSelectedClaim(null);
+    }
+  }, [activeTab, searchQuery, claims]);
+
+  const handleCardClick = (tab: CustomerTabFilter) => {
+    setActiveTab(tab);
+    setMobileView('LIST');
+  };
+
+  const getStatusConfig = (status: ClaimStatus) => {
+    switch (status) {
+      case 'SUBMITTED':
+        return {
+          label: 'Submitted',
+          badgeClass: 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200 dark:border-amber-800/60',
+          dotClass: 'bg-amber-500',
+        };
+      case 'UNDER_REVIEW':
+        return {
+          label: 'Under Review',
+          badgeClass: 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border-blue-200 dark:border-blue-800/60',
+          dotClass: 'bg-blue-500',
+        };
+      case 'ADDITIONAL_INFO_REQUIRED':
+        return {
+          label: 'Action Required',
+          badgeClass: 'bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 border-purple-200 dark:border-purple-800/60',
+          dotClass: 'bg-purple-500',
+        };
+      case 'APPROVED':
+        return {
+          label: 'Approved',
+          badgeClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60',
+          dotClass: 'bg-emerald-500',
+        };
+      case 'IN_PROGRESS':
+        return {
+          label: 'In Service',
+          badgeClass: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/70 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/60',
+          dotClass: 'bg-indigo-500',
+        };
+      case 'COMPLETED':
+        return {
+          label: 'Completed',
+          badgeClass: 'bg-teal-100 text-teal-800 dark:bg-teal-950/70 dark:text-teal-300 border-teal-200 dark:border-teal-800/60',
+          dotClass: 'bg-teal-500',
+        };
+      case 'REJECTED':
+        return {
+          label: 'Rejected',
+          badgeClass: 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200 dark:border-rose-800/60',
+          dotClass: 'bg-rose-500',
+        };
+      case 'CANCELLED':
+        return {
+          label: 'Cancelled',
+          badgeClass: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+          dotClass: 'bg-slate-400',
+        };
+      default:
+        return {
+          label: status,
+          badgeClass: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+          dotClass: 'bg-slate-400',
+        };
+    }
+  };
+
+  const renderStatusBadge = (status: ClaimStatus) => {
+    const config = getStatusConfig(status);
     return (
-      <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${styles[status]}`}>
-        {status.replace(/_/g, ' ')}
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${config.badgeClass}`}
+      >
+        <span className={`w-1.5 h-1.5 rounded-full ${config.dotClass}`}></span>
+        {config.label}
       </span>
     );
   };
 
+  const getStageIndex = (status: ClaimStatus) => {
+    switch (status) {
+      case 'SUBMITTED':
+        return 0;
+      case 'UNDER_REVIEW':
+      case 'ADDITIONAL_INFO_REQUIRED':
+        return 1;
+      case 'APPROVED':
+      case 'IN_PROGRESS':
+        return 2;
+      case 'COMPLETED':
+        return 3;
+      default:
+        return -1;
+    }
+  };
+
+  // Card themes
+  const getCardTheme = (tab: CustomerTabFilter) => {
+    const isActive = activeTab === tab;
+    switch (tab) {
+      case 'ALL':
+        return {
+          card: isActive
+            ? 'bg-slate-100 dark:bg-slate-800/90 border-slate-400 dark:border-slate-500 text-slate-900 dark:text-slate-100 shadow-sm ring-2 ring-slate-400/25'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-800 hover:border-slate-350 dark:hover:border-slate-650 hover:bg-slate-50 dark:hover:bg-slate-800/60 shadow-2xs',
+          iconBg: isActive
+            ? 'bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
+          icon: Layers,
+          label: 'Total Claims',
+          count: stats.total,
+        };
+      case 'IN_REVIEW':
+        return {
+          card: isActive
+            ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-400 dark:border-blue-600/80 text-blue-950 dark:text-blue-100 shadow-sm ring-2 ring-blue-500/25'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700/80 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 shadow-2xs',
+          iconBg: isActive
+            ? 'bg-blue-500 text-white shadow-xs'
+            : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400',
+          icon: Activity,
+          label: 'Under Review',
+          count: stats.inReview,
+        };
+      case 'ACTION_REQUIRED':
+        return {
+          card: isActive
+            ? 'bg-purple-50/90 dark:bg-purple-950/40 border-purple-400 dark:border-purple-600/80 text-purple-950 dark:text-purple-100 shadow-sm ring-2 ring-purple-500/25'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-700/80 hover:bg-purple-50/40 dark:hover:bg-purple-950/20 shadow-2xs',
+          iconBg: isActive
+            ? 'bg-purple-500 text-white shadow-xs'
+            : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400',
+          icon: MessageSquare,
+          label: 'Action Needed',
+          count: stats.actionRequired,
+        };
+      case 'IN_SERVICE':
+        return {
+          card: isActive
+            ? 'bg-indigo-50/90 dark:bg-indigo-950/40 border-indigo-400 dark:border-indigo-600/80 text-indigo-950 dark:text-indigo-100 shadow-sm ring-2 ring-indigo-500/25'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700/80 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/20 shadow-2xs',
+          iconBg: isActive
+            ? 'bg-indigo-500 text-white shadow-xs'
+            : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400',
+          icon: Wrench,
+          label: 'In Repair',
+          count: stats.inService,
+        };
+      case 'COMPLETED':
+        return {
+          card: isActive
+            ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-400 dark:border-emerald-600/80 text-emerald-950 dark:text-emerald-100 shadow-sm ring-2 ring-emerald-500/25'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700/80 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 shadow-2xs',
+          iconBg: isActive
+            ? 'bg-emerald-500 text-white shadow-xs'
+            : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400',
+          icon: CheckCheck,
+          label: 'Completed',
+          count: stats.completed,
+        };
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">My Warranty Claims & Service Progress</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Track retailer review, communication, and repair progress in real time</p>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60">
+              <FileText className="w-5 h-5" />
+            </span>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">My Claims & Service Tracking</h1>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Monitor real-time retailer reviews, workshop repair notes, and after-sales service progress.
+          </p>
         </div>
-        <Link
-          to="/customer/submit-claim"
-          className="px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition text-sm shadow-xs self-start"
-        >
-          Submit New Claim
-        </Link>
+
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => fetchClaims(true)}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-2xs transition cursor-pointer disabled:opacity-50"
+            title="Refresh"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`} />
+            <span>Refresh</span>
+          </button>
+          <Link
+            to="/customer/submit-claim"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+          >
+            <Send className="w-3.5 h-3.5" /> Submit New Claim
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6">
-        {/* Left List */}
-        <div className="lg:col-span-5 xl:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 max-h-72 lg:max-h-[80vh] overflow-y-auto">
-          {loading ? (
-            <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">Loading your claims...</div>
-          ) : claims.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">
-              <FileText className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-              No claims submitted yet.
-            </div>
-          ) : (
-            claims.map((c) => (
-              <div
-                key={c.id}
-                onClick={() => setSelectedClaim(c)}
-                className={`p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition ${
-                  selectedClaim?.id === c.id ? 'bg-indigo-50/70 dark:bg-indigo-950/40 border-l-4 border-indigo-600' : ''
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{c.productName}</span>
-                  {getStatusBadge(c.currentStatus)}
-                </div>
-                {c.serialNumber && (
-                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">S/N: {c.serialNumber}</div>
-                )}
-                <div className="text-xs text-slate-500 dark:text-slate-400">Retailer: {c.retailerBusinessName}</div>
-                <div className="text-xs text-slate-600 dark:text-slate-300 line-clamp-1 mt-1">{c.issueDescription}</div>
-                <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-                  Submitted: {new Date(c.createdAt).toLocaleDateString()}
-                </div>
+      {/* 5 Metric Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {(['ALL', 'IN_REVIEW', 'ACTION_REQUIRED', 'IN_SERVICE', 'COMPLETED'] as CustomerTabFilter[]).map((tab) => {
+          const theme = getCardTheme(tab);
+          const Icon = theme.icon;
+          const isSelected = activeTab === tab;
+
+          return (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => handleCardClick(tab)}
+              className={`p-3.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer relative overflow-hidden group ${theme.card}`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider opacity-80 truncate">
+                  {theme.label}
+                </span>
+                <span className={`p-1.5 rounded-lg transition-transform group-hover:scale-105 shrink-0 ${theme.iconBg}`}>
+                  <Icon className="w-3.5 h-3.5" />
+                </span>
               </div>
-            ))
+              <div className="text-2xl font-bold flex items-center gap-1.5">
+                {theme.count}
+                {tab === 'ACTION_REQUIRED' && stats.actionRequired > 0 && !isSelected && (
+                  <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Clean, Non-redundant Search Bar */}
+      <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by product, retailer, S/N, or issue description..."
+            className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           )}
         </div>
 
-        {/* Right Detail */}
-        <div className="lg:col-span-7 xl:col-span-8 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs p-5 xl:p-6 space-y-6">
+        <div className="flex items-center justify-between sm:justify-end gap-2 text-xs">
+          <span className="text-slate-500 dark:text-slate-400 font-medium">
+            Showing <strong className="text-slate-800 dark:text-slate-200">{filteredClaims.length}</strong> of{' '}
+            {claims.length}
+          </span>
+
+          {(searchQuery || activeTab !== 'ALL') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setActiveTab('ALL');
+              }}
+              className="px-2.5 py-1 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition font-semibold cursor-pointer"
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Switcher */}
+      <div className="flex items-center lg:hidden gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+        <button
+          type="button"
+          onClick={() => setMobileView('LIST')}
+          className={`flex-1 py-1.5 rounded-lg text-center transition cursor-pointer ${
+            mobileView === 'LIST'
+              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+              : 'text-slate-600 dark:text-slate-400'
+          }`}
+        >
+          Claims List ({filteredClaims.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileView('DETAIL')}
+          disabled={!selectedClaim}
+          className={`flex-1 py-1.5 rounded-lg text-center transition cursor-pointer disabled:opacity-40 ${
+            mobileView === 'DETAIL'
+              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+              : 'text-slate-600 dark:text-slate-400'
+          }`}
+        >
+          {selectedClaim ? 'Claim Details' : 'No Claim Selected'}
+        </button>
+      </div>
+
+      {/* Main Workspace */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6 items-start">
+        {/* Left List */}
+        <div
+          className={`lg:col-span-5 xl:col-span-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col max-h-[82vh] overflow-hidden ${
+            mobileView === 'DETAIL' ? 'hidden lg:flex' : 'flex'
+          }`}
+        >
+          <div className="p-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+              {getCardTheme(activeTab).label} Queue ({filteredClaims.length})
+            </span>
+          </div>
+
+          <div className="divide-y divide-slate-100 dark:divide-slate-800/80 overflow-y-auto flex-1">
+            {loading ? (
+              <div className="p-12 text-center text-slate-400 dark:text-slate-500 space-y-2">
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto text-indigo-500" />
+                <div className="text-xs font-medium">Loading your claims...</div>
+              </div>
+            ) : filteredClaims.length === 0 ? (
+              <div className="p-12 text-center text-slate-500 dark:text-slate-400 space-y-3">
+                <FileText className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600" />
+                <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">No claims found</div>
+                <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
+                  You have no warranty claims matching this filter category.
+                </p>
+                {(searchQuery || activeTab !== 'ALL') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setActiveTab('ALL');
+                    }}
+                    className="mt-2 text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+                  >
+                    View all claims
+                  </button>
+                )}
+              </div>
+            ) : (
+              filteredClaims.map((c) => {
+                const isSelected = selectedClaim?.id === c.id;
+                const needsInfo = c.currentStatus === 'ADDITIONAL_INFO_REQUIRED';
+
+                return (
+                  <div
+                    key={c.id}
+                    onClick={() => {
+                      setSelectedClaim(c);
+                      setMobileView('DETAIL');
+                    }}
+                    className={`p-4 cursor-pointer transition-all duration-150 ${
+                      isSelected
+                        ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-l-4 border-indigo-600 shadow-2xs'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 border-l-4 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <div className="min-w-0">
+                        <div className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
+                          {c.productName}
+                        </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                          <Store className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span className="truncate">{c.retailerBusinessName}</span>
+                        </div>
+                      </div>
+                      <div className="shrink-0">{renderStatusBadge(c.currentStatus)}</div>
+                    </div>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 my-1.5 leading-relaxed">
+                      {c.issueDescription}
+                    </p>
+
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 mt-1 border-t border-slate-100/80 dark:border-slate-800/60">
+                      <span>Submitted: {new Date(c.createdAt).toLocaleDateString()}</span>
+                      {needsInfo && (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 animate-pulse">
+                          Reply Needed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Right Detail Workspace */}
+        <div
+          className={`lg:col-span-7 xl:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden ${
+            mobileView === 'LIST' ? 'hidden lg:block' : 'block'
+          }`}
+        >
           {selectedClaim ? (
-            <>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
-                <div>
-                  <div className="text-xs text-slate-400 dark:text-slate-500 uppercase font-semibold">Claim Details</div>
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{selectedClaim.productName}</h2>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 flex-wrap">
-                    <span>Retailer: {selectedClaim.retailerBusinessName}</span>
-                    {selectedClaim.serialNumber && (
-                      <span className="font-mono font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        S/N: {selectedClaim.serialNumber}
+            <div>
+              {/* Mobile Back Button */}
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 lg:hidden flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setMobileView('LIST')}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Queue ({filteredClaims.length})
+                </button>
+                <span className="text-xs text-slate-400 font-mono">
+                  #{selectedClaim.id.slice(0, 8)}
+                </span>
+              </div>
+
+              {/* Header */}
+              <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        Claim #{selectedClaim.id.slice(0, 8)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(selectedClaim.id, 'cust-claim-id')}
+                        className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-indigo-600 font-mono transition cursor-pointer"
+                        title="Copy Claim ID"
+                      >
+                        {copiedId === 'cust-claim-id' ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-500" /> Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" /> Copy ID
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
+                      {selectedClaim.productName}
+                    </h2>
+
+                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+                      <span className="flex items-center gap-1">
+                        <Store className="w-3.5 h-3.5 text-indigo-500" /> {selectedClaim.retailerBusinessName}
+                      </span>
+                      {selectedClaim.serialNumber && (
+                        <span className="font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                          S/N: {selectedClaim.serialNumber}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:items-end gap-1.5 shrink-0">
+                    <div>{renderStatusBadge(selectedClaim.currentStatus)}</div>
+                    {selectedClaim.resolutionType && (
+                      <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Resolution: {selectedClaim.resolutionType}
                       </span>
                     )}
                   </div>
                 </div>
-                <div>{getStatusBadge(selectedClaim.currentStatus)}</div>
+
+                {/* 4-Step Progress Tracker */}
+                {selectedClaim.currentStatus !== 'REJECTED' && selectedClaim.currentStatus !== 'CANCELLED' && (
+                  <div className="mt-6 pt-5 border-t border-slate-200/70 dark:border-slate-800">
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                      {[
+                        { title: '1. Submitted', desc: 'Received' },
+                        { title: '2. In Review', desc: 'Evaluating' },
+                        { title: '3. In Service', desc: 'Repairing' },
+                        { title: '4. Ready', desc: 'Completed' },
+                      ].map((step, idx) => {
+                        const currentStage = getStageIndex(selectedClaim.currentStatus);
+                        const isDone = currentStage > idx;
+                        const isCurrent = currentStage === idx;
+
+                        return (
+                          <div key={idx} className="space-y-1.5">
+                            <div className="relative flex items-center justify-center">
+                              <div
+                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs ${
+                                  isDone
+                                    ? 'bg-emerald-600 text-white'
+                                    : isCurrent
+                                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-500/20'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700'
+                                }`}
+                              >
+                                {isDone ? <Check className="w-4 h-4" /> : idx + 1}
+                              </div>
+                            </div>
+                            <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                              {step.title}
+                            </div>
+                            <div className="text-[10px] text-slate-400 hidden sm:block">{step.desc}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Action Toolbar */}
-              <div className="flex flex-wrap gap-2 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
-                {/* Cancellation is permitted only when claim is in initial review stages */}
-                {(selectedClaim.currentStatus === 'SUBMITTED' || selectedClaim.currentStatus === 'UNDER_REVIEW') && (
-                  <button
-                    onClick={() => setCancelModal(true)}
-                    className="px-3.5 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center gap-1 cursor-pointer"
-                  >
-                    <Ban className="w-3.5 h-3.5" /> Cancel Claim
-                  </button>
-                )}
-
-                {/* Reply to info request */}
-                {selectedClaim.currentStatus === 'ADDITIONAL_INFO_REQUIRED' && (
-                  <button
-                    onClick={() => setReplyModal(true)}
-                    className="px-3.5 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-semibold hover:bg-purple-700 transition flex items-center gap-1 cursor-pointer"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" /> Provide Requested Information
-                  </button>
-                )}
-
-                {selectedClaim.currentStatus === 'APPROVED' && (
-                  <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold py-1">
-                    Approved ({selectedClaim.resolutionType}). Service center is scheduling work.
-                  </span>
-                )}
-                {selectedClaim.currentStatus === 'IN_PROGRESS' && (
-                  <span className="text-xs text-indigo-700 dark:text-indigo-400 font-semibold py-1">
-                    Repair / replacement in progress. Check service updates below.
-                  </span>
-                )}
-                {selectedClaim.currentStatus === 'COMPLETED' && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-teal-700 dark:text-teal-400 font-semibold py-1">
-                      Service completed!
-                    </span>
-                    {!selectedClaim.customerRating && (
+              {/* Action Banner */}
+              <div className="p-4 sm:p-5 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  {selectedClaim.currentStatus === 'ADDITIONAL_INFO_REQUIRED' ? (
+                    <div className="flex items-center justify-between w-full gap-3">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-purple-800 dark:text-purple-300">
+                        <MessageSquare className="w-4 h-4 text-purple-600" />
+                        The retailer needs additional information or photos from you.
+                      </div>
                       <button
-                        onClick={() => setFeedbackModal(true)}
-                        className="px-3 py-1 bg-amber-600 text-white rounded-lg text-xs font-semibold hover:bg-amber-700 transition flex items-center gap-1 shadow-xs cursor-pointer"
+                        type="button"
+                        onClick={() => setReplyModal(true)}
+                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer shrink-0"
                       >
-                        <Star className="w-3.5 h-3.5 fill-current" /> Rate Service
+                        Provide Requested Information
                       </button>
+                    </div>
+                  ) : (selectedClaim.currentStatus === 'SUBMITTED' || selectedClaim.currentStatus === 'UNDER_REVIEW') ? (
+                    <div className="flex items-center justify-between w-full gap-3">
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        Your claim is currently under retailer assessment.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setCancelModal(true)}
+                        className="px-3.5 py-1.5 border border-rose-300 dark:border-rose-800/60 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl text-xs font-semibold transition cursor-pointer"
+                      >
+                        Cancel Claim
+                      </button>
+                    </div>
+                  ) : selectedClaim.currentStatus === 'COMPLETED' ? (
+                    <div className="flex items-center justify-between w-full gap-3">
+                      <span className="text-xs font-semibold text-teal-700 dark:text-teal-400 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4" /> Service completed! Your unit is ready.
+                      </span>
+                      {!selectedClaim.customerRating && (
+                        <button
+                          type="button"
+                          onClick={() => setFeedbackModal(true)}
+                          className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1"
+                        >
+                          <Star className="w-3.5 h-3.5 fill-current" /> Rate Service Experience
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      Status: {selectedClaim.currentStatus.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Body Details */}
+              <div className="p-5 sm:p-6 space-y-6">
+                {/* Reported Problem */}
+                <div className="space-y-1.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Reported Problem Description
+                  </span>
+                  <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                    "{selectedClaim.issueDescription}"
+                  </div>
+                </div>
+
+                {/* Final Resolution Notes if completed */}
+                {selectedClaim.resolutionNotes && (
+                  <div className="p-4 bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 rounded-2xl space-y-1">
+                    <span className="text-xs font-bold text-teal-800 dark:text-teal-300 uppercase">
+                      Official Service Resolution Notes
+                    </span>
+                    <p className="text-sm text-teal-900 dark:text-teal-200">{selectedClaim.resolutionNotes}</p>
+                  </div>
+                )}
+
+                {/* Customer Review if rated */}
+                {selectedClaim.customerRating && (
+                  <div className="p-4 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-2xl space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
+                        Your Submitted Rating
+                      </span>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`w-3.5 h-3.5 ${
+                              s <= (selectedClaim.customerRating || 0)
+                                ? 'fill-amber-400 text-amber-400'
+                                : 'text-slate-300 dark:text-slate-600'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {selectedClaim.customerFeedback && (
+                      <p className="text-sm text-slate-800 dark:text-slate-200 italic">
+                        "{selectedClaim.customerFeedback}"
+                      </p>
                     )}
                   </div>
                 )}
-                {selectedClaim.currentStatus === 'CANCELLED' && (
-                  <span className="text-xs text-slate-500 dark:text-slate-400 italic py-1">
-                    You cancelled this claim: {selectedClaim.cancellationReason}
-                  </span>
-                )}
-              </div>
 
+                {/* Service Updates from Technician */}
+                <div className="space-y-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <Wrench className="w-3.5 h-3.5 text-indigo-500" /> Service Workshop Updates
+                  </span>
+
+<<<<<<< Updated upstream
               {/* Issue Description */}
               <div>
                 <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-semibold">Reported Issue</span>
@@ -432,62 +1027,63 @@ export const CustomerClaims: React.FC = () => {
                         <div className="font-semibold text-indigo-900 dark:text-indigo-200">{sn.note}</div>
                         <div className="text-[10px] text-indigo-500 dark:text-indigo-400 mt-1">
                           {new Date(sn.addedAt).toLocaleString()}
+=======
+                  {selectedClaim.serviceNotes && selectedClaim.serviceNotes.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {selectedClaim.serviceNotes.map((sn, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3.5 bg-indigo-50/40 dark:bg-indigo-950/20 rounded-xl border border-indigo-100/80 dark:border-indigo-800/40 space-y-1"
+                        >
+                          <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{sn.note}</div>
+                          <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
+                            <span>{new Date(sn.addedAt).toLocaleString()}</span>
+                          </div>
+>>>>>>> Stashed changes
                         </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-400">
+                      No service updates logged yet. Check back soon.
+                    </div>
+                  )}
+                </div>
+
+                {/* Audit Lifecycle History */}
+                <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" /> Tracking Milestones
+                  </span>
+
+                  <div className="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-4 ml-2">
+                    {selectedClaim.statusHistory?.map((h) => (
+                      <div key={h.id} className="relative">
+                        <div className="absolute -left-[31px] top-1 bg-white dark:bg-slate-900 border-2 border-indigo-600 rounded-full w-3.5 h-3.5"></div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            {h.newStatus.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            {new Date(h.changedAt).toLocaleString()}
+                          </span>
+                        </div>
+                        {h.note && (
+                          <div className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{h.note}</div>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
-              )}
-
-              {/* Final Resolution Notes */}
-              {selectedClaim.resolutionNotes && (
-                <div className="p-4 bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 rounded-xl">
-                  <span className="text-xs text-teal-800 dark:text-teal-300 uppercase font-semibold">Final Resolution Notes</span>
-                  <p className="text-sm text-teal-900 dark:text-teal-200 mt-1">{selectedClaim.resolutionNotes}</p>
-                </div>
-              )}
-
-              {/* Customer Rating & Feedback */}
-              {selectedClaim.customerRating && (
-                <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl space-y-1">
-                  <span className="text-xs text-amber-800 dark:text-amber-300 uppercase font-semibold">Your Service Review</span>
-                  <div className="flex items-center gap-1 text-amber-500 text-lg">
-                    {'★'.repeat(selectedClaim.customerRating)}{'☆'.repeat(5 - selectedClaim.customerRating)}
-                    <span className="text-xs font-bold text-amber-900 dark:text-amber-200 ml-2">({selectedClaim.customerRating} / 5 stars)</span>
-                  </div>
-                  {selectedClaim.customerFeedback && (
-                    <p className="text-sm text-amber-950 dark:text-amber-200 italic mt-1 bg-white/70 dark:bg-slate-800/70 p-2.5 rounded-lg border border-amber-100 dark:border-amber-800">
-                      "{selectedClaim.customerFeedback}"
-                    </p>
-                  )}
-                  {selectedClaim.feedbackSubmittedAt && (
-                    <div className="text-[10px] text-amber-600 dark:text-amber-400 pt-0.5">
-                      Submitted: {new Date(selectedClaim.feedbackSubmittedAt).toLocaleString()}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Claim Status Audit Trail */}
-              <div>
-                <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-semibold">Chronological Service Progress</span>
-                <div className="mt-3 relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-4">
-                  {selectedClaim.statusHistory?.map((h) => (
-                    <div key={h.id} className="relative">
-                      <div className="absolute -left-[31px] top-0.5 bg-slate-400 rounded-full w-2.5 h-2.5 border-2 border-white dark:border-slate-900 ring-2 ring-slate-200 dark:ring-slate-700"></div>
-                      <div className="text-xs font-bold text-slate-800 dark:text-slate-200">{h.newStatus.replace(/_/g, ' ')}</div>
-                      <div className="text-xs text-slate-600 dark:text-slate-400">{h.note}</div>
-                      <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                        {new Date(h.changedAt).toLocaleString()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
-            </>
+            </div>
           ) : (
-            <div className="text-center py-20 text-slate-400 dark:text-slate-500 text-sm">
-              Select a claim on the left to track progress and service history.
+            <div className="p-16 text-center text-slate-400 dark:text-slate-500 space-y-3">
+              <FileText className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600" />
+              <div className="text-base font-bold text-slate-700 dark:text-slate-300">No Claim Selected</div>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Select a claim on the left to track progress and service history.
+              </p>
             </div>
           )}
         </div>
@@ -495,16 +1091,16 @@ export const CustomerClaims: React.FC = () => {
 
       {/* Cancel Modal */}
       {cancelModal && selectedClaim && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Cancel Warranty Claim</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              You may cancel your claim while it is SUBMITTED or UNDER_REVIEW. A cancellation reason is required.
+              You may cancel your claim while it is under initial review. Please state a reason.
             </p>
 
             <form onSubmit={handleCancelSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                   Cancellation Reason <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -512,8 +1108,8 @@ export const CustomerClaims: React.FC = () => {
                   rows={3}
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
-                  placeholder="e.g. Problem resolved on its own, or registered by mistake..."
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  placeholder="e.g. Issue resolved on its own, or registered by mistake..."
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
                 />
               </div>
 
@@ -524,14 +1120,14 @@ export const CustomerClaims: React.FC = () => {
                     setCancelModal(false);
                     setCancelReason('');
                   }}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Keep Claim
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || !cancelReason.trim()}
-                  className="px-4 py-2 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'Cancelling...' : 'Confirm Cancellation'}
                 </button>
@@ -543,30 +1139,46 @@ export const CustomerClaims: React.FC = () => {
 
       {/* Reply Modal */}
       {replyModal && selectedClaim && (
+<<<<<<< Updated upstream
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Provide Additional Information</h3>
+=======
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Provide Requested Information</h3>
+>>>>>>> Stashed changes
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Provide the details requested by the retailer. Your claim will automatically return to{' '}
-              <strong className="text-slate-800 dark:text-slate-200">UNDER_REVIEW</strong>.
+              Provide the details requested by the retailer. Your claim will automatically return to <strong>UNDER_REVIEW</strong>.
             </p>
 
             <form onSubmit={handleReplySubmit} className="space-y-4">
               <div>
+<<<<<<< Updated upstream
                 <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
                   Response Details (Optional)
+=======
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                  Response Details <span className="text-rose-500">*</span>
+>>>>>>> Stashed changes
                 </label>
                 <textarea
                   rows={3}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
+<<<<<<< Updated upstream
                   placeholder="Explain the required details (optional)..."
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+=======
+                  placeholder="Explain the required details..."
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+>>>>>>> Stashed changes
                 />
               </div>
 
               {/* Upload Supporting Images (Optional) */}
               <div>
+<<<<<<< Updated upstream
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
                     Upload Supporting Images (Optional)
@@ -738,20 +1350,46 @@ export const CustomerClaims: React.FC = () => {
                     </button>
                   </div>
                 )}
+=======
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Additional Evidence Link or Cloud URL (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={additionalEvidence}
+                  onChange={(e) => setAdditionalEvidence(e.target.value)}
+                  placeholder="Link to photo or document"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+>>>>>>> Stashed changes
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   type="button"
+<<<<<<< Updated upstream
                   onClick={closeReplyModal}
                   className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+=======
+                  onClick={() => {
+                    setReplyModal(false);
+                    setReplyText('');
+                    setAdditionalEvidence('');
+                  }}
+                  className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+>>>>>>> Stashed changes
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
+<<<<<<< Updated upstream
                   disabled={submitting || replyImages.some((img) => img.uploading)}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-semibold hover:bg-purple-700 disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shadow-xs"
+=======
+                  disabled={submitting || !replyText.trim()}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
+>>>>>>> Stashed changes
                 >
                   {submitting ? (
                     <>
@@ -771,18 +1409,18 @@ export const CustomerClaims: React.FC = () => {
         </div>
       )}
 
-      {/* Feedback & Rating Modal */}
+      {/* Feedback Modal */}
       {feedbackModal && selectedClaim && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Rate After-Sales Service</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Your feedback helps {selectedClaim.retailerBusinessName} and the WarranTrack platform maintain high service standards.
+              Your rating helps {selectedClaim.retailerBusinessName} and WarranTrack maintain high service standards.
             </p>
 
             <form onSubmit={handleFeedbackSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
                   Star Rating <span className="text-amber-500">*</span>
                 </label>
                 <div className="flex items-center gap-2">
@@ -805,7 +1443,7 @@ export const CustomerClaims: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Comments or Feedback (Optional)
                 </label>
                 <textarea
@@ -813,7 +1451,7 @@ export const CustomerClaims: React.FC = () => {
                   value={feedbackText}
                   onChange={(e) => setFeedbackText(e.target.value)}
                   placeholder="Tell us about the turnaround time, repair quality, or communication..."
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
@@ -825,14 +1463,14 @@ export const CustomerClaims: React.FC = () => {
                     setFeedbackText('');
                     setRating(5);
                   }}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-amber-600 text-white rounded-lg text-xs font-semibold hover:bg-amber-700 disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'Submitting...' : 'Submit Rating'}
                 </button>
@@ -844,4 +1482,3 @@ export const CustomerClaims: React.FC = () => {
     </div>
   );
 };
-
