@@ -28,9 +28,12 @@ import {
   Upload,
   Loader2,
   Plus,
-  AlertCircle
+  AlertCircle,
+  ZoomIn,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ImagePreviewModal } from '../../components/ImagePreviewModal';
+import { getAccessibleImageUrl } from '../../utils/imageUrl';
 
 interface SelectedImage {
   id: string;
@@ -87,6 +90,9 @@ export const CustomerClaims: React.FC = () => {
   const [feedbackModal, setFeedbackModal] = useState(false);
   const [rating, setRating] = useState(5);
   const [feedbackText, setFeedbackText] = useState('');
+
+  // Full-screen Image Preview Lightbox Modal
+  const [previewModalImage, setPreviewModalImage] = useState<{ url: string; title?: string } | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -924,26 +930,42 @@ export const CustomerClaims: React.FC = () => {
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                       {selectedClaim.evidenceReferences.map((ref, idx) => (
-                        <a
+                        <div
                           key={idx}
-                          href={ref}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group relative block rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 aspect-video hover:opacity-90 transition shadow-2xs"
+                          onClick={() =>
+                            setPreviewModalImage({
+                              url: ref,
+                              title: `Supporting Evidence #${idx + 1} (${ref.split('/').pop() || 'image'})`,
+                            })
+                          }
+                          className="group relative block rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 aspect-video hover:opacity-95 transition shadow-2xs cursor-pointer"
+                          title="Click to view full image"
                         >
                           <img
-                            src={ref}
+                            src={getAccessibleImageUrl(ref)}
                             alt={`Evidence ${idx + 1}`}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                             onError={(e) => {
-                              (e.target as HTMLElement).style.display = 'none';
+                              const target = e.target as HTMLElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
                             }}
                           />
+                          <div
+                            style={{ display: 'none' }}
+                            className="w-full h-full flex-col items-center justify-center p-2 text-center text-slate-400 bg-slate-100 dark:bg-slate-800"
+                          >
+                            <FileText className="w-5 h-5 text-slate-400 mb-1" />
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-full">
+                              {ref.split('/').pop() || `Attachment ${idx + 1}`}
+                            </span>
+                          </div>
                           <div className="p-1.5 text-[10px] text-slate-600 dark:text-slate-300 truncate bg-white/90 dark:bg-slate-900/90 absolute bottom-0 inset-x-0 flex items-center justify-between">
                             <span className="truncate">{ref.split('/').pop() || `Attachment ${idx + 1}`}</span>
-                            <ArrowUpRight className="w-3 h-3 shrink-0 ml-1 opacity-70" />
+                            <ZoomIn className="w-3 h-3 shrink-0 ml-1 opacity-70 group-hover:opacity-100 text-indigo-600 dark:text-indigo-400" />
                           </div>
-                        </a>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -1190,8 +1212,16 @@ export const CustomerClaims: React.FC = () => {
                             key={img.id}
                             className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xs"
                           >
-                            <div className="aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
-                              <img src={img.previewUrl} alt={img.name} className="w-full h-full object-cover" />
+                            <div
+                              onClick={() => setPreviewModalImage({ url: img.previewUrl, title: img.name })}
+                              className="aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800 relative cursor-pointer"
+                              title="Click to view full image"
+                            >
+                              <img
+                                src={img.previewUrl}
+                                alt={img.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              />
                               {img.uploading && (
                                 <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
                                   <Loader2 className="w-5 h-5 text-white animate-spin" />
@@ -1199,8 +1229,11 @@ export const CustomerClaims: React.FC = () => {
                               )}
                               <button
                                 type="button"
-                                onClick={() => handleRemoveReplyImage(img.id)}
-                                className="absolute top-1 right-1 p-1 rounded-full bg-slate-900/70 text-white hover:bg-rose-600 transition cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveReplyImage(img.id);
+                                }}
+                                className="absolute top-1 right-1 p-1 rounded-full bg-slate-900/70 text-white hover:bg-rose-600 transition cursor-pointer z-10"
                                 title="Remove image"
                               >
                                 <X className="w-3 h-3" />
@@ -1357,6 +1390,13 @@ export const CustomerClaims: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Full-screen Zoomable/Pannable Image Preview Modal */}
+      <ImagePreviewModal
+        isOpen={Boolean(previewModalImage)}
+        onClose={() => setPreviewModalImage(null)}
+        imageUrl={previewModalImage?.url || ''}
+        title={previewModalImage?.title}
+      />
     </div>
   );
 };
