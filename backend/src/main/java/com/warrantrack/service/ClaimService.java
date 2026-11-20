@@ -354,11 +354,20 @@ public class ClaimService {
         claim.setUpdatedAt(Instant.now());
         claim = claimRepository.save(claim);
 
+        String responseText;
+        if (request.getResponse() != null && !request.getResponse().trim().isEmpty()) {
+            responseText = request.getResponse().trim();
+        } else if (request.getAdditionalEvidence() != null && !request.getAdditionalEvidence().isEmpty()) {
+            responseText = "Customer uploaded supporting image(s)/evidence";
+        } else {
+            responseText = "Customer confirmed and provided information";
+        }
+
         recordHistory(claim.getId(), prev, ClaimStatus.UNDER_REVIEW, "Customer",
-                "Customer provided response: " + request.getResponse().trim());
+                "Customer provided response: " + responseText);
 
         auditService.logAction(customerId, "CUSTOMER", "CLAIM_INFO_REPLIED", "Claim", claim.getId(),
-                "Customer responded to additional info request: " + request.getResponse().trim());
+                "Customer responded to additional info request: " + responseText);
 
         // Notify retailer
         Retailer retailer = retailerRepository.findById(claim.getRetailerId()).orElse(null);
