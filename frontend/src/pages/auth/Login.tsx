@@ -75,17 +75,17 @@ export const Login: React.FC = () => {
   const isSuspended = error?.toLowerCase().includes('suspended');
 
   return (
-    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-[#E2ECE1] dark:bg-[#11291B] p-6 sm:p-9 rounded-3xl border border-[#BDD0BC] dark:border-[#1E4C32] shadow-md transition-colors">
       <div className="text-center space-y-2 mb-6">
-        <div className="bg-indigo-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
+        <div className="bg-[#17432A] dark:bg-[#1E5234] text-[#86E4AE] w-12 h-12 rounded-2xl flex items-center justify-center mx-auto shadow-xs border border-[#27643E]/40">
           <ShieldCheck className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Sign in to WarranTrack</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Access your warranties, products, and claims</p>
+        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#0C2114] dark:text-[#F0F6F2]">Sign in to WarranTrack</h2>
+        <p className="text-xs sm:text-sm text-[#476B53] dark:text-[#8EAE9A]">Access your warranties, products, and claims</p>
       </div>
 
       {wasDeactivated && (
-        <div className="mb-4 p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 rounded-xl text-xs flex items-start gap-2.5">
+        <div className="mb-4 p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 rounded-2xl text-xs flex items-start gap-2.5">
           <CheckCircle2 className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <span>
             Your account was successfully deactivated. All your warranty cards and claim records remain safely preserved. You can sign in and reactivate anytime.
@@ -94,14 +94,14 @@ export const Login: React.FC = () => {
       )}
 
       {reactivateSuccess && (
-        <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 rounded-lg text-sm flex items-center gap-2">
+        <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 rounded-2xl text-sm flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>{reactivateSuccess}</span>
         </div>
       )}
 
       {error && !isInactive && (
-        <div className={`mb-4 p-3.5 rounded-xl text-xs flex items-start gap-2.5 ${isSuspended
+        <div className={`mb-4 p-3.5 rounded-2xl text-xs flex items-start gap-2.5 ${isSuspended
           ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-800 dark:text-rose-300'
           : 'bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-800/60 text-red-700 dark:text-rose-300'
           }`}>
@@ -116,7 +116,7 @@ export const Login: React.FC = () => {
 
       {/* Inactive Account Reactivation Offer */}
       {isInactive && (
-        <div className="mb-5 p-4 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl space-y-3">
+        <div className="mb-5 p-4 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl space-y-3">
           <div className="flex items-start gap-2.5">
             <PauseCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div>
@@ -130,7 +130,7 @@ export const Login: React.FC = () => {
             type="button"
             onClick={handleReactivate}
             disabled={reactivating}
-            className="w-full py-2.5 px-3 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-2.5 px-3 bg-[#17432A] hover:bg-[#123621] text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {reactivating ? (
               <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -144,21 +144,21 @@ export const Login: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#345741] dark:text-[#A7C8B4] mb-1">Email Address</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[#BDD0BC] dark:border-[#1E4C32] bg-[#D6E3D5] dark:bg-[#0E2417] text-[#0C2114] dark:text-[#F0F6F2] focus:outline-none focus:ring-2 focus:ring-[#1E5234] dark:focus:ring-[#86E4AE] text-sm transition"
             placeholder="you@example.com"
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">Password</label>
-            <Link to="/forgot-password" className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
+            <label className="text-xs font-semibold uppercase tracking-wider text-[#345741] dark:text-[#A7C8B4]">Password</label>
+            <Link to="/forgot-password" className="text-xs text-[#17432A] dark:text-[#86E4AE] font-semibold hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -168,13 +168,13 @@ export const Login: React.FC = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-3.5 pr-10 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-[#BDD0BC] dark:border-[#1E4C32] bg-[#D6E3D5] dark:bg-[#0E2417] text-[#0C2114] dark:text-[#F0F6F2] focus:outline-none focus:ring-2 focus:ring-[#1E5234] dark:focus:ring-[#86E4AE] text-sm transition"
               placeholder="••••••••"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none transition p-0.5"
+              className="absolute right-3 top-2.5 text-[#476B53] hover:text-[#0C2114] dark:text-[#8EAE9A] dark:hover:text-white focus:outline-none transition p-0.5 cursor-pointer"
               title={showPassword ? 'Hide password' : 'Show password'}
               tabIndex={-1}
             >
@@ -186,10 +186,10 @@ export const Login: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+          className="w-full py-3 px-4 bg-[#17432A] dark:bg-[#86E4AE] text-white dark:text-[#0C2114] font-bold rounded-2xl hover:bg-[#123621] dark:hover:bg-[#68D897] transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white dark:border-[#0C2114]"></div>
           ) : (
             <>
               <LogIn className="w-4 h-4" /> Sign In
@@ -198,16 +198,16 @@ export const Login: React.FC = () => {
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-center space-y-2 text-xs text-slate-600 dark:text-slate-400">
+      <div className="mt-6 pt-6 border-t border-[#CCD9CB] dark:border-[#1E4C32] text-center space-y-2 text-xs text-[#476B53] dark:text-[#8EAE9A]">
         <div>
           Don't have an account yet?{' '}
-          <Link to="/register" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+          <Link to="/register" className="text-[#17432A] dark:text-[#86E4AE] font-semibold hover:underline">
             Register as Customer
           </Link>
         </div>
         <div>
           Are you a retail merchant?{' '}
-          <Link to="/register-retailer" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+          <Link to="/register/retailer" className="text-[#17432A] dark:text-[#86E4AE] font-semibold hover:underline">
             Register Retailer Account
           </Link>
         </div>

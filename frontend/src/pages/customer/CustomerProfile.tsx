@@ -171,8 +171,8 @@ export const CustomerProfile: React.FC = () => {
       </div>
 
       {/* Profile Overview Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 px-6 py-8 text-white">
+      <div className="bg-[#E2ECE1] dark:bg-[#11291B] rounded-3xl border border-[#BDD0BC] dark:border-[#1E4C32] shadow-xs overflow-hidden">
+        <div className="bg-gradient-to-r from-[#0C2216] via-[#143924] to-[#0E2618] border-b border-[#245D3B]/40 px-6 py-8 text-white">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-xl font-bold text-white shadow-inner">

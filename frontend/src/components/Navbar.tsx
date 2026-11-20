@@ -14,6 +14,7 @@ import {
   Clock,
   Inbox,
   Menu,
+  LayoutDashboard,
 } from 'lucide-react';
 import { NotificationItem } from '../types';
 import { getNotificationTargetRoute, getNotificationMeta, formatNotificationTime } from '../utils/notificationUtils';
@@ -21,9 +22,14 @@ import { getNotificationTargetRoute, getNotificationMeta, formatNotificationTime
 interface NavbarProps {
   onToggleMobileNav?: () => void;
   mobileNavOpen?: boolean;
+  isDashboardRoute?: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  onToggleMobileNav,
+  mobileNavOpen,
+  isDashboardRoute = false,
+}) => {
   const { user, logout } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -31,6 +37,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
   const [markingAll, setMarkingAll] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const getHomeRoute = () => {
+    if (!user) return '/';
+    if (user.role === 'ADMIN') return '/admin';
+    if (user.role === 'RETAILER') return '/retailer';
+    return '/customer';
+  };
 
   // Click-outside and Escape key listener to close popover
   useEffect(() => {
@@ -86,19 +99,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
     switch (role) {
       case 'ADMIN':
         return (
-          <span className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200/70 dark:border-purple-800/60 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+          <span className="bg-[#DEE7DC] dark:bg-[#12281B] text-[#1E4D32] dark:text-[#E5C38F] border border-[#CCD8CA] dark:border-[#1F452E] text-xs font-semibold px-2.5 py-0.5 rounded-full tracking-wide">
             Administrator
           </span>
         );
       case 'RETAILER':
         return (
-          <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/60 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+          <span className="bg-[#DDE5E0] dark:bg-[#122421] text-[#1F483D] dark:text-[#A7D9C9] border border-[#CAD8D1] dark:border-[#1B3F35] text-xs font-semibold px-2.5 py-0.5 rounded-full tracking-wide">
             Retailer
           </span>
         );
       case 'CUSTOMER':
         return (
-          <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+          <span className="bg-[#E2EBE0] dark:bg-[#112719] text-[#1C472A] dark:text-[#B6DFBF] border border-[#CBDAC7] dark:border-[#1D4428] text-xs font-semibold px-2.5 py-0.5 rounded-full tracking-wide">
             Customer
           </span>
         );
@@ -108,15 +121,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
   };
 
   return (
-    <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-colors">
+    <header className="bg-[#D3E0D1]/90 dark:bg-[#0E2417]/90 border-b border-[#C0D1BF] dark:border-[#173C27] sticky top-0 z-30 transition-colors backdrop-blur-md">
       <div className="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1680px] mx-auto px-3 sm:px-6 lg:px-8 2xl:px-10 h-16 flex items-center justify-between">
         {/* Left: Mobile Nav Hamburger + Brand */}
         <div className="flex items-center gap-1 sm:gap-2">
-          {user && (
+          {user && isDashboardRoute && (
             <button
               type="button"
               onClick={onToggleMobileNav}
-              className="lg:hidden p-2 -ml-1 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              className="lg:hidden p-2 -ml-1 rounded-lg text-[#163B27] dark:text-[#CAD6CC] hover:bg-[#C2D4C0] dark:hover:bg-[#153823] transition cursor-pointer"
               aria-label="Toggle navigation menu"
               aria-expanded={mobileNavOpen}
             >
@@ -124,22 +137,32 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
             </button>
           )}
 
-          <Link to="/" className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition">
-            <div className="bg-indigo-600 text-white p-1.5 sm:p-2 rounded-lg shrink-0">
-              <ShieldCheck className="w-5 h-5" />
+          <Link to={getHomeRoute()} className="flex items-center gap-2.5 group transition">
+            <div className="bg-[#17432A] dark:bg-[#1E5234] text-[#E8F3EA] p-2 rounded-2xl shrink-0 shadow-xs border border-[#27643E]/40 group-hover:scale-105 transition-transform">
+              <ShieldCheck className="w-5 h-5 text-[#86E4AE] dark:text-[#86E4AE]" />
             </div>
-            <span className="font-bold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">
-              Warran<span className="text-indigo-600 dark:text-indigo-400">Track</span>
+            <span className="font-serif text-xl sm:text-2xl tracking-tight text-[#0C2114] dark:text-[#EDF2EB] font-bold">
+              Warran<span className="text-[#256B40] dark:text-[#86E4AE] italic font-normal">Track</span>
             </span>
           </Link>
         </div>
 
         {/* Right Nav */}
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
 
           {user ? (
             <>
+              {!isDashboardRoute && (
+                <Link
+                  to={getHomeRoute()}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-[#F3F7F2] dark:text-[#0C2114] bg-[#17432A] dark:bg-[#86E4AE] hover:bg-[#123621] dark:hover:bg-[#68D897] rounded-full shadow-xs transition"
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span>Go to Dashboard</span>
+                </Link>
+              )}
+
               <div className="hidden md:inline-flex">
                 {getRoleBadge(user.role)}
               </div>
@@ -153,18 +176,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
                   aria-label="Toggle notifications menu"
                   className={`relative p-2 rounded-full transition cursor-pointer ${
                     showNotifications
-                      ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-400 ring-2 ring-indigo-200 dark:ring-indigo-800'
-                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'bg-[#C2D4C0] dark:bg-[#163C27] text-[#0C2114] dark:text-[#86E4AE] ring-2 ring-[#27643E]/30'
+                      : 'text-[#2A523A] hover:text-[#0C2114] dark:text-[#A7C8B4] dark:hover:text-[#F0F6F2] hover:bg-[#C5D7C3] dark:hover:bg-[#153823]'
                   }`}
                   title="Notifications"
                 >
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
                     <>
-                      {/* Subtle Ping Animation */}
-                      <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-400 animate-ping opacity-75" />
-                      {/* Count Badge */}
-                      <span className="absolute -top-0.5 -right-0.5 bg-rose-600 text-white text-[10px] font-bold px-1.5 min-w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-slate-900 shadow-xs">
+                      <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#10B981] animate-ping opacity-75" />
+                      <span className="absolute -top-0.5 -right-0.5 bg-[#17432A] text-white text-[10px] font-bold px-1.5 min-w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-[#D3E0D1] dark:ring-[#0E2417] shadow-xs">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     </>
@@ -173,17 +194,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
 
                 {/* Notifications Dropdown Panel */}
                 {showNotifications && (
-                  <div className="fixed sm:absolute right-2 sm:right-0 left-2 sm:left-auto top-16 sm:top-auto mt-2 sm:w-[420px] max-w-[calc(100vw-1rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 py-0 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                  <div className="fixed sm:absolute right-2 sm:right-0 left-2 sm:left-auto top-16 sm:top-auto mt-2 sm:w-[420px] max-w-[calc(100vw-1rem)] bg-[#E2ECE1] dark:bg-[#11291B] rounded-3xl shadow-2xl border border-[#BDD0BC] dark:border-[#1E4C32] py-0 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                     {/* Header */}
-                    <div className="p-4 bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                    <div className="p-4 bg-[#D7E4D6] dark:bg-[#153423] border-b border-[#BDD0BC] dark:border-[#1E4C32] flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-slate-900 dark:text-slate-100">Notifications</span>
+                        <span className="font-bold text-sm text-[#0C2114] dark:text-[#F0F6F2]">Notifications</span>
                         {unreadCount > 0 ? (
-                          <span className="px-2 py-0.5 text-[11px] font-bold rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                          <span className="px-2 py-0.5 text-[11px] font-bold rounded-full bg-[#C2D7C1] dark:bg-[#1C4830] text-[#133A24] dark:text-[#86E4AE] border border-[#AEC5AD] dark:border-[#27643E]">
                             {unreadCount} unread
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                          <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-[#CAD8C9] dark:bg-[#183B27] text-[#345741] dark:text-[#A7C8B4]">
                             All caught up
                           </span>
                         )}
@@ -194,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
                           type="button"
                           onClick={handleMarkAllAsRead}
                           disabled={markingAll}
-                          className="inline-flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold px-2 py-1 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 text-xs text-[#17432A] dark:text-[#86E4AE] hover:text-[#0C2114] dark:hover:text-[#A7E9C4] font-semibold px-2 py-1 rounded-md hover:bg-[#CCD9CB] dark:hover:bg-[#1C4830] transition cursor-pointer disabled:opacity-50"
                           title="Mark all notifications as read"
                         >
                           <CheckCheck className="w-3.5 h-3.5" />
@@ -204,14 +225,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
                     </div>
 
                     {/* Filter Tabs */}
-                    <div className="px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 text-xs">
+                    <div className="px-4 py-2 bg-[#DDE9DC] dark:bg-[#132E1F] border-b border-[#BDD0BC] dark:border-[#1E4C32] flex items-center gap-2 text-xs">
                       <button
                         type="button"
                         onClick={() => setFilterMode('ALL')}
-                        className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                        className={`px-3 py-1 rounded-full font-medium transition cursor-pointer ${
                           filterMode === 'ALL'
-                            ? 'bg-slate-900 dark:bg-indigo-600 text-white'
-                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            ? 'bg-[#17432A] dark:bg-[#86E4AE] text-white dark:text-[#0C2114] shadow-xs'
+                            : 'text-[#2D543C] dark:text-[#A7C8B4] hover:bg-[#CAD9C9] dark:hover:bg-[#183B27]'
                         }`}
                       >
                         All ({notifications.length})
@@ -219,16 +240,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
                       <button
                         type="button"
                         onClick={() => setFilterMode('UNREAD')}
-                        className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer flex items-center gap-1 ${
+                        className={`px-3 py-1 rounded-full font-medium transition cursor-pointer flex items-center gap-1 ${
                           filterMode === 'UNREAD'
-                            ? 'bg-slate-900 dark:bg-indigo-600 text-white'
-                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            ? 'bg-[#17432A] dark:bg-[#86E4AE] text-white dark:text-[#0C2114] shadow-xs'
+                            : 'text-[#2D543C] dark:text-[#A7C8B4] hover:bg-[#CAD9C9] dark:hover:bg-[#183B27]'
                         }`}
                       >
                         <span>Unread</span>
                         {unreadCount > 0 && (
                           <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                            filterMode === 'UNREAD' ? 'bg-indigo-500 text-white' : 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
+                            filterMode === 'UNREAD' ? 'bg-[#10B981] text-white' : 'bg-[#C2D7C1] dark:bg-[#1C4830] text-[#133A24] dark:text-[#86E4AE]'
                           }`}>
                             {unreadCount}
                           </span>
@@ -237,7 +258,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
                     </div>
 
                     {/* Notification List */}
-                    <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+                    <div className="max-h-[380px] overflow-y-auto divide-y divide-[#CFDCCD] dark:divide-[#183B27]">
                       {displayedNotifications.length === 0 ? (
                         <div className="px-6 py-10 text-center space-y-2">
                           <Inbox className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600" />
@@ -322,12 +343,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
                     </div>
 
                     {/* Footer */}
-                    <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Clicking any alert marks it as read and opens the record</span>
+                    <div className="px-4 py-2.5 bg-[#D7E4D6] dark:bg-[#153423] border-t border-[#BDD0BC] dark:border-[#1E4C32] flex items-center justify-between text-xs">
+                      <span className="text-[11px] text-[#476B53] dark:text-[#8EAE9A]">Clicking any alert marks it as read and opens the record</span>
                       <Link
                         to="/notifications"
                         onClick={() => setShowNotifications(false)}
-                        className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold transition flex items-center gap-1"
+                        className="text-xs text-[#17432A] dark:text-[#86E4AE] hover:text-[#0C2114] dark:hover:text-[#A7E9C4] font-bold transition flex items-center gap-1"
                       >
                         <span>View All</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -340,17 +361,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
               {/* User details & Profile Link */}
               <Link
                 to={user.role === 'CUSTOMER' ? '/customer/profile' : user.role === 'RETAILER' ? '/retailer/profile' : '#'}
-                className="flex items-center gap-2.5 text-left p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition group"
+                className="flex items-center gap-2.5 text-left p-1.5 rounded-2xl hover:bg-[#C2D4C0] dark:hover:bg-[#153823] transition group"
                 title={user.role === 'CUSTOMER' ? 'View My Customer Profile' : 'View Profile'}
               >
-                <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200/60 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-bold text-xs shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition">
+                <div className="w-8 h-8 rounded-xl bg-[#C2D7C1] dark:bg-[#1C4830] border border-[#AEC5AD] dark:border-[#27643E] flex items-center justify-center text-[#133A24] dark:text-[#86E4AE] font-bold text-xs shrink-0 group-hover:bg-[#17432A] group-hover:text-[#F3F7F2] transition">
                   <UserIcon className="w-4 h-4" />
                 </div>
                 <div className="hidden sm:flex flex-col text-left min-w-0">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition leading-tight truncate max-w-[120px] md:max-w-[160px] xl:max-w-[220px]">
+                  <span className="text-xs font-bold text-[#0C2114] dark:text-[#EDF2EB] group-hover:text-[#17432A] dark:group-hover:text-[#86E4AE] transition leading-tight truncate max-w-[120px] md:max-w-[160px] xl:max-w-[220px]">
                     {user.name}
                   </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight truncate max-w-[120px] md:max-w-[160px] xl:max-w-[220px]">
+                  <span className="text-[11px] text-[#476B53] dark:text-[#8EAE9A] leading-tight truncate max-w-[120px] md:max-w-[160px] xl:max-w-[220px]">
                     {user.email}
                   </span>
                 </div>
@@ -366,16 +387,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileNav, mobileNavOpen
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Link
                 to="/login"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-3 py-2 rounded-lg transition"
+                className="text-xs sm:text-sm font-semibold text-[#1C3D2A] hover:text-[#0C1E14] dark:text-[#CBD9CD] dark:hover:text-white px-3 sm:px-3.5 py-2 rounded-xl hover:bg-[#DEE7DC] dark:hover:bg-[#12271B] transition"
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="text-sm font-medium bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 shadow-sm transition"
+                className="text-xs sm:text-sm font-semibold bg-[#173D26] hover:bg-[#102B1B] dark:bg-[#D5A06D] dark:hover:bg-[#C58E57] text-[#F3F7F2] dark:text-[#07130B] px-4 sm:px-4.5 py-2 rounded-xl shadow-xs hover:shadow-sm transition"
               >
                 Get Started
               </Link>
