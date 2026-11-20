@@ -164,6 +164,11 @@ public class ClaimController {
 
         String storedFilename = UUID.randomUUID().toString() + extension;
         Path uploadDir = Paths.get("uploads", "evidence");
+        if (!Files.exists(uploadDir) && Files.exists(Paths.get("backend", "uploads", "evidence"))) {
+            uploadDir = Paths.get("backend", "uploads", "evidence");
+        } else if (!Files.exists(uploadDir) && Files.exists(Paths.get("backend"))) {
+            uploadDir = Paths.get("backend", "uploads", "evidence");
+        }
 
         try {
             if (!Files.exists(uploadDir)) {

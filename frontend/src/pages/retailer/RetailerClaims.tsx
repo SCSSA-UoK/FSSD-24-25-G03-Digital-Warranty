@@ -27,8 +27,10 @@ import {
   Activity,
   ArrowUpRight,
   X,
-  ArrowLeft
+  ArrowLeft,
+  ZoomIn,
 } from 'lucide-react';
+import { ImagePreviewModal } from '../../components/ImagePreviewModal';
 
 type TabFilter = 'ALL' | 'NEEDS_ACTION' | 'AWAITING_INFO' | 'IN_SERVICE' | 'COMPLETED' | 'CLOSED';
 
@@ -59,6 +61,9 @@ export const RetailerClaims: React.FC = () => {
 
   const [completeModal, setCompleteModal] = useState(false);
   const [completeNotes, setCompleteNotes] = useState('');
+
+  // Full-screen Image Preview Lightbox Modal
+  const [previewModalImage, setPreviewModalImage] = useState<{ url: string; title?: string } | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -992,12 +997,16 @@ export const RetailerClaims: React.FC = () => {
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {selectedClaim.evidenceReferences.map((ref, idx) => (
-                        <a
+                        <div
                           key={idx}
-                          href={ref}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 transition group flex items-center justify-between"
+                          onClick={() =>
+                            setPreviewModalImage({
+                              url: ref,
+                              title: `Customer Evidence #${idx + 1} (${ref.split('/').pop() || 'image'})`,
+                            })
+                          }
+                          className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 transition group flex items-center justify-between cursor-pointer"
+                          title="Click to view full image"
                         >
                           <div className="flex items-center gap-2 truncate">
                             <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -1005,8 +1014,8 @@ export const RetailerClaims: React.FC = () => {
                               Attachment {idx + 1}
                             </span>
                           </div>
-                          <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition" />
-                        </a>
+                          <ZoomIn className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition" />
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -1516,6 +1525,13 @@ export const RetailerClaims: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Full-screen Zoomable/Pannable Image Preview Modal */}
+      <ImagePreviewModal
+        isOpen={Boolean(previewModalImage)}
+        onClose={() => setPreviewModalImage(null)}
+        imageUrl={previewModalImage?.url || ''}
+        title={previewModalImage?.title}
+      />
     </div>
   );
 };

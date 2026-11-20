@@ -5,6 +5,7 @@ import com.warrantrack.dto.warranty.PublicWarrantyResponse;
 import com.warrantrack.service.WarrantyService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,9 @@ public class PublicController {
     public ResponseEntity<Resource> getEvidenceFile(@PathVariable String filename) {
         Path filePath = Paths.get("uploads", "evidence").resolve(filename).normalize();
         if (!Files.exists(filePath)) {
+            filePath = Paths.get("backend", "uploads", "evidence").resolve(filename).normalize();
+        }
+        if (!Files.exists(filePath)) {
             return ResponseEntity.notFound().build();
         }
         Resource resource = new FileSystemResource(filePath);
@@ -54,6 +58,7 @@ public class PublicController {
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
                 .body(resource);
     }
 }

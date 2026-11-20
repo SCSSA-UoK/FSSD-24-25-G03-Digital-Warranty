@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Plus,
 } from 'lucide-react';
+import { ImagePreviewModal } from '../../components/ImagePreviewModal';
 
 interface SelectedImage {
   id: string;
@@ -49,6 +50,7 @@ export const SubmitClaim: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewModalImage, setPreviewModalImage] = useState<{ url: string; title?: string } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const imagesRef = useRef<SelectedImage[]>([]);
@@ -361,14 +363,18 @@ export const SubmitClaim: React.FC = () => {
                   {images.map((img) => (
                     <div
                       key={img.id}
-                      onClick={(e) => e.stopPropagation()}
-                      className="relative group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-xs flex flex-col cursor-default"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewModalImage({ url: img.previewUrl, title: img.name });
+                      }}
+                      className="relative group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-xs flex flex-col cursor-pointer"
+                      title="Click to view full image"
                     >
                       <div className="relative h-28 sm:h-32 w-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden">
                         <img
                           src={img.previewUrl}
                           alt={img.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                         />
                         {/* Uploading Status Overlay */}
                         {img.uploading && (
@@ -472,6 +478,14 @@ export const SubmitClaim: React.FC = () => {
           )}
         </button>
       </form>
+
+      {/* Full-screen Zoomable/Pannable Image Preview Modal */}
+      <ImagePreviewModal
+        isOpen={Boolean(previewModalImage)}
+        onClose={() => setPreviewModalImage(null)}
+        imageUrl={previewModalImage?.url || ''}
+        title={previewModalImage?.title}
+      />
     </div>
   );
 };
