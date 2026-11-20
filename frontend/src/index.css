@@ -2,10 +2,134 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --color-sage-50: #f1f6f1;
+  --color-sage-100: #e2ede2;
+  --color-sage-200: #cbdecb;
+  --color-sage-300: #a9caa9;
+  --color-sage-400: #81af82;
+  --color-sage-500: #5d925e;
+  --color-sage-600: #477548;
+  --color-sage-700: #385d39;
+  --color-sage-800: #2f4b30;
+  --color-sage-900: #273e28;
+  --color-sage-950: #122113;
+
+  --color-forest-950: #07170e;
+  --color-forest-900: #0c2316;
+  --color-forest-850: #102d1d;
+  --color-forest-800: #153925;
+  --color-forest-700: #1a472f;
+
+  --color-mint-300: #86efac;
+  --color-mint-400: #4ade80;
+  --color-mint-500: #34d399;
+  --color-mint-600: #10b981;
+
+  --color-sand-50: #fbf8f3;
+  --color-sand-100: #f5efe6;
+  --color-sand-200: #ece2d2;
+  --color-sand-300: #e0d0b8;
+
+  /* Eradicate stark white: light mode cards and surfaces are soft non-white botanical sage */
+  --color-white: #e3ece2;
+
+  /* Slate remapping: replace default cool-blue slate with calibrated botanical forest & sage greens */
+  --color-slate-50: #e8f0e7;
+  --color-slate-100: #dce7dc;
+  --color-slate-200: #c2d5c1;
+  --color-slate-300: #a2c2a3;
+  --color-slate-400: #7ba67d;
+  --color-slate-500: #558759;
+  --color-slate-600: #3c6d42;
+  --color-slate-700: #285433;
+  --color-slate-800: #1a4228;
+  --color-slate-900: #12331e;
+  --color-slate-950: #0a1f12;
+
+  /* Gray, Zinc, Neutral remapping: ensure all card surfaces align with botanical green */
+  --color-gray-50: #e8f0e7;
+  --color-gray-100: #dce7dc;
+  --color-gray-200: #c2d5c1;
+  --color-gray-300: #a2c2a3;
+  --color-gray-400: #7ba67d;
+  --color-gray-500: #558759;
+  --color-gray-600: #3c6d42;
+  --color-gray-700: #285433;
+  --color-gray-800: #1a4228;
+  --color-gray-900: #12331e;
+  --color-gray-950: #0a1f12;
+
+  --color-zinc-50: #e8f0e7;
+  --color-zinc-100: #dce7dc;
+  --color-zinc-200: #c2d5c1;
+  --color-zinc-300: #a2c2a3;
+  --color-zinc-400: #7ba67d;
+  --color-zinc-500: #558759;
+  --color-zinc-600: #3c6d42;
+  --color-zinc-700: #285433;
+  --color-zinc-800: #1a4228;
+  --color-zinc-900: #12331e;
+  --color-zinc-950: #0a1f12;
+
+  --color-neutral-50: #e8f0e7;
+  --color-neutral-100: #dce7dc;
+  --color-neutral-200: #c2d5c1;
+  --color-neutral-300: #a2c2a3;
+  --color-neutral-400: #7ba67d;
+  --color-neutral-500: #558759;
+  --color-neutral-600: #3c6d42;
+  --color-neutral-700: #285433;
+  --color-neutral-800: #1a4228;
+  --color-neutral-900: #12331e;
+  --color-neutral-950: #0a1f12;
+
+  /* Theme color remapping: eradicate all blue and purple radiances with calibrated botanical greens */
+  --color-indigo-50: #eef5ef;
+  --color-indigo-100: #dcece0;
+  --color-indigo-200: #b9dac0;
+  --color-indigo-300: #8fc398;
+  --color-indigo-400: #5ea66d;
+  --color-indigo-500: #3c894e;
+  --color-indigo-600: #1e5233;
+  --color-indigo-700: #174229;
+  --color-indigo-800: #143722;
+  --color-indigo-900: #102d1c;
+  --color-indigo-950: #081a10;
+
+  --color-purple-50: #f1f7f2;
+  --color-purple-100: #deede1;
+  --color-purple-200: #bedbc3;
+  --color-purple-300: #93c39a;
+  --color-purple-400: #64a66e;
+  --color-purple-500: #41894d;
+  --color-purple-600: #256637;
+  --color-purple-700: #1d522c;
+  --color-purple-800: #194325;
+  --color-purple-900: #14371f;
+  --color-purple-950: #081a0e;
+
+  --color-blue-50: #eef5ef;
+  --color-blue-100: #dcece0;
+  --color-blue-200: #b9dac0;
+  --color-blue-300: #8fc398;
+  --color-blue-400: #5ea66d;
+  --color-blue-500: #3c894e;
+  --color-blue-600: #1e5233;
+  --color-blue-700: #174229;
+  --color-blue-800: #143722;
+  --color-blue-900: #102d1c;
+  --color-blue-950: #081a10;
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    font-family: var(--font-sans);
   }
 
   html.dark {
@@ -13,11 +137,18 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased transition-colors duration-200 overflow-x-hidden;
+    background-color: #D3E0D1;
+    color: #0C2114;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    overflow-x: hidden;
   }
 
   html.dark body {
-    @apply bg-slate-950 text-slate-100;
+    background-color: #0E2417;
+    color: #F0F6F2;
   }
 
   img, video, canvas, audio, iframe, embed, object {
@@ -49,28 +180,188 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.4);
+  background-color: rgba(50, 95, 65, 0.35);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(148, 163, 184, 0.7);
+  background-color: rgba(50, 95, 65, 0.6);
 }
 
 html.dark ::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 116, 139, 0.4);
+  background-color: rgba(134, 228, 174, 0.3);
 }
 
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(148, 163, 184, 0.6);
+  background-color: rgba(134, 228, 174, 0.5);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  scrollbar-color: rgba(50, 95, 65, 0.35) transparent;
 }
 
 html.dark * {
-  scrollbar-color: rgba(100, 116, 139, 0.4) transparent;
+  scrollbar-color: rgba(134, 228, 174, 0.3) transparent;
+}
+
+/* =========================================================================
+   Botanical Form Controls & Input Fields System
+   - Light mode: Non-white sage parchment (#D6E3D5), subtle moss border, deep forest text
+   - Dark mode: Velvety deep forest green (#0E2417), foliage border (#1E4C32), parchment text (#F0F6F2)
+   - Focus Radiant: Emerald leaf in light mode, mint glow (#86E4AE) in dark mode (no blue/purple)
+   ========================================================================= */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+textarea,
+select {
+  background-color: #D6E3D5 !important;
+  border-color: #BDD0BC !important;
+  color: #0C2114 !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"])::placeholder,
+textarea::placeholder {
+  color: #62826A !important;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+html.dark textarea,
+html.dark select {
+  background-color: #0E2417 !important;
+  border-color: #1E4C32 !important;
+  color: #F0F6F2 !important;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"])::placeholder,
+html.dark textarea::placeholder {
+  color: #6E947A !important;
+}
+
+/* Botanical radiant ring on focus */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]):focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: #1E5234 !important;
+  --tw-ring-color: rgba(30, 82, 52, 0.25) !important;
+  box-shadow: 0 0 0 3px rgba(30, 82, 52, 0.22) !important;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]):focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  outline: none !important;
+  border-color: #86E4AE !important;
+  --tw-ring-color: rgba(134, 228, 174, 0.35) !important;
+  box-shadow: 0 0 0 3px rgba(134, 228, 174, 0.3) !important;
+}
+
+/* Disabled & Readonly field styling */
+input:disabled, textarea:disabled, select:disabled,
+input[readonly], textarea[readonly] {
+  opacity: 0.72;
+  cursor: not-allowed;
+  background-color: #C8D8C7 !important;
+}
+
+html.dark input:disabled, html.dark textarea:disabled, html.dark select:disabled,
+html.dark input[readonly], html.dark textarea[readonly] {
+  opacity: 0.72;
+  cursor: not-allowed;
+  background-color: #0A1B11 !important;
+}
+
+/* Select dropdown option styling */
+select option {
+  background-color: #D6E3D5;
+  color: #0C2114;
+}
+
+html.dark select option {
+  background-color: #0E2417;
+  color: #F0F6F2;
+}
+
+/* =========================================================================
+   Browser Autofill Overrides (Eradicates Browser Default Cool-Blue Radiant)
+   ========================================================================= */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #D6E3D5 inset !important;
+  box-shadow: 0 0 0 1000px #D6E3D5 inset !important;
+  -webkit-text-fill-color: #0C2114 !important;
+  caret-color: #1E5234 !important;
+  border-color: #BDD0BC !important;
+  transition: background-color 50000s ease-in-out 0s;
+}
+
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #D6E3D5 inset, 0 0 0 3px rgba(30, 82, 52, 0.22) !important;
+  box-shadow: 0 0 0 1000px #D6E3D5 inset, 0 0 0 3px rgba(30, 82, 52, 0.22) !important;
+  border-color: #1E5234 !important;
+}
+
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover, 
+html.dark input:-webkit-autofill:focus, 
+html.dark input:-webkit-autofill:active,
+html.dark textarea:-webkit-autofill,
+html.dark textarea:-webkit-autofill:hover,
+html.dark textarea:-webkit-autofill:focus,
+html.dark select:-webkit-autofill,
+html.dark select:-webkit-autofill:hover,
+html.dark select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0E2417 inset !important;
+  box-shadow: 0 0 0 1000px #0E2417 inset !important;
+  -webkit-text-fill-color: #F0F6F2 !important;
+  caret-color: #86E4AE !important;
+  border-color: #1E4C32 !important;
+  transition: background-color 50000s ease-in-out 0s;
+}
+
+html.dark input:-webkit-autofill:focus,
+html.dark textarea:-webkit-autofill:focus,
+html.dark select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0E2417 inset, 0 0 0 3px rgba(134, 228, 174, 0.35) !important;
+  box-shadow: 0 0 0 1000px #0E2417 inset, 0 0 0 3px rgba(134, 228, 174, 0.35) !important;
+  border-color: #86E4AE !important;
+}
+
+/* Caret & Selection Colors */
+input, textarea {
+  caret-color: #1E5234;
+}
+
+html.dark input, html.dark textarea {
+  caret-color: #86E4AE;
+}
+
+::selection {
+  background-color: #1E5234;
+  color: #F0F6F2;
+}
+
+html.dark ::selection {
+  background-color: #86E4AE;
+  color: #0C2114;
+}
+
+input[type="checkbox"], input[type="radio"] {
+  accent-color: #1E5234;
+}
+
+html.dark input[type="checkbox"], html.dark input[type="radio"] {
+  accent-color: #86E4AE;
 }
 

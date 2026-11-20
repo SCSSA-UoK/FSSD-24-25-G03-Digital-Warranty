@@ -98,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
 
   const renderNavItems = () => (
     <div className="space-y-1">
-      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2.5 xl:px-3 py-1.5 xl:py-2">
+      <div className="text-[11px] font-bold uppercase tracking-wider text-[#345741] dark:text-[#8EAE9A] px-2.5 xl:px-3 py-1.5 xl:py-2">
         {user.role} Navigation
       </div>
       {links.map((link) => {
@@ -112,17 +112,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
               if (onClose) onClose();
             }}
             className={({ isActive }) =>
-              `flex items-center gap-2.5 xl:gap-3 px-2.5 xl:px-3 py-2 xl:py-2.5 rounded-lg text-xs xl:text-sm font-medium transition ${
+              `flex items-center gap-2.5 xl:gap-3 px-2.5 xl:px-3 py-2 xl:py-2.5 rounded-2xl text-xs xl:text-sm font-medium transition ${
                 isActive
-                  ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-semibold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
+                  ? 'bg-[#17432A] dark:bg-[#1B4B2F] text-[#86E4AE] font-semibold border border-[#27643E]/50 shadow-xs'
+                  : 'text-[#2D543C] dark:text-[#A7C8B4] hover:bg-[#CAD8C9] dark:hover:bg-[#163824] hover:text-[#0C2114] dark:hover:text-[#F0F6F2]'
               }`
             }
           >
             <Icon className="w-4 h-4 shrink-0" />
             <span className="flex-1 truncate">{link.label}</span>
             {link.to === '/notifications' && unreadCount > 0 && (
-              <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-xs">
+              <span className="bg-[#10B981] text-[#0C2114] text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-xs">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}
@@ -135,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
   return (
     <>
       {/* Desktop Persistent Sidebar (>= 1024px) */}
-      <aside className="hidden lg:flex lg:w-60 xl:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col lg:p-3 xl:p-4 shrink-0 transition-colors">
+      <aside className="hidden lg:flex lg:w-60 xl:w-64 bg-[#D7E4D6] dark:bg-[#11291B] border-r border-[#BDD0BC] dark:border-[#1E4C32] sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col lg:p-3 xl:p-4 shrink-0 transition-colors">
         {renderNavItems()}
       </aside>
 
@@ -144,24 +144,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
         <div className="fixed inset-0 z-50 lg:hidden flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs transition-opacity duration-200"
+            className="fixed inset-0 bg-[#0C2114]/75 backdrop-blur-xs transition-opacity duration-200"
             onClick={onClose}
             aria-hidden="true"
           />
 
           {/* Drawer Content */}
-          <div className="relative w-72 max-w-[85vw] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 h-full flex flex-col p-4 shadow-2xl z-10 transition-transform duration-300 ease-in-out">
+          <div className="relative w-72 max-w-[85vw] bg-[#D7E4D6] dark:bg-[#11291B] border-r border-[#BDD0BC] dark:border-[#1E4C32] h-full flex flex-col p-4 shadow-2xl z-10 transition-transform duration-300 ease-in-out">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between pb-3 mb-2 border-b border-[#BDD0BC] dark:border-[#1E4C32]">
               <div className="flex items-center gap-2">
-                <div className="bg-indigo-600 text-white p-1.5 rounded-lg">
+                <div className="bg-[#17432A] dark:bg-[#1B4B2F] text-[#86E4AE] p-1.5 rounded-xl shadow-xs border border-[#27643E]/40">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                  <div className="font-serif font-bold text-sm text-[#0C2114] dark:text-[#EDF2EB] leading-tight">
                     WarranTrack
                   </div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">
+                  <div className="text-[10px] text-[#476B53] dark:text-[#8EAE9A] capitalize">
                     {user.role?.toLowerCase()} Portal
                   </div>
                 </div>

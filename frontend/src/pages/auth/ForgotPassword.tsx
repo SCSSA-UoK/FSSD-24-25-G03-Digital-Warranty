@@ -210,9 +210,9 @@ export const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm text-center transition-colors">
+    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-[#E2ECE1] dark:bg-[#11291B] p-6 sm:p-9 rounded-3xl border border-[#BDD0BC] dark:border-[#1E4C32] shadow-md text-center transition-colors">
       {/* Icon */}
-      <div className="bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
+      <div className="bg-[#17432A] dark:bg-[#1E5234] text-[#86E4AE] w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#27643E]/40">
         {step === 'SUCCESS' ? (
           <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
         ) : step === 'SET_PASSWORD' ? (
@@ -251,32 +251,32 @@ export const ForgotPassword: React.FC = () => {
           <div
             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition ${
               step === 'REQUEST'
-                ? 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
+                ? 'bg-[#17432A] dark:bg-[#86E4AE] text-white dark:text-[#0C2114] shadow-xs'
+                : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
             }`}
           >
             <span>1</span>
             <span>Email</span>
           </div>
-          <div className="w-3 h-0.5 bg-slate-200 dark:bg-slate-700"></div>
+          <div className="w-3 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
           <div
             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition ${
               step === 'VERIFY_OTP'
-                ? 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                ? 'bg-[#17432A] dark:bg-[#86E4AE] text-white dark:text-[#0C2114] shadow-xs'
                 : step === 'SET_PASSWORD'
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700'
+                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700'
             }`}
           >
             <span>2</span>
             <span>Verify OTP</span>
           </div>
-          <div className="w-3 h-0.5 bg-slate-200 dark:bg-slate-700"></div>
+          <div className="w-3 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
           <div
             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition ${
               step === 'SET_PASSWORD'
-                ? 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700'
+                ? 'bg-[#17432A] dark:bg-[#86E4AE] text-white dark:text-[#0C2114] shadow-xs'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700'
             }`}
           >
             <span>3</span>
@@ -335,7 +335,7 @@ export const ForgotPassword: React.FC = () => {
           <button
             type="submit"
             disabled={loading || !email.trim()}
-            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-medium rounded-xl transition flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+            className="w-full py-3 px-4 bg-[#17432A] dark:bg-[#86E4AE] hover:bg-[#123621] dark:hover:bg-[#68D897] text-white dark:text-[#0C2114] font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
               <div className="flex items-center gap-2">
@@ -437,7 +437,7 @@ export const ForgotPassword: React.FC = () => {
             <button
               type="submit"
               disabled={loading || otp.trim().length !== 6 || expiresIn <= 0}
-              className="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-medium rounded-xl transition flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+              className="flex-1 py-3 px-4 bg-[#17432A] dark:bg-[#86E4AE] hover:bg-[#123621] dark:hover:bg-[#68D897] text-white dark:text-[#0C2114] font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
@@ -530,7 +530,7 @@ export const ForgotPassword: React.FC = () => {
             <button
               type="submit"
               disabled={loading || !newPassword || newPassword.length < 6 || !confirmPassword}
-              className="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-medium rounded-xl transition flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+              className="flex-1 py-3 px-4 bg-[#17432A] dark:bg-[#86E4AE] hover:bg-[#123621] dark:hover:bg-[#68D897] text-white dark:text-[#0C2114] font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <div className="flex items-center gap-2">

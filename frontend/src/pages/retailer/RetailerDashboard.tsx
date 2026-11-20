@@ -115,22 +115,22 @@ export const RetailerDashboard: React.FC = () => {
       </div>
 
       {/* Quick Action Banner */}
-      <div className="bg-gradient-to-r from-indigo-700 via-blue-600 to-indigo-800 text-white rounded-2xl p-5 xl:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 xl:gap-6">
+      <div className="bg-gradient-to-r from-[#123621] via-[#17432A] to-[#0E2C1A] text-white rounded-3xl p-6 xl:p-7 shadow-md border border-[#27643E]/50 flex flex-col md:flex-row items-center justify-between gap-5 xl:gap-6">
         <div className="space-y-1 text-center md:text-left">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-semibold text-white mb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/15 text-xs font-semibold text-[#86E4AE] mb-1">
             <CreditCard className="w-3.5 h-3.5" /> Point of Sale & Checkout
           </div>
-          <h3 className="text-xl font-bold">Ring up customer sales & issue instant warranties</h3>
-          <p className="text-sm text-indigo-100 max-w-xl">
+          <h3 className="font-serif text-xl sm:text-2xl font-bold">Ring up customer sales &amp; issue instant warranties</h3>
+          <p className="text-sm text-[#D2E7D9] max-w-xl">
             Use the POS Billing Terminal to add single or multiple products (with or without warranty), compute taxes, print customer receipts, and automatically issue verifiable digital warranty cards.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
           <Link
             to="/retailer/pos"
-            className="px-5 py-2.5 bg-white text-indigo-700 font-semibold rounded-xl hover:bg-indigo-50 transition shadow-md flex items-center gap-2 text-sm"
+            className="px-6 py-3 bg-[#F5EFE6] text-[#0C2114] font-bold rounded-full hover:bg-[#EBE2D4] transition shadow-md flex items-center gap-2 text-sm"
           >
-            Launch POS Terminal <ArrowRight className="w-4 h-4" />
+            Launch POS Terminal <ArrowRight className="w-4 h-4 text-[#17432A]" />
           </Link>
         </div>
       </div>

@@ -114,7 +114,7 @@ export const CustomerWarranties: React.FC = () => {
                 className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition overflow-hidden flex flex-col justify-between"
               >
                 {/* Card Header */}
-                <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/80 dark:to-slate-900">
+                <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between bg-slate-50/70 dark:bg-[#12331E]/60">
                   <div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                       {w.retailerBusinessName}

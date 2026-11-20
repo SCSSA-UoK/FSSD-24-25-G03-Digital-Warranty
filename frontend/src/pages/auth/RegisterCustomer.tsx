@@ -153,13 +153,13 @@ export const RegisterCustomer: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-white dark:bg-slate-900 p-5 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+    <div className="w-full max-w-md mx-auto my-6 sm:my-12 bg-[#E2ECE1] dark:bg-[#11291B] p-6 sm:p-9 rounded-3xl border border-[#BDD0BC] dark:border-[#1E4C32] shadow-md transition-colors">
       <div className="text-center space-y-2 mb-6">
-        <div className="bg-emerald-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
+        <div className="bg-[#17432A] dark:bg-[#1E5234] text-[#86E4AE] w-12 h-12 rounded-2xl flex items-center justify-center mx-auto shadow-xs border border-[#27643E]/40">
           <ShieldCheck className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Create Customer Account</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Access all your digital warranties across retailers</p>
+        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#0C2114] dark:text-[#F0F6F2]">Create Customer Account</h2>
+        <p className="text-xs sm:text-sm text-[#476B53] dark:text-[#8EAE9A]">Access all your digital warranties across retailers</p>
       </div>
 
       {success && (
@@ -357,10 +357,10 @@ export const RegisterCustomer: React.FC = () => {
         <button
           type="submit"
           disabled={loading || Boolean(success)}
-          className="w-full py-2.5 px-4 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+          className="w-full py-3 px-4 bg-[#17432A] dark:bg-[#86E4AE] hover:bg-[#123621] dark:hover:bg-[#68D897] text-white dark:text-[#0C2114] font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white dark:border-[#0C2114]"></div>
           ) : success ? (
             <>
               <Check className="w-4 h-4" /> Account Created
@@ -373,16 +373,16 @@ export const RegisterCustomer: React.FC = () => {
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-center space-y-2 text-xs text-slate-600 dark:text-slate-400">
+      <div className="mt-6 pt-6 border-t border-[#CCD9CB] dark:border-[#1E4C32] text-center space-y-2 text-xs text-[#476B53] dark:text-[#8EAE9A]">
         <div>
           Already have an account?{' '}
-          <Link to="/login" className="text-emerald-700 dark:text-emerald-400 font-semibold hover:underline">
+          <Link to="/login" className="text-[#17432A] dark:text-[#86E4AE] font-semibold hover:underline">
             Sign In
           </Link>
         </div>
         <div>
           Want to register a business instead?{' '}
-          <Link to="/register/retailer" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+          <Link to="/register/retailer" className="text-[#17432A] dark:text-[#86E4AE] font-semibold hover:underline">
             Retailer Sign Up
           </Link>
         </div>
