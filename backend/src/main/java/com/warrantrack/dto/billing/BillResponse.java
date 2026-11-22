@@ -25,6 +25,8 @@ public class BillResponse {
     private Double discountAmount;
     private Double taxAmount;
     private Double grandTotal;
+    private Double receivedAmount;
+    private Double changeAmount;
 
     private PaymentMethod paymentMethod;
     private String paymentNotes;
@@ -36,6 +38,10 @@ public class BillResponse {
     }
 
     public BillResponse(String id, String invoiceNumber, String retailerId, String retailerBusinessName, String retailerContactEmail, String retailerContactPhone, String retailerAddress, String customerName, String customerEmail, String customerPhone, List<BillItemResponse> items, Double subtotal, Double discountAmount, Double taxAmount, Double grandTotal, PaymentMethod paymentMethod, String paymentNotes, Instant createdAt, Instant updatedAt) {
+        this(id, invoiceNumber, retailerId, retailerBusinessName, retailerContactEmail, retailerContactPhone, retailerAddress, customerName, customerEmail, customerPhone, items, subtotal, discountAmount, taxAmount, grandTotal, grandTotal, 0.0, paymentMethod, paymentNotes, createdAt, updatedAt);
+    }
+
+    public BillResponse(String id, String invoiceNumber, String retailerId, String retailerBusinessName, String retailerContactEmail, String retailerContactPhone, String retailerAddress, String customerName, String customerEmail, String customerPhone, List<BillItemResponse> items, Double subtotal, Double discountAmount, Double taxAmount, Double grandTotal, Double receivedAmount, Double changeAmount, PaymentMethod paymentMethod, String paymentNotes, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.invoiceNumber = invoiceNumber;
         this.retailerId = retailerId;
@@ -51,6 +57,8 @@ public class BillResponse {
         this.discountAmount = discountAmount;
         this.taxAmount = taxAmount;
         this.grandTotal = grandTotal;
+        this.receivedAmount = receivedAmount;
+        this.changeAmount = changeAmount;
         this.paymentMethod = paymentMethod;
         this.paymentNotes = paymentNotes;
         this.createdAt = createdAt;
@@ -177,6 +185,22 @@ public class BillResponse {
         this.grandTotal = grandTotal;
     }
 
+    public Double getReceivedAmount() {
+        return receivedAmount;
+    }
+
+    public void setReceivedAmount(Double receivedAmount) {
+        this.receivedAmount = receivedAmount;
+    }
+
+    public Double getChangeAmount() {
+        return changeAmount;
+    }
+
+    public void setChangeAmount(Double changeAmount) {
+        this.changeAmount = changeAmount;
+    }
+
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
@@ -229,6 +253,8 @@ public class BillResponse {
         private Double discountAmount;
         private Double taxAmount;
         private Double grandTotal;
+        private Double receivedAmount;
+        private Double changeAmount;
         private PaymentMethod paymentMethod;
         private String paymentNotes;
         private Instant createdAt;
@@ -309,6 +335,16 @@ public class BillResponse {
             return this;
         }
 
+        public Builder receivedAmount(Double receivedAmount) {
+            this.receivedAmount = receivedAmount;
+            return this;
+        }
+
+        public Builder changeAmount(Double changeAmount) {
+            this.changeAmount = changeAmount;
+            return this;
+        }
+
         public Builder paymentMethod(PaymentMethod paymentMethod) {
             this.paymentMethod = paymentMethod;
             return this;
@@ -330,7 +366,7 @@ public class BillResponse {
         }
 
         public BillResponse build() {
-            return new BillResponse(id, invoiceNumber, retailerId, retailerBusinessName, retailerContactEmail, retailerContactPhone, retailerAddress, customerName, customerEmail, customerPhone, items, subtotal, discountAmount, taxAmount, grandTotal, paymentMethod, paymentNotes, createdAt, updatedAt);
+            return new BillResponse(id, invoiceNumber, retailerId, retailerBusinessName, retailerContactEmail, retailerContactPhone, retailerAddress, customerName, customerEmail, customerPhone, items, subtotal, discountAmount, taxAmount, grandTotal, receivedAmount, changeAmount, paymentMethod, paymentNotes, createdAt, updatedAt);
         }
     }
 }

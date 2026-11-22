@@ -41,6 +41,8 @@ public class Bill {
     private Double discountAmount = 0.0;
     private Double taxAmount = 0.0;
     private Double grandTotal = 0.0;
+    private Double receivedAmount = 0.0;
+    private Double changeAmount = 0.0;
 
     private PaymentMethod paymentMethod = PaymentMethod.CASH;
     private String paymentNotes;
@@ -55,6 +57,10 @@ public class Bill {
     }
 
     public Bill(String id, String invoiceNumber, String retailerId, String retailerBusinessName, String retailerContactEmail, String retailerContactPhone, String retailerAddress, String customerName, String customerEmail, String customerPhone, List<BillItem> items, Double subtotal, Double discountAmount, Double taxAmount, Double grandTotal, PaymentMethod paymentMethod, String paymentNotes, Instant createdAt, Instant updatedAt) {
+        this(id, invoiceNumber, retailerId, retailerBusinessName, retailerContactEmail, retailerContactPhone, retailerAddress, customerName, customerEmail, customerPhone, items, subtotal, discountAmount, taxAmount, grandTotal, grandTotal, 0.0, paymentMethod, paymentNotes, createdAt, updatedAt);
+    }
+
+    public Bill(String id, String invoiceNumber, String retailerId, String retailerBusinessName, String retailerContactEmail, String retailerContactPhone, String retailerAddress, String customerName, String customerEmail, String customerPhone, List<BillItem> items, Double subtotal, Double discountAmount, Double taxAmount, Double grandTotal, Double receivedAmount, Double changeAmount, PaymentMethod paymentMethod, String paymentNotes, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.invoiceNumber = invoiceNumber;
         this.retailerId = retailerId;
@@ -70,6 +76,8 @@ public class Bill {
         this.discountAmount = discountAmount != null ? discountAmount : 0.0;
         this.taxAmount = taxAmount != null ? taxAmount : 0.0;
         this.grandTotal = grandTotal != null ? grandTotal : 0.0;
+        this.receivedAmount = receivedAmount != null ? receivedAmount : (grandTotal != null ? grandTotal : 0.0);
+        this.changeAmount = changeAmount != null ? changeAmount : 0.0;
         this.paymentMethod = paymentMethod != null ? paymentMethod : PaymentMethod.CASH;
         this.paymentNotes = paymentNotes;
         this.createdAt = createdAt;
@@ -196,6 +204,22 @@ public class Bill {
         this.grandTotal = grandTotal;
     }
 
+    public Double getReceivedAmount() {
+        return receivedAmount;
+    }
+
+    public void setReceivedAmount(Double receivedAmount) {
+        this.receivedAmount = receivedAmount;
+    }
+
+    public Double getChangeAmount() {
+        return changeAmount;
+    }
+
+    public void setChangeAmount(Double changeAmount) {
+        this.changeAmount = changeAmount;
+    }
+
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
@@ -248,6 +272,8 @@ public class Bill {
         private Double discountAmount = 0.0;
         private Double taxAmount = 0.0;
         private Double grandTotal = 0.0;
+        private Double receivedAmount = 0.0;
+        private Double changeAmount = 0.0;
         private PaymentMethod paymentMethod = PaymentMethod.CASH;
         private String paymentNotes;
         private Instant createdAt;
@@ -328,6 +354,16 @@ public class Bill {
             return this;
         }
 
+        public Builder receivedAmount(Double receivedAmount) {
+            this.receivedAmount = receivedAmount;
+            return this;
+        }
+
+        public Builder changeAmount(Double changeAmount) {
+            this.changeAmount = changeAmount;
+            return this;
+        }
+
         public Builder paymentMethod(PaymentMethod paymentMethod) {
             this.paymentMethod = paymentMethod;
             return this;
@@ -349,7 +385,7 @@ public class Bill {
         }
 
         public Bill build() {
-            return new Bill(id, invoiceNumber, retailerId, retailerBusinessName, retailerContactEmail, retailerContactPhone, retailerAddress, customerName, customerEmail, customerPhone, items, subtotal, discountAmount, taxAmount, grandTotal, paymentMethod, paymentNotes, createdAt, updatedAt);
+            return new Bill(id, invoiceNumber, retailerId, retailerBusinessName, retailerContactEmail, retailerContactPhone, retailerAddress, customerName, customerEmail, customerPhone, items, subtotal, discountAmount, taxAmount, grandTotal, receivedAmount, changeAmount, paymentMethod, paymentNotes, createdAt, updatedAt);
         }
     }
 }

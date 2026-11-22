@@ -19,6 +19,8 @@ public class BillRequest {
 
     private Double discountAmount = 0.0;
     private Double taxAmount = 0.0;
+    private Double receivedAmount;
+    private Double changeAmount;
     private PaymentMethod paymentMethod = PaymentMethod.CASH;
     private String paymentNotes;
 
@@ -71,6 +73,22 @@ public class BillRequest {
 
     public void setTaxAmount(Double taxAmount) {
         this.taxAmount = taxAmount;
+    }
+
+    public Double getReceivedAmount() {
+        return receivedAmount;
+    }
+
+    public void setReceivedAmount(Double receivedAmount) {
+        this.receivedAmount = receivedAmount;
+    }
+
+    public Double getChangeAmount() {
+        return changeAmount;
+    }
+
+    public void setChangeAmount(Double changeAmount) {
+        this.changeAmount = changeAmount;
     }
 
     public PaymentMethod getPaymentMethod() {
