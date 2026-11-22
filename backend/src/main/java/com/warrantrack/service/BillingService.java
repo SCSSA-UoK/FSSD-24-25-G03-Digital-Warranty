@@ -363,6 +363,12 @@ public class BillingService {
         double discount = request.getDiscountAmount() != null ? Math.max(0.0, request.getDiscountAmount()) : 0.0;
         double tax = request.getTaxAmount() != null ? Math.max(0.0, request.getTaxAmount()) : 0.0;
         double grandTotal = Math.max(0.0, Math.round((subtotal - discount + tax) * 100.0) / 100.0);
+        double received = (request.getReceivedAmount() != null && request.getReceivedAmount() >= 0)
+                ? Math.round(request.getReceivedAmount() * 100.0) / 100.0
+                : grandTotal;
+        double change = (request.getChangeAmount() != null)
+                ? Math.round(request.getChangeAmount() * 100.0) / 100.0
+                : Math.max(0.0, Math.round((received - grandTotal) * 100.0) / 100.0);
 
         // 5. Build and save Bill document
         Bill bill = Bill.builder()
@@ -380,6 +386,8 @@ public class BillingService {
                 .discountAmount(discount)
                 .taxAmount(tax)
                 .grandTotal(grandTotal)
+                .receivedAmount(received)
+                .changeAmount(change)
                 .paymentMethod(paymentMethod)
                 .paymentNotes(request.getPaymentNotes())
                 .createdAt(Instant.now())
@@ -475,6 +483,8 @@ public class BillingService {
                 .discountAmount(b.getDiscountAmount())
                 .taxAmount(b.getTaxAmount())
                 .grandTotal(b.getGrandTotal())
+                .receivedAmount(b.getReceivedAmount() != null ? b.getReceivedAmount() : b.getGrandTotal())
+                .changeAmount(b.getChangeAmount() != null ? b.getChangeAmount() : 0.0)
                 .paymentMethod(b.getPaymentMethod())
                 .paymentNotes(b.getPaymentNotes())
                 .createdAt(b.getCreatedAt())

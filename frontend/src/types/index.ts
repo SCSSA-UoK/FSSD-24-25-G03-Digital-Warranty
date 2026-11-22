@@ -294,6 +294,8 @@ export interface Bill {
   discountAmount: number;
   taxAmount: number;
   grandTotal: number;
+  receivedAmount?: number;
+  changeAmount?: number;
   paymentMethod: PaymentMethod;
   paymentNotes?: string;
   createdAt: string;
@@ -322,6 +324,8 @@ export interface CreateBillRequest {
   items: BillItemRequest[];
   discountAmount?: number;
   taxAmount?: number;
+  receivedAmount?: number;
+  changeAmount?: number;
   paymentMethod?: PaymentMethod;
   paymentNotes?: string;
 }

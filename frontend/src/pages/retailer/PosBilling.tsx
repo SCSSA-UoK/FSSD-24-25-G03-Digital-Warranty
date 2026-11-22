@@ -14,7 +14,9 @@ import {
   Receipt, 
   ShoppingBag, 
   History,
-  X
+  X,
+  Banknote,
+  DollarSign
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CustomerLookupInput } from '../../components/CustomerLookupInput';
@@ -51,6 +53,7 @@ export const PosBilling: React.FC = () => {
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [taxAmount, setTaxAmount] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
+  const [receivedAmount, setReceivedAmount] = useState<string>('');
   const [paymentNotes, setPaymentNotes] = useState('');
 
   // Custom Item Modal
@@ -234,6 +237,7 @@ export const PosBilling: React.FC = () => {
     setCart([]);
     setDiscountAmount(0);
     setTaxAmount(0);
+    setReceivedAmount('');
     setCustomerName('');
     setCustomerEmail('');
     setCustomerPhone('');
@@ -244,6 +248,11 @@ export const PosBilling: React.FC = () => {
   // Calculations
   const subtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const grandTotal = Math.max(0, subtotal - (discountAmount || 0) + (taxAmount || 0));
+
+  const receivedAmountNum = parseFloat(receivedAmount) || 0;
+  const hasReceivedInput = receivedAmount.trim() !== '';
+  const effectiveReceived = hasReceivedInput ? receivedAmountNum : grandTotal;
+  const changeBalance = Math.round((effectiveReceived - grandTotal) * 100) / 100;
 
   const hasStockViolations = cart.some((item) => {
     if (!item.productId) return false;
@@ -352,6 +361,8 @@ export const PosBilling: React.FC = () => {
       customerPhone: customerPhone.trim() || undefined,
       discountAmount: Number(discountAmount) || 0,
       taxAmount: Number(taxAmount) || 0,
+      receivedAmount: effectiveReceived,
+      changeAmount: Math.max(0, changeBalance),
       paymentMethod,
       paymentNotes: paymentNotes.trim() || undefined,
       items: cart.map((item) => {
@@ -823,7 +834,84 @@ export const PosBilling: React.FC = () => {
               </div>
               <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-700 text-sm font-extrabold text-slate-900 dark:text-slate-100">
                 <span>Grand Total</span>
-                <span className="text-blue-600 dark:text-blue-400">${grandTotal.toFixed(2)}</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-black">${grandTotal.toFixed(2)}</span>
+              </div>
+
+              {/* Received Amount & Balance / Change Return */}
+              <div className="pt-2.5 border-t border-dashed border-slate-300 dark:border-slate-600 space-y-2">
+                <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                  <span className="font-semibold flex items-center gap-1">
+                    <Banknote className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    Received Amount ($)
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setReceivedAmount(grandTotal > 0 ? grandTotal.toFixed(2) : '')}
+                      title="Fill exact amount"
+                      className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                    >
+                      Exact
+                    </button>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder={grandTotal > 0 ? grandTotal.toFixed(2) : '0.00'}
+                      value={receivedAmount}
+                      onChange={(e) => setReceivedAmount(e.target.value)}
+                      className="w-24 px-2 py-0.5 border border-slate-300 dark:border-slate-600 rounded text-right font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Quick Cash Presets when cart has total */}
+                {grandTotal > 0 && (
+                  <div className="flex items-center justify-end gap-1 flex-wrap pt-0.5">
+                    <span className="text-[10px] text-slate-400 mr-0.5">Tender:</span>
+                    {[
+                      Math.ceil(grandTotal),
+                      Math.ceil(grandTotal / 10) * 10,
+                      Math.ceil(grandTotal / 20) * 20,
+                      Math.ceil(grandTotal / 50) * 50,
+                      100,
+                    ]
+                      .filter((val, idx, arr) => val >= grandTotal && arr.indexOf(val) === idx)
+                      .slice(0, 4)
+                      .map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => setReceivedAmount(preset.toFixed(2))}
+                          className={`text-[10px] px-1.5 py-0.5 rounded border transition font-medium cursor-pointer ${
+                            receivedAmountNum === preset
+                              ? 'bg-emerald-600 text-white border-emerald-600 font-bold'
+                              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          ${preset}
+                        </button>
+                      ))}
+                  </div>
+                )}
+
+                {/* Change / Balance Due indicator */}
+                <div className="flex justify-between items-center pt-1.5 border-t border-slate-200/80 dark:border-slate-700/80 font-bold">
+                  <span className="text-slate-700 dark:text-slate-300">
+                    {hasReceivedInput && changeBalance < 0 ? 'Balance Due:' : 'Balance / Change:'}
+                  </span>
+                  <span
+                    className={`text-xs sm:text-sm px-2 py-0.5 rounded-md font-extrabold ${
+                      !hasReceivedInput || changeBalance === 0
+                        ? 'text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-700/60'
+                        : changeBalance > 0
+                        ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60'
+                        : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/60'
+                    }`}
+                  >
+                    ${hasReceivedInput ? Math.abs(changeBalance).toFixed(2) : '0.00'}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -840,7 +928,7 @@ export const PosBilling: React.FC = () => {
                     onClick={() => setPaymentMethod(method)}
                     className={`py-1.5 rounded-lg font-semibold border transition cursor-pointer ${
                       paymentMethod === method
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs dark:bg-emerald-600 dark:border-emerald-600'
                         : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
