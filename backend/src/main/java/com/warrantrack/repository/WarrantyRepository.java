@@ -26,5 +26,7 @@ public interface WarrantyRepository extends MongoRepository<Warranty, String> {
 
     long countByRetailerId(String retailerId);
 
+    long countByCustomerIdAndRetailerId(String customerId, String retailerId);
+
     List<Warranty> findByExpiryDateBetweenAndCustomerIdIsNotNull(java.time.LocalDate startDate, java.time.LocalDate endDate);
 }

@@ -25,4 +25,11 @@ public interface UserRepository extends MongoRepository<User, String> {
     boolean existsByEmailNormalized(String emailNormalized);
 
     List<User> findByRole(Role role);
+
+    @Query("{ 'role': 'CUSTOMER', '$or': [ { '_id': { '$in': ?0 } }, { 'emailNormalized': { '$in': ?1 } }, { 'secondaryEmails.emailNormalized': { '$in': ?1 } }, { 'phone': { '$in': ?2 } } ] }")
+    List<User> findRegisteredCustomersByRetailerCustomerIdentifiers(
+            java.util.Collection<String> userIds,
+            java.util.Collection<String> emailsNormalized,
+            java.util.Collection<String> phones
+    );
 }
