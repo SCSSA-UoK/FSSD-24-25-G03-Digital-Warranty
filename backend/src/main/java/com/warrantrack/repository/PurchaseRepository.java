@@ -34,4 +34,6 @@ public interface PurchaseRepository extends MongoRepository<Purchase, String> {
     Optional<Purchase> findBySerialNumber(String serialNumber);
 
     Optional<Purchase> findByRetailerIdAndProductIdAndSerialNumber(String retailerId, String productId, String serialNumber);
+
+    List<Purchase> findByRetailerIdOrderByCreatedAtDesc(String retailerId);
 }

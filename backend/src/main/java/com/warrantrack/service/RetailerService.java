@@ -6,11 +6,14 @@ import com.warrantrack.exception.BadRequestException;
 import com.warrantrack.exception.ResourceNotFoundException;
 import com.warrantrack.exception.UnauthorizedException;
 import com.warrantrack.model.Bill;
+import com.warrantrack.model.Purchase;
 import com.warrantrack.model.Retailer;
+import com.warrantrack.model.SecondaryEmail;
 import com.warrantrack.model.User;
 import com.warrantrack.model.enums.ApprovalStatus;
 import com.warrantrack.model.enums.Role;
 import com.warrantrack.repository.BillRepository;
+import com.warrantrack.repository.PurchaseRepository;
 import com.warrantrack.repository.RetailerRepository;
 import com.warrantrack.repository.UserRepository;
 import com.warrantrack.repository.WarrantyRepository;
@@ -29,15 +32,18 @@ public class RetailerService {
     private final UserRepository userRepository;
     private final BillRepository billRepository;
     private final WarrantyRepository warrantyRepository;
+    private final PurchaseRepository purchaseRepository;
 
     public RetailerService(RetailerRepository retailerRepository,
                            UserRepository userRepository,
                            BillRepository billRepository,
-                           WarrantyRepository warrantyRepository) {
+                           WarrantyRepository warrantyRepository,
+                           PurchaseRepository purchaseRepository) {
         this.retailerRepository = retailerRepository;
         this.userRepository = userRepository;
         this.billRepository = billRepository;
         this.warrantyRepository = warrantyRepository;
+        this.purchaseRepository = purchaseRepository;
     }
 
     public Retailer getRetailerByUserId(String userId) {
@@ -85,6 +91,7 @@ public class RetailerService {
     }
 
     public List<CustomerLookupResponse> lookupCustomers(String userId, String query) {
+        // Enforce multi-tenant isolation: retailer ID is derived from the authenticated session
         Retailer retailer = getApprovedRetailerByUserId(userId);
         String retailerId = retailer.getId();
 
@@ -98,54 +105,153 @@ public class RetailerService {
 
         Map<String, CustomerLookupResponse> resultMap = new LinkedHashMap<>();
 
+        // Multi-tenant database query: fetch only bills and purchases belonging to THIS retailer
         List<Bill> retailerBills = billRepository.findByRetailerIdOrderByCreatedAtDesc(retailerId);
+        List<Purchase> retailerPurchases = purchaseRepository.findByRetailerIdOrderByCreatedAtDesc(retailerId);
 
-        // 1. If query is empty, return recent customers who have transacted with this retailer
-        if (cleanQ.isEmpty()) {
-            for (Bill bill : retailerBills) {
-                if (bill.getCustomerEmail() == null && bill.getCustomerPhone() == null) continue;
-                String key = (bill.getCustomerEmail() != null && !bill.getCustomerEmail().isBlank())
-                        ? EmailNormalizer.normalize(bill.getCustomerEmail())
-                        : bill.getCustomerPhone();
-                if (key != null && !resultMap.containsKey(key)) {
-                    CustomerLookupResponse item = buildFromBill(bill, retailerBills, dateFormatter);
-                    resultMap.put(key, item);
-                    if (resultMap.size() >= 8) break;
-                }
+        // Extract tenant customer identifiers (strictly from this retailer's own historical sales)
+        Set<String> tenantCustomerUserIds = new HashSet<>();
+        Set<String> tenantCustomerEmailsNorm = new HashSet<>();
+        Set<String> tenantCustomerPhones = new HashSet<>();
+
+        for (Bill b : retailerBills) {
+            if (b.getCustomerEmail() != null && !b.getCustomerEmail().isBlank()) {
+                tenantCustomerEmailsNorm.add(EmailNormalizer.normalize(b.getCustomerEmail()));
             }
-            return new ArrayList<>(resultMap.values());
+            if (b.getCustomerPhone() != null && !b.getCustomerPhone().isBlank()) {
+                tenantCustomerPhones.add(b.getCustomerPhone().trim());
+            }
         }
 
-        // 2. Search Registered Customers in UserRepository
-        List<User> registeredCustomers = userRepository.findByRole(Role.CUSTOMER);
+        for (Purchase p : retailerPurchases) {
+            if (p.getCustomerId() != null && !p.getCustomerId().isBlank()) {
+                tenantCustomerUserIds.add(p.getCustomerId().trim());
+            }
+            if (p.getCustomerEmailNormalized() != null && !p.getCustomerEmailNormalized().isBlank()) {
+                tenantCustomerEmailsNorm.add(p.getCustomerEmailNormalized().trim());
+            } else if (p.getCustomerEmail() != null && !p.getCustomerEmail().isBlank()) {
+                tenantCustomerEmailsNorm.add(EmailNormalizer.normalize(p.getCustomerEmail()));
+            }
+        }
+
+        // If this retailer has never had any customer transaction, return empty immediately
+        if (tenantCustomerUserIds.isEmpty() && tenantCustomerEmailsNorm.isEmpty() && tenantCustomerPhones.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Multi-tenant database query: fetch only registered users who match THIS retailer's customer records
+        Collection<String> queryUserIds = tenantCustomerUserIds.isEmpty() ? Set.of("__none__") : tenantCustomerUserIds;
+        Collection<String> queryEmails = tenantCustomerEmailsNorm.isEmpty() ? Set.of("__none__") : tenantCustomerEmailsNorm;
+        Collection<String> queryPhones = tenantCustomerPhones.isEmpty() ? Set.of("__none__") : tenantCustomerPhones;
+
+        List<User> registeredCustomers = userRepository.findRegisteredCustomersByRetailerCustomerIdentifiers(
+                queryUserIds, queryEmails, queryPhones
+        );
+
+        Set<String> registeredEmailsNormalized = new HashSet<>();
+        Set<String> registeredPhoneDigits = new HashSet<>();
+
+        // 1. Process registered customers who have transacted with THIS retailer
         for (User user : registeredCustomers) {
+            String uId = user.getId();
             String uName = user.getName() != null ? user.getName().toLowerCase() : "";
             String uEmail = user.getEmail() != null ? user.getEmail().toLowerCase() : "";
             String uEmailNorm = user.getEmailNormalized() != null ? user.getEmailNormalized() : "";
-            String uPhoneDigits = user.getPhone() != null ? user.getPhone().replaceAll("[^0-9]", "") : "";
+            String uPhone = user.getPhone() != null ? user.getPhone() : "";
+            String uPhoneDigits = uPhone.replaceAll("[^0-9]", "");
 
-            boolean exactEmail = !normalizedEmail.isEmpty() && (uEmailNorm.equals(normalizedEmail) || uEmail.equals(cleanQ));
-            boolean exactPhone = !phoneDigits.isEmpty() && uPhoneDigits.equals(phoneDigits);
-            boolean emailContains = !cleanQ.isEmpty() && uEmail.contains(cleanQ);
-            boolean phoneContains = !phoneDigits.isEmpty() && phoneDigits.length() >= 3 && uPhoneDigits.contains(phoneDigits);
-            boolean nameContains = !cleanQ.isEmpty() && uName.contains(cleanQ);
-
-            if (exactEmail || exactPhone || emailContains || phoneContains || nameContains) {
-                String matchType = exactPhone ? "EXACT_PHONE"
-                        : exactEmail ? "EXACT_EMAIL"
-                        : (phoneContains || emailContains) ? "CONTACT_MATCH" : "NAME_MATCH";
-
-                long totalWarranties = warrantyRepository.countByCustomerId(user.getId());
-
-                List<Bill> matchingBills = retailerBills.stream()
-                        .filter(b -> (b.getCustomerEmail() != null && EmailNormalizer.normalize(b.getCustomerEmail()).equals(uEmailNorm))
-                                || (b.getCustomerPhone() != null && !phoneDigits.isEmpty() && b.getCustomerPhone().replaceAll("[^0-9]", "").equals(uPhoneDigits)))
-                        .toList();
-
-                String lastPurchaseDate = null;
-                if (!matchingBills.isEmpty() && matchingBills.get(0).getCreatedAt() != null) {
-                    lastPurchaseDate = dateFormatter.format(matchingBills.get(0).getCreatedAt());
+            Set<String> userEmailsNorm = new HashSet<>();
+            if (!uEmailNorm.isBlank()) userEmailsNorm.add(uEmailNorm);
+            if (user.getSecondaryEmails() != null) {
+                for (SecondaryEmail se : user.getSecondaryEmails()) {
+                    if (se != null && se.getEmailNormalized() != null && !se.getEmailNormalized().isBlank()) {
+                        userEmailsNorm.add(se.getEmailNormalized());
+                    }
                 }
+            }
+
+            // Find all bills for this user with THIS retailer only
+            List<Bill> matchingBills = retailerBills.stream()
+                    .filter(b -> {
+                        if (b.getCustomerEmail() != null && !b.getCustomerEmail().isBlank()) {
+                            if (userEmailsNorm.contains(EmailNormalizer.normalize(b.getCustomerEmail()))) {
+                                return true;
+                            }
+                        }
+                        if (b.getCustomerPhone() != null && !b.getCustomerPhone().isBlank() && !uPhoneDigits.isEmpty()) {
+                            if (b.getCustomerPhone().replaceAll("[^0-9]", "").equals(uPhoneDigits)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    })
+                    .toList();
+
+            // Find all purchases for this user with THIS retailer only
+            List<Purchase> matchingPurchases = retailerPurchases.stream()
+                    .filter(p -> {
+                        if (p.getCustomerId() != null && p.getCustomerId().equals(uId)) {
+                            return true;
+                        }
+                        if (p.getCustomerEmailNormalized() != null && userEmailsNorm.contains(p.getCustomerEmailNormalized())) {
+                            return true;
+                        }
+                        if (p.getCustomerEmail() != null && userEmailsNorm.contains(EmailNormalizer.normalize(p.getCustomerEmail()))) {
+                            return true;
+                        }
+                        return false;
+                    })
+                    .toList();
+
+            // Strictly enforce: customer MUST have previous transactions with this retailer
+            if (matchingBills.isEmpty() && matchingPurchases.isEmpty()) {
+                continue;
+            }
+
+            // Check if matches the search query
+            boolean matchesQuery = false;
+            String matchType = "PREVIOUS_CUSTOMER";
+
+            if (cleanQ.isEmpty()) {
+                matchesQuery = true;
+            } else {
+                boolean exactEmail = !normalizedEmail.isEmpty() && (userEmailsNorm.contains(normalizedEmail) || uEmail.equals(cleanQ));
+                boolean exactPhone = !phoneDigits.isEmpty() && uPhoneDigits.equals(phoneDigits);
+                boolean emailContains = !cleanQ.isEmpty() && (uEmail.contains(cleanQ) || userEmailsNorm.stream().anyMatch(e -> e.contains(cleanQ)));
+                boolean phoneContains = !phoneDigits.isEmpty() && phoneDigits.length() >= 3 && uPhoneDigits.contains(phoneDigits);
+                boolean nameContains = !cleanQ.isEmpty() && uName.contains(cleanQ);
+
+                if (exactEmail || exactPhone || emailContains || phoneContains || nameContains) {
+                    matchesQuery = true;
+                    matchType = exactPhone ? "EXACT_PHONE"
+                            : exactEmail ? "EXACT_EMAIL"
+                            : (phoneContains || emailContains) ? "CONTACT_MATCH" : "NAME_MATCH";
+                }
+            }
+
+            if (matchesQuery) {
+                // Strict isolation: count ONLY warranties issued by THIS retailer
+                long totalWarranties = warrantyRepository.countByCustomerIdAndRetailerId(user.getId(), retailerId);
+
+                // Transaction count with THIS retailer only
+                long billCount = matchingBills.size();
+                long standalonePurchases = matchingPurchases.stream()
+                        .filter(p -> p.getBillId() == null || p.getBillId().isBlank())
+                        .count();
+                long previousPurchases = Math.max(1, billCount + standalonePurchases);
+
+                // Last purchase date with THIS retailer only
+                Instant latestDate = null;
+                if (!matchingBills.isEmpty() && matchingBills.get(0).getCreatedAt() != null) {
+                    latestDate = matchingBills.get(0).getCreatedAt();
+                }
+                if (!matchingPurchases.isEmpty() && matchingPurchases.get(0).getCreatedAt() != null) {
+                    Instant pDate = matchingPurchases.get(0).getCreatedAt();
+                    if (latestDate == null || pDate.isAfter(latestDate)) {
+                        latestDate = pDate;
+                    }
+                }
+                String lastPurchaseDate = latestDate != null ? dateFormatter.format(latestDate) : null;
 
                 CustomerLookupResponse resp = CustomerLookupResponse.builder()
                         .id(user.getId())
@@ -156,7 +262,7 @@ public class RetailerService {
                         .isEmailVerified(user.isEmailVerified())
                         .accountStatus(user.getAccountStatus() != null ? user.getAccountStatus().name() : "ACTIVE")
                         .totalWarranties(totalWarranties)
-                        .previousPurchasesWithRetailer(matchingBills.size())
+                        .previousPurchasesWithRetailer(previousPurchases)
                         .lastPurchaseDate(lastPurchaseDate)
                         .matchType(matchType)
                         .build();
@@ -164,36 +270,55 @@ public class RetailerService {
                 String key = !uEmailNorm.isEmpty() ? uEmailNorm : user.getPhone();
                 if (key != null) {
                     resultMap.put(key, resp);
+                    registeredEmailsNormalized.addAll(userEmailsNorm);
+                    if (!uPhoneDigits.isEmpty()) {
+                        registeredPhoneDigits.add(uPhoneDigits);
+                    }
                 }
             }
         }
 
-        // 3. Search past Bills for this retailer for in-store customers not registered yet
+        // 2. Process unregistered in-store customers from past Bills of THIS retailer
         for (Bill bill : retailerBills) {
             String bName = bill.getCustomerName() != null ? bill.getCustomerName().toLowerCase() : "";
             String bEmail = bill.getCustomerEmail() != null ? bill.getCustomerEmail().toLowerCase() : "";
             String bEmailNorm = bill.getCustomerEmail() != null ? EmailNormalizer.normalize(bill.getCustomerEmail()) : "";
-            String bPhoneDigits = bill.getCustomerPhone() != null ? bill.getCustomerPhone().replaceAll("[^0-9]", "") : "";
+            String bPhone = bill.getCustomerPhone() != null ? bill.getCustomerPhone() : "";
+            String bPhoneDigits = bPhone.replaceAll("[^0-9]", "");
 
-            String key = !bEmailNorm.isEmpty() ? bEmailNorm : bill.getCustomerPhone();
-            if (key == null || resultMap.containsKey(key)) {
+            // If already included as registered customer, skip to prevent duplicates
+            if (!bEmailNorm.isEmpty() && registeredEmailsNormalized.contains(bEmailNorm)) {
+                continue;
+            }
+            if (!bPhoneDigits.isEmpty() && registeredPhoneDigits.contains(bPhoneDigits)) {
                 continue;
             }
 
-            boolean exactEmail = !normalizedEmail.isEmpty() && (bEmailNorm.equals(normalizedEmail) || bEmail.equals(cleanQ));
-            boolean exactPhone = !phoneDigits.isEmpty() && bPhoneDigits.equals(phoneDigits);
-            boolean emailContains = !cleanQ.isEmpty() && bEmail.contains(cleanQ);
-            boolean phoneContains = !phoneDigits.isEmpty() && phoneDigits.length() >= 3 && bPhoneDigits.contains(phoneDigits);
-            boolean nameContains = !cleanQ.isEmpty() && bName.contains(cleanQ);
+            String key = !bEmailNorm.isEmpty() ? bEmailNorm : bPhone;
+            if (key == null || key.isBlank() || resultMap.containsKey(key)) {
+                continue;
+            }
 
-            if (exactEmail || exactPhone || emailContains || phoneContains || nameContains) {
+            if (cleanQ.isEmpty()) {
                 CustomerLookupResponse item = buildFromBill(bill, retailerBills, dateFormatter);
-                item.setMatchType(exactPhone ? "EXACT_PHONE" : exactEmail ? "EXACT_EMAIL" : "PREVIOUS_CUSTOMER");
                 resultMap.put(key, item);
+                if (resultMap.size() >= 10) break;
+            } else {
+                boolean exactEmail = !normalizedEmail.isEmpty() && (bEmailNorm.equals(normalizedEmail) || bEmail.equals(cleanQ));
+                boolean exactPhone = !phoneDigits.isEmpty() && bPhoneDigits.equals(phoneDigits);
+                boolean emailContains = !cleanQ.isEmpty() && bEmail.contains(cleanQ);
+                boolean phoneContains = !phoneDigits.isEmpty() && phoneDigits.length() >= 3 && bPhoneDigits.contains(phoneDigits);
+                boolean nameContains = !cleanQ.isEmpty() && bName.contains(cleanQ);
+
+                if (exactEmail || exactPhone || emailContains || phoneContains || nameContains) {
+                    CustomerLookupResponse item = buildFromBill(bill, retailerBills, dateFormatter);
+                    item.setMatchType(exactPhone ? "EXACT_PHONE" : exactEmail ? "EXACT_EMAIL" : "PREVIOUS_CUSTOMER");
+                    resultMap.put(key, item);
+                }
             }
         }
 
-        // 4. Sort results: EXACT matches first, then registered active users, then previous customers
+        // 3. Sort results: EXACT matches first, then registered active users, then previous customers
         List<CustomerLookupResponse> list = new ArrayList<>(resultMap.values());
         list.sort((a, b) -> {
             boolean aExact = "EXACT_PHONE".equals(a.getMatchType()) || "EXACT_EMAIL".equals(a.getMatchType());
