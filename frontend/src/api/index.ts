@@ -379,6 +379,43 @@ export const notificationApi = {
   },
 };
 
+export interface ChatHistoryItem {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatAction {
+  id: string;
+  label: string;
+  summary?: string;
+  path?: string;
+}
+
+export interface ChatAgentResponse {
+  message: string;
+  pendingAction?: ChatAction;
+  navigationActions?: ChatAction[];
+}
+
+export const chatApi = {
+  sendMessage: async (message: string, history: ChatHistoryItem[]) => {
+    const res = await apiClient.post<ApiResponse<ChatAgentResponse>>('/chat/message', {
+      message,
+      history,
+    });
+    return res.data.data;
+  },
+  confirmAction: async (actionId: string) => {
+    const res = await apiClient.post<ApiResponse<ChatAgentResponse>>('/chat/confirm', {
+      actionId,
+    });
+    return res.data.data;
+  },
+  cancelAction: async (actionId: string) => {
+    await apiClient.post<ApiResponse<string>>('/chat/cancel', { actionId });
+  },
+};
+
 export const billingApi = {
   create: async (data: CreateBillRequest) => {
     const res = await apiClient.post<ApiResponse<Bill>>('/bills', data);

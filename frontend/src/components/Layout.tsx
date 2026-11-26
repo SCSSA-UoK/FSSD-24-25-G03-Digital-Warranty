@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
+import { Chatbot } from './Chatbot';
 import { useAuth } from '../context/AuthContext';
 import { AlertCircle, AlertTriangle } from 'lucide-react';
 
@@ -84,6 +85,7 @@ export const Layout: React.FC = () => {
           <Outlet />
         </main>
       )}
+      {user && <Chatbot />}
     </div>
   );
 };
