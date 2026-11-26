@@ -1,0 +1,24 @@
+unit: analytics
+side_effects: []
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/AnalyticsController.java:25
+    condition: admin analytics request
+    behavior: returns platform-wide aggregated metrics
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/controller/AnalyticsController.java:31
+    condition: retailer analytics request
+    behavior: returns metrics scoped to the authenticated retailer
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/config/SecurityConfig.java:62
+    trigger: caller lacks required role
+    outcome: HTTP 403
+    contract: 403 FORBIDDEN
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/AnalyticsService.java:1
+    scope: read-only aggregation
+    isolation: not specified
+    must_preserve: false

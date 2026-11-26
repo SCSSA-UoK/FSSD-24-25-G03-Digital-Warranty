@@ -1,0 +1,9 @@
+unit: notifications
+bindings:
+  - type: route-declaration
+    name: /api/notifications/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/NotificationController.java:17
+    target: NotificationController
+    must_appear_in_target: true
+    notes: Authenticated per-user routes.
+runtime_config: []

@@ -1,0 +1,30 @@
+unit: auth
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/AuthService.java:1
+    effect: creates or updates users and hashes passwords with BCrypt
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/AuthService.java:1
+    effect: sends verification/reset OTP and records account actions
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/AuthController.java:22
+    condition: customer or retailer registration role
+    behavior: creates the corresponding account and role-specific profile
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/AuthService.java:1
+    condition: OTP valid, expired, exhausted, or mismatched
+    behavior: permits verification or rejects according to OTP expiry and attempt policy
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/exception/GlobalExceptionHandler.java:1
+    trigger: invalid credentials or unauthorized account
+    outcome: HTTP 401/403 and ApiResponse error body
+    contract: UNAUTHORIZED/FORBIDDEN status
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/AuthService.java:1
+    scope: account registration and role-profile creation
+    isolation: not specified
+    must_preserve: true

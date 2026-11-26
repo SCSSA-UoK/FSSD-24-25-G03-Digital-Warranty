@@ -1,0 +1,30 @@
+unit: purchases
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/PurchaseService.java:1
+    effect: creates Purchase, deducts stock, and creates active Warranty atomically
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/PurchaseService.java:1
+    effect: generates purchase reference, invoice data, and QR token
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/PurchaseService.java:1
+    condition: stock quantity insufficient
+    behavior: rejects registration and performs no purchase/warranty write
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/PurchaseService.java:1
+    condition: duplicate purchase reference or serial
+    behavior: rejects duplicate purchase
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/PurchaseController.java:28
+    trigger: validation or stock failure
+    outcome: HTTP 400 with ApiResponse error
+    contract: 400 BAD_REQUEST
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/PurchaseService.java:1
+    scope: purchase, stock decrement, and warranty creation
+    isolation: not specified
+    must_preserve: true

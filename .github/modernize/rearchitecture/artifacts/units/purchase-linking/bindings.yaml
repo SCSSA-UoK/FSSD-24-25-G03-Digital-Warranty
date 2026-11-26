@@ -1,0 +1,15 @@
+unit: purchase-linking
+bindings:
+  - type: route-declaration
+    name: /api/customer/purchases/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/CustomerLinkingController.java:19
+    target: CustomerLinkingController
+    must_appear_in_target: true
+    notes: Restricted to CUSTOMER role.
+runtime_config:
+  - key: app.otp.expiry-minutes
+    source_loc: backend/src/main/resources/application.yml:52
+    source: properties-file
+    default_value: "5"
+    must_appear_in_target: true
+    notes: Controls alternate-email OTP validity.

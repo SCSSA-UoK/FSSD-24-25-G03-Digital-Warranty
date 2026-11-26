@@ -1,0 +1,9 @@
+unit: analytics
+bindings:
+  - type: route-declaration
+    name: /api/analytics/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/AnalyticsController.java:16
+    target: AnalyticsController
+    must_appear_in_target: true
+    notes: Requires authentication; admin and retailer scopes are distinct.
+runtime_config: []

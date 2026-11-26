@@ -1,0 +1,9 @@
+unit: purchases
+bindings:
+  - type: route-declaration
+    name: /api/purchases/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/PurchaseController.java:18
+    target: PurchaseController
+    must_appear_in_target: true
+    notes: Restricted to RETAILER role.
+runtime_config: []

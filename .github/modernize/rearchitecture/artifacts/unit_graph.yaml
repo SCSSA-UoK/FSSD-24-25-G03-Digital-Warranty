@@ -1,0 +1,210 @@
+units:
+  - name: auth
+    trigger: api
+    trigger_detail: "POST /api/auth/** and GET/PUT/PATCH /api/auth/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/AuthController.java
+        line: 13
+      - path: frontend/src/App.tsx
+        line: 58
+    exported_signature:
+      - method: "ResponseEntity<?> AuthController.login(LoginRequest)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/AuthController.java:34
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs:
+      - module: jwt-security
+        used_fields: [JwtTokenProvider, JwtAuthenticationFilter, UserPrincipal]
+      - module: user-model
+        used_fields: [id, email, role, accountStatus]
+
+  - name: admin
+    trigger: api
+    trigger_detail: "/api/admin/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/AdminController.java
+        line: 30
+    exported_signature:
+      - method: "ResponseEntity<?> AdminController.getDashboard()"
+        source_loc: backend/src/main/java/com/warrantrack/controller/AdminController.java:44
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [analytics]
+    shared_refs:
+      - module: audit-log
+        used_fields: [id, actorId, action, targetType, timestamp]
+      - module: user-model
+        used_fields: [id, email, accountStatus]
+
+  - name: analytics
+    trigger: api
+    trigger_detail: "GET /api/analytics/admin and /api/analytics/retailer"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/AnalyticsController.java
+        line: 16
+    exported_signature:
+      - method: "ResponseEntity<?> AnalyticsController.getAdminAnalytics()"
+        source_loc: backend/src/main/java/com/warrantrack/controller/AnalyticsController.java:25
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: []
+
+  - name: retailer
+    trigger: api
+    trigger_detail: "/api/retailer/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/RetailerController.java
+        line: 16
+    exported_signature:
+      - method: "ResponseEntity<?> RetailerController.getProfile(Authentication)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/RetailerController.java:26
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [auth]
+    shared_refs:
+      - module: retailer-model
+        used_fields: [id, userId, businessName, approvalStatus]
+
+  - name: product-catalog
+    trigger: api
+    trigger_detail: "/api/products/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/ProductController.java
+        line: 18
+    exported_signature:
+      - method: "ResponseEntity<?> ProductController.createProduct(Authentication,ProductRequest)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/ProductController.java:28
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [retailer]
+    shared_refs:
+      - module: retailer-model
+        used_fields: [id, userId]
+
+  - name: purchases
+    trigger: api
+    trigger_detail: "/api/purchases/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/PurchaseController.java
+        line: 18
+    exported_signature:
+      - method: "ResponseEntity<?> PurchaseController.registerPurchase(Authentication,PurchaseRegistrationRequest)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/PurchaseController.java:28
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [product-catalog, retailer]
+    shared_refs:
+      - module: purchase-model
+        used_fields: [id, retailerId, customerEmailNormalized, serialNumber]
+
+  - name: billing
+    trigger: api
+    trigger_detail: "/api/bills/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/BillingController.java
+        line: 18
+    exported_signature:
+      - method: "ResponseEntity<?> BillingController.createBill(Authentication,BillRequest)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/BillingController.java:27
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [purchases, product-catalog]
+    shared_refs:
+      - module: purchase-model
+        used_fields: [id, purchaseReference]
+
+  - name: warranties
+    trigger: api
+    trigger_detail: "/api/customer/warranties/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/WarrantyController.java
+        line: 16
+    exported_signature:
+      - method: "ResponseEntity<?> WarrantyController.getWarranties(Authentication)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/WarrantyController.java:26
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [purchases]
+    shared_refs:
+      - module: warranty-model
+        used_fields: [id, purchaseId, customerId, qrToken, startDate, expiryDate]
+
+  - name: public-verification
+    trigger: api
+    trigger_detail: "GET /api/public/warranties/verify/{qrToken}"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/PublicController.java
+        line: 22
+    exported_signature:
+      - method: "ResponseEntity<?> PublicController.verifyWarranty(String)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [warranties]
+    shared_refs:
+      - module: warranty-model
+        used_fields: [qrToken, productName, brand, model, startDate, expiryDate, retailerId]
+
+  - name: purchase-linking
+    trigger: api
+    trigger_detail: "/api/customer/purchases/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/CustomerLinkingController.java
+        line: 19
+    exported_signature:
+      - method: "ResponseEntity<?> CustomerLinkingController.getPendingPurchases(Authentication)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/CustomerLinkingController.java:36
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [auth, purchases, warranties]
+    shared_refs:
+      - module: purchase-model
+        used_fields: [id, customerEmailNormalized, customerId]
+
+  - name: claims
+    trigger: api
+    trigger_detail: "/api/claims/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/ClaimController.java
+        line: 29
+    exported_signature:
+      - method: "ResponseEntity<?> ClaimController.submitClaim(Authentication,ClaimSubmissionRequest)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/ClaimController.java:38
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [warranties, purchases, retailer, notifications]
+    shared_refs: []
+
+  - name: notifications
+    trigger: api
+    trigger_detail: "/api/notifications/**"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/controller/NotificationController.java
+        line: 17
+    exported_signature:
+      - method: "ResponseEntity<?> NotificationController.getUnreadCount(Authentication)"
+        source_loc: backend/src/main/java/com/warrantrack/controller/NotificationController.java:33
+        stability: frozen
+    dynamic_entrypoints: []
+    depends_on: [auth]
+    shared_refs:
+      - module: notification-model
+        used_fields: [id, userId, type, isRead, createdAt]
+
+  - name: warranty-reminders
+    trigger: job
+    trigger_detail: "Cron app.warranty.reminder-cron"
+    source_anchors:
+      - path: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java
+        line: 31
+    exported_signature: []
+    dynamic_entrypoints:
+      - target: com.warrantrack.service.WarrantyReminderScheduler
+        mechanism: annotation-scan
+        source_loc: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    depends_on: [warranties, notifications]
+    shared_refs:
+      - module: warranty-model
+        used_fields: [id, customerId, expiryDate]

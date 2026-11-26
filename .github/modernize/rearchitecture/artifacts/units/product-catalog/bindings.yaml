@@ -1,0 +1,9 @@
+unit: product-catalog
+bindings:
+  - type: route-declaration
+    name: /api/products/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/ProductController.java:18
+    target: ProductController
+    must_appear_in_target: true
+    notes: Restricted to RETAILER role.
+runtime_config: []

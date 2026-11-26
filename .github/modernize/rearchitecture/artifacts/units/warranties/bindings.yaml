@@ -1,0 +1,9 @@
+unit: warranties
+bindings:
+  - type: route-declaration
+    name: /api/customer/warranties/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/WarrantyController.java:16
+    target: WarrantyController
+    must_appear_in_target: true
+    notes: Restricted to CUSTOMER role.
+runtime_config: []

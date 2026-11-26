@@ -1,0 +1,21 @@
+unit: claims
+bindings:
+  - type: route-declaration
+    name: /api/claims/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/ClaimController.java:29
+    target: ClaimController
+    must_appear_in_target: true
+    notes: Authenticated routes with customer/retailer authorization in service methods.
+  - type: route-declaration
+    name: multipart /api/claims/upload-evidence
+    source_loc: backend/src/main/java/com/warrantrack/controller/ClaimController.java:150
+    target: ClaimController.uploadEvidence
+    must_appear_in_target: true
+    notes: Multipart evidence upload; server multipart limit is 10 MB.
+runtime_config:
+  - key: spring.servlet.multipart.max-file-size
+    source_loc: backend/src/main/resources/application.yml:14
+    source: properties-file
+    default_value: "10MB"
+    must_appear_in_target: true
+    notes: Maximum uploaded evidence file size.

@@ -1,0 +1,7 @@
+unit: purchase-linking
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/CustomerLinkingService.java:1
+    drivers: [concern_split]
+    rationale: OTP verification, alternate-email storage, and purchase-link mutation are separable linking concerns.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/CustomerLinkingService.java, lines: [1, 1]}

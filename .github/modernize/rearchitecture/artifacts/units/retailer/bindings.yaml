@@ -1,0 +1,9 @@
+unit: retailer
+bindings:
+  - type: route-declaration
+    name: /api/retailer/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/RetailerController.java:16
+    target: RetailerController
+    must_appear_in_target: true
+    notes: Restricted to RETAILER role.
+runtime_config: []

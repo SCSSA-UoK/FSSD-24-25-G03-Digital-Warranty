@@ -1,0 +1,7 @@
+unit: purchases
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/PurchaseService.java:1
+    drivers: [data_ownership_split, execution_model_split]
+    rationale: Purchase persistence and stock/warranty side effects form separate transactional responsibilities.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/PurchaseService.java, lines: [1, 1]}

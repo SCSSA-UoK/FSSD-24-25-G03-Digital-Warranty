@@ -1,0 +1,7 @@
+unit: billing
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/BillingService.java:1
+    drivers: [concern_split, data_ownership_split]
+    rationale: Invoice calculation and purchase/warranty persistence are separable billing concerns.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/BillingService.java, lines: [1, 1]}

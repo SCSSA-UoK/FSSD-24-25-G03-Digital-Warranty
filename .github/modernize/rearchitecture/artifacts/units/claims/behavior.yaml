@@ -1,0 +1,46 @@
+unit: claims
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:34
+    effect: creates claim and initial status history
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:1
+    effect: appends status history, notifications, and audit records on transitions
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/controller/ClaimController.java:150
+    effect: uploads and stores claim evidence references
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:1
+    condition: SUBMITTED -> UNDER_REVIEW or CANCELLED
+    behavior: permits only the declared transitions
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:1
+    condition: UNDER_REVIEW -> APPROVED, REJECTED, ADDITIONAL_INFO_REQUIRED, or CANCELLED
+    behavior: permits only the declared transitions
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:1
+    condition: APPROVED -> IN_PROGRESS or COMPLETED
+    behavior: permits service start or direct completion
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:1
+    condition: IN_PROGRESS -> COMPLETED
+    behavior: permits final completion
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:1
+    trigger: invalid claim transition
+    outcome: InvalidStateTransitionException mapped to bad-request
+    contract: 400 with transition names
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:34
+    trigger: expired warranty or active duplicate claim
+    outcome: claim submission rejected
+    contract: 400 BAD_REQUEST
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:34
+    scope: claim state, status history, and notification/audit effects
+    isolation: not specified
+    must_preserve: true

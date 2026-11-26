@@ -1,0 +1,7 @@
+unit: notifications
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/NotificationService.java:1
+    drivers: [concern_split]
+    rationale: Notification creation and read-state delivery are separable notification responsibilities.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/NotificationService.java, lines: [1, 1]}

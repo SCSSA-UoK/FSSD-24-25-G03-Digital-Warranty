@@ -1,0 +1,23 @@
+unit: retailer
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/RetailerService.java:1
+    effect: updates approved retailer profile data
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/RetailerService.java:1
+    condition: retailer approval status
+    behavior: approved retailers may operate; pending, rejected, or suspended statuses are blocked as appropriate
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/RetailerController.java:39
+    trigger: profile or customer lookup unauthorized
+    outcome: HTTP 403 or not-found
+    contract: 403 or resource-not-found
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/RetailerService.java:1
+    scope: profile lookup/update
+    isolation: not specified
+    must_preserve: true

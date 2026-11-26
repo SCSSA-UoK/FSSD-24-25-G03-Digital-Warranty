@@ -1,0 +1,27 @@
+unit: purchase-linking
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/CustomerLinkingService.java:1
+    effect: sends OTP, stores verification state, and links purchases/warranties to customer
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/CustomerLinkingService.java:1
+    condition: OTP expired, incorrect, or attempt limit reached
+    behavior: rejects verification and prevents reuse
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/controller/CustomerLinkingController.java:112
+    condition: link all matching purchases
+    behavior: links all eligible purchases and returns linking summary
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/service/CustomerLinkingService.java:1
+    trigger: unverified or already-linked purchase
+    outcome: bad-request or unauthorized
+    contract: 400/403
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/CustomerLinkingService.java:1
+    scope: OTP verification and purchase/warranty ownership update
+    isolation: not specified
+    must_preserve: true

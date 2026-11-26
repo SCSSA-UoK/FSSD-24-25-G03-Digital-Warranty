@@ -1,0 +1,7 @@
+unit: analytics
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/AnalyticsService.java:1
+    drivers: [concern_split, data_ownership_split]
+    rationale: Platform-wide and retailer-scoped aggregations have different tenant scopes and query ownership.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/AnalyticsService.java, lines: [1, 1]}

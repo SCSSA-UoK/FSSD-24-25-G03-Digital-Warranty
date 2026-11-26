@@ -1,0 +1,7 @@
+unit: admin
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/controller/AdminController.java:30
+    drivers: [concern_split]
+    rationale: Dashboard, KYC actions, customer operations, and audit logs are separately owned administrative concerns.
+    source_slice: {file: backend/src/main/java/com/warrantrack/controller/AdminController.java, lines: [30, 110]}

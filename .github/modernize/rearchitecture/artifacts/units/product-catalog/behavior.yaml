@@ -1,0 +1,23 @@
+unit: product-catalog
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/ProductService.java:1
+    effect: creates, updates, activates, or deactivates retailer products
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/ProductController.java:60
+    condition: activate or deactivate product
+    behavior: toggles product availability while preserving retailer ownership
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/ProductController.java:28
+    trigger: invalid product or unauthorized retailer
+    outcome: bad-request or 403
+    contract: 400/403
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/ProductService.java:1
+    scope: product update as one persisted operation
+    isolation: not specified
+    must_preserve: true

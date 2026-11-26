@@ -1,0 +1,7 @@
+unit: auth
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/AuthService.java:1
+    drivers: [concern_split]
+    rationale: Authentication, account lifecycle, password reset, and OTP verification are distinct concern slices within the auth service.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/AuthService.java, lines: [1, 1]}
