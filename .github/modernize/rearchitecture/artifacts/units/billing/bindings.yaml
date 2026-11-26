@@ -1,0 +1,9 @@
+unit: billing
+bindings:
+  - type: route-declaration
+    name: /api/bills/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/BillingController.java:18
+    target: BillingController
+    must_appear_in_target: true
+    notes: Retailer routes restricted except public invoice lookup.
+runtime_config: []

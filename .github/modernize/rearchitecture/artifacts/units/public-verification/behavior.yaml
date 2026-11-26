@@ -1,0 +1,24 @@
+unit: public-verification
+side_effects: []
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+    condition: qrToken resolves and coverage is active
+    behavior: returns masked public warranty verification DTO
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+    condition: qrToken unknown or warranty expired
+    behavior: returns not-found or marks verification as unavailable/expired
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+    trigger: unknown qrToken
+    outcome: 404 without sensitive identity data
+    contract: 404
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+    scope: read-only public lookup
+    isolation: not specified
+    must_preserve: false

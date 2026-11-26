@@ -1,0 +1,7 @@
+unit: warranties
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/WarrantyService.java:1
+    drivers: [concern_split]
+    rationale: Wallet access and coverage-date/status calculation are separable warranty concerns.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/WarrantyService.java, lines: [1, 1]}

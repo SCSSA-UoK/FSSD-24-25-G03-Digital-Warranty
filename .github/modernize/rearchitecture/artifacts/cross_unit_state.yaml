@@ -1,0 +1,75 @@
+flows:
+  - name: jwt-authentication-principal
+    medium: http-header
+    key: Authorization-Bearer-JWT
+    writer:
+      unit: auth
+      source_loc: backend/src/main/java/com/warrantrack/security/JwtTokenProvider.java:1
+    reader:
+      unit: claims
+      source_loc: backend/src/main/java/com/warrantrack/controller/ClaimController.java:29
+    pairing: matched
+    must_preserve: true
+    must_confirm: null
+    verification_hint: "Verify login returns a usable bearer token and protected API calls resolve the same user/role."
+    notes: "Stateless HTTP authentication supplies Spring Security context and UserPrincipal."
+
+  - name: retailer-user-id-to-merchant-record
+    medium: database
+    key: Retailer.userId
+    writer:
+      unit: auth
+      source_loc: backend/src/main/java/com/warrantrack/service/AuthService.java:1
+    reader:
+      unit: retailer
+      source_loc: backend/src/main/java/com/warrantrack/service/RetailerService.java:1
+    pairing: matched
+    must_preserve: true
+    must_confirm: null
+    verification_hint: "Create retailer and verify merchant profile resolves only by authenticated userId."
+    notes: "Retailer services derive tenant scope from the authenticated user rather than trusting request-provided identifiers."
+
+  - name: purchase-to-warranty
+    medium: database
+    key: Warranty.purchaseId
+    writer:
+      unit: purchases
+      source_loc: backend/src/main/java/com/warrantrack/service/PurchaseService.java:1
+    reader:
+      unit: warranties
+      source_loc: backend/src/main/java/com/warrantrack/service/WarrantyService.java:1
+    pairing: matched
+    must_preserve: true
+    must_confirm: null
+    verification_hint: "Register a purchase and verify the resulting warranty references the same purchase id."
+    notes: "A purchase links to a persisted warranty used by wallet and claims."
+
+  - name: warranty-to-claim
+    medium: database
+    key: Claim.warrantyId
+    writer:
+      unit: claims
+      source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:34
+    reader:
+      unit: claims
+      source_loc: backend/src/main/java/com/warrantrack/service/ClaimService.java:64
+    pairing: matched
+    must_preserve: true
+    must_confirm: null
+    verification_hint: "Submit a claim and verify it is discoverable under the correct customer and warranty."
+    notes: "Claim state persists warranty, purchase, customer, and retailer identifiers."
+
+  - name: frontend-auth-context
+    medium: framework-context
+    key: AuthContext.user
+    writer:
+      unit: auth
+      source_loc: frontend/src/context/AuthContext.tsx:1
+    reader:
+      unit: notifications
+      source_loc: frontend/src/context/NotificationContext.tsx:1
+    pairing: matched
+    must_preserve: true
+    must_confirm: null
+    verification_hint: "Verify role and token remain available after navigation and reload."
+    notes: "Frontend context supplies authenticated user state to role-protected pages."

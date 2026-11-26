@@ -1,0 +1,24 @@
+unit: warranties
+side_effects: []
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/WarrantyService.java:1
+    condition: LocalDate is before start, between dates, or after expiry
+    behavior: returns corresponding ACTIVE or EXPIRED coverage status
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/WarrantyService.java:1
+    condition: authenticated customer owns warranty
+    behavior: includes warranty in the customer wallet
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/WarrantyController.java:33
+    trigger: warranty belongs to another customer
+    outcome: unauthorized
+    contract: 403
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/WarrantyService.java:1
+    scope: read-only warranty lookup
+    isolation: not specified
+    must_preserve: false

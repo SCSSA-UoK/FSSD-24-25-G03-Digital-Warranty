@@ -1,0 +1,145 @@
+modules:
+  - name: jwt-security
+    kind: utility
+    source_loc: backend/src/main/java/com/warrantrack/security/JwtTokenProvider.java:1
+    used_by_units: [auth, retailer, claims, notifications]
+    fields:
+      - name: JwtTokenProvider
+        type: com.warrantrack.security.JwtTokenProvider
+      - name: JwtAuthenticationFilter
+        type: com.warrantrack.security.JwtAuthenticationFilter
+      - name: UserPrincipal
+        type: com.warrantrack.security.UserPrincipal
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Authentication behavior depends on the stateless JWT filter and Spring Security principal."
+
+  - name: user-model
+    kind: dto
+    source_loc: backend/src/main/java/com/warrantrack/model/User.java:13
+    used_by_units: [auth, admin]
+    fields:
+      - name: id
+        type: String
+      - name: email
+        type: String
+      - name: role
+        type: com.warrantrack.model.enums.Role
+      - name: accountStatus
+        type: com.warrantrack.model.enums.AccountStatus
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "User identity and role semantics are shared by authentication and administration."
+
+  - name: retailer-model
+    kind: dto
+    source_loc: backend/src/main/java/com/warrantrack/model/Retailer.java:12
+    used_by_units: [retailer, product-catalog, purchases]
+    fields:
+      - name: id
+        type: String
+      - name: userId
+        type: String
+      - name: businessName
+        type: String
+      - name: approvalStatus
+        type: com.warrantrack.model.enums.ApprovalStatus
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Retailer identity and approval status scope merchant operations."
+
+  - name: purchase-model
+    kind: dto
+    source_loc: backend/src/main/java/com/warrantrack/model/Purchase.java:14
+    used_by_units: [purchases, billing, warranties, purchase-linking]
+    fields:
+      - name: id
+        type: String
+      - name: retailerId
+        type: String
+      - name: purchaseReference
+        type: String
+      - name: customerEmailNormalized
+        type: String
+      - name: customerId
+        type: String
+      - name: serialNumber
+        type: String
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Purchase records link POS billing, warranties, and customer linking."
+
+  - name: warranty-model
+    kind: dto
+    source_loc: backend/src/main/java/com/warrantrack/model/Warranty.java:14
+    used_by_units: [warranties, public-verification, purchase-linking, claims, warranty-reminders]
+    fields:
+      - name: id
+        type: String
+      - name: purchaseId
+        type: String
+      - name: customerId
+        type: String
+      - name: qrToken
+        type: String
+      - name: startDate
+        type: java.time.LocalDate
+      - name: expiryDate
+        type: java.time.LocalDate
+      - name: retailerId
+        type: String
+      - name: productName
+        type: String
+      - name: brand
+        type: String
+      - name: model
+        type: String
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Warranty documents are read by wallet, public verification, claims, linking, and reminders."
+
+  - name: notification-model
+    kind: dto
+    source_loc: backend/src/main/java/com/warrantrack/model/Notification.java:12
+    used_by_units: [notifications, claims, warranty-reminders]
+    fields:
+      - name: id
+        type: String
+      - name: userId
+        type: String
+      - name: type
+        type: com.warrantrack.model.enums.NotificationType
+      - name: isRead
+        type: boolean
+      - name: createdAt
+        type: java.time.Instant
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Notifications are created by claims and reminders and read through the notification API."
+
+  - name: audit-log
+    kind: store
+    source_loc: backend/src/main/java/com/warrantrack/model/AuditLog.java:8
+    used_by_units: [admin, auth, claims]
+    fields:
+      - name: id
+        type: String
+      - name: actorId
+        type: String
+      - name: action
+        type: String
+      - name: targetType
+        type: String
+      - name: timestamp
+        type: java.time.Instant
+    god_class: false
+    split_candidate: false
+    migration_strategy: copy
+    notes: "Immutable administrative and business audit records are append-only."
+

@@ -1,0 +1,27 @@
+unit: auth
+bindings:
+  - type: route-declaration
+    name: /api/auth/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/AuthController.java:13
+    target: AuthController
+    must_appear_in_target: true
+    notes: Publicly accessible authentication routes.
+  - type: filter
+    name: JwtAuthenticationFilter
+    source_loc: backend/src/main/java/com/warrantrack/config/SecurityConfig.java:46
+    target: JwtAuthenticationFilter before UsernamePasswordAuthenticationFilter
+    must_appear_in_target: true
+    notes: Stateless bearer-token authentication.
+runtime_config:
+  - key: JWT_SECRET
+    source_loc: backend/src/main/resources/application.yml:43
+    source: env
+    default_value: none
+    must_appear_in_target: true
+    notes: Signing key for JWT.
+  - key: app.otp.expiry-minutes
+    source_loc: backend/src/main/resources/application.yml:52
+    source: properties-file
+    default_value: "5"
+    must_appear_in_target: true
+    notes: OTP validity period.

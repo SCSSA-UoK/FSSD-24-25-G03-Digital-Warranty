@@ -1,0 +1,9 @@
+unit: public-verification
+bindings:
+  - type: route-declaration
+    name: /api/public/warranties/verify/{qrToken}
+    source_loc: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+    target: PublicController
+    must_appear_in_target: true
+    notes: Public unauthenticated route.
+runtime_config: []

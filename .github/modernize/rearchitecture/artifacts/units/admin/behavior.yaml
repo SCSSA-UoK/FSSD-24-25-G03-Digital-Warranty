@@ -1,0 +1,26 @@
+unit: admin
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/AdminService.java:1
+    effect: updates retailer approval and customer account status
+    must_preserve: true
+  - source_loc: backend/src/main/java/com/warrantrack/service/AuditService.java:1
+    effect: appends immutable audit log records
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/AdminService.java:1
+    condition: retailer status APPROVE, REJECT, or SUSPEND
+    behavior: applies the corresponding status and mandatory rejection reason
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/AdminController.java:30
+    trigger: caller lacks ADMIN role
+    outcome: HTTP 403
+    contract: 403 FORBIDDEN
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/AdminService.java:1
+    scope: status update plus audit-log append
+    isolation: not specified
+    must_preserve: true

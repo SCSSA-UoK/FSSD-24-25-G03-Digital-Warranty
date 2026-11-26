@@ -1,0 +1,15 @@
+unit: warranty-reminders
+bindings:
+  - type: listener
+    name: "@Scheduled(cron = \"${app.warranty.reminder-cron:0 0 9 * * ?}\")"
+    source_loc: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    target: WarrantyReminderScheduler
+    must_appear_in_target: true
+    notes: Spring scheduled job at configurable cron; default daily at 09:00.
+runtime_config:
+  - key: WARRANTY_REMINDER_CRON
+    source_loc: backend/src/main/resources/application.yml:58
+    source: env
+    default_value: "0 0 9 * * ?"
+    must_appear_in_target: true
+    notes: Cron expression for warranty reminders.

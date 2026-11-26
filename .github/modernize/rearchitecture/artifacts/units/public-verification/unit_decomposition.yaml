@@ -1,0 +1,7 @@
+unit: public-verification
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+    drivers: [concern_split]
+    rationale: Public verification and evidence-file serving are distinct public endpoint concerns.
+    source_slice: {file: backend/src/main/java/com/warrantrack/controller/PublicController.java, lines: [31, 37]}

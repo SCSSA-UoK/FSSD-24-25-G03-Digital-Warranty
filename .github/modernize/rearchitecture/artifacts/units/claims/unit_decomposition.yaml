@@ -1,0 +1,7 @@
+unit: claims
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/ClaimService.java:34
+    drivers: [concern_split, lifecycle_split]
+    rationale: Submission, state transitions, evidence, and feedback are distinct claim lifecycle responsibilities.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/ClaimService.java, lines: [34, 300]}

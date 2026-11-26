@@ -1,0 +1,23 @@
+unit: warranty-reminders
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    effect: creates warranty expiration reminder notifications
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    condition: warranty matches reminder window
+    behavior: sends or persists the corresponding notification
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    trigger: reminder job encounters a persistence or lookup failure
+    outcome: job logs failure and continues according to scheduler behavior
+    contract: no external HTTP contract
+    must_preserve: false
+concurrency:
+  model: thread-pool
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    scope: scheduled scan and notification writes
+    isolation: not specified
+    must_preserve: true

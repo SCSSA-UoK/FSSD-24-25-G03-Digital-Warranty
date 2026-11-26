@@ -1,0 +1,7 @@
+unit: retailer
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/RetailerService.java:1
+    drivers: [concern_split]
+    rationale: Retailer profile, approval state, and customer lookup are separate retailer-domain concerns.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/RetailerService.java, lines: [1, 1]}

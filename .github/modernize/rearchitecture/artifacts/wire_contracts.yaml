@@ -1,0 +1,207 @@
+contracts:
+  - name: authentication
+    unit: auth
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/AuthController.java:22
+    contract:
+      method: POST
+      path: /api/auth/login
+      request: LoginRequest
+      response: AuthResponse with JWT and user
+      error: GlobalExceptionHandler status and ApiResponse shape
+      auth: none
+    target_contract:
+      method: POST /api/auth/login
+      notes: Preserve request fields, bearer token response, and 400/401/403 error semantics.
+    semantic_divergence: []
+
+  - name: admin-operations
+    unit: admin
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/AdminController.java:44
+    contract:
+      method: GET/PATCH
+      path: /api/admin/**
+      request: status-update and filter parameters
+      response: dashboard, retailer, customer, claim, audit-log DTOs
+      error: 403 for non-admin, resource/not-found and bad-request responses
+      auth: bearer JWT with ADMIN role
+    target_contract:
+      method: GET/PATCH /api/admin/**
+      notes: Preserve ADMIN role requirement and existing response DTO fields.
+    semantic_divergence: []
+
+  - name: retailer-profile
+    unit: retailer
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/RetailerController.java:26
+    contract:
+      method: GET/PUT
+      path: /api/retailer/profile
+      request: profile update fields
+      response: RetailerResponse
+      error: unauthorized or not-found
+      auth: bearer JWT with RETAILER role
+    target_contract:
+      method: GET/PUT /api/retailer/profile
+      notes: Preserve authenticated merchant scoping and RetailerResponse fields.
+    semantic_divergence: []
+
+  - name: product-catalog
+    unit: product-catalog
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/ProductController.java:28
+    contract:
+      method: POST/GET/PUT/PATCH
+      path: /api/products/**
+      request: ProductRequest
+      response: ProductResponse
+      error: stock/status validation and 403 for non-retailer
+      auth: bearer JWT with RETAILER role
+    target_contract:
+      method: POST/GET/PUT/PATCH /api/products/**
+      notes: Preserve activation/deactivation actions and stock and warranty fields.
+    semantic_divergence: []
+
+  - name: purchase-registration
+    unit: purchases
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/PurchaseController.java:28
+    contract:
+      method: POST/GET
+      path: /api/purchases/**
+      request: PurchaseRegistrationRequest
+      response: PurchaseResponse
+      error: duplicate/stock/tenant validation
+      auth: bearer JWT with RETAILER role
+    target_contract:
+      method: POST/GET /api/purchases/**
+      notes: Preserve purchase creation and warranty/stock side effects.
+    semantic_divergence: []
+
+  - name: billing
+    unit: billing
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/BillingController.java:27
+    contract:
+      method: POST/GET
+      path: /api/bills/** and /api/bills/invoice/{invoiceNumber}
+      request: BillRequest
+      response: BillResponse
+      error: retailer-only except public invoice lookup
+      auth: bearer JWT; invoice route public
+    target_contract:
+      method: POST/GET /api/bills/**
+      notes: Preserve bill totals and public invoice lookup while enforcing retailer ownership.
+    semantic_divergence: []
+
+  - name: warranty-wallet
+    unit: warranties
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/WarrantyController.java:26
+    contract:
+      method: GET
+      path: /api/customer/warranties/**
+      request: user from JWT
+      response: WarrantyResponse
+      error: 403 and resource-not-found
+      auth: bearer JWT with CUSTOMER role
+    target_contract:
+      method: GET /api/customer/warranties/**
+      notes: Preserve customer ownership scoping and QR/warranty date fields.
+    semantic_divergence: []
+
+  - name: public-verification
+    unit: public-verification
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/PublicController.java:31
+    contract:
+      method: GET
+      path: /api/public/warranties/verify/{qrToken}
+      request: qrToken path parameter
+      response: PublicWarrantyResponse
+      error: 404 for unknown/invalid token
+      auth: none
+    target_contract:
+      method: GET /api/public/warranties/verify/{qrToken}
+      notes: Preserve public masking and exclude customer identity, invoice, and internal IDs.
+    semantic_divergence:
+      - field: qrToken
+        issue: URL path token must remain opaque and stable.
+        source_loc: backend/src/main/java/com/warrantrack/model/Warranty.java:45
+
+  - name: purchase-linking
+    unit: purchase-linking
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/CustomerLinkingController.java:36
+    contract:
+      method: GET/POST/DELETE
+      path: /api/customer/purchases/**
+      request: OTP and purchase-linking DTOs
+      response: pending, verification, and linking DTOs
+      error: expired/invalid OTP and ownership failures
+      auth: bearer JWT with CUSTOMER role
+    target_contract:
+      method: GET/POST/DELETE /api/customer/purchases/**
+      notes: Preserve OTP expiry, attempt limits, single-use behavior, and secondary-email linking.
+    semantic_divergence: []
+
+  - name: claims
+    unit: claims
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/ClaimController.java:38
+    contract:
+      method: POST/PATCH/GET
+      path: /api/claims/**
+      request: claim submission, decision, progress, cancel, feedback DTOs
+      response: ClaimResponse
+      error: invalid state transition, unauthorized retailer/customer, and 400 validation
+      auth: bearer JWT; endpoint role checks in service/controller
+    target_contract:
+      method: POST/PATCH/GET /api/claims/**
+      notes: Preserve finite-state transitions, history, notifications, audit records, and feedback rules.
+    semantic_divergence: []
+
+  - name: notifications
+    unit: notifications
+    type: rest
+    stability: frozen
+    source_loc: backend/src/main/java/com/warrantrack/controller/NotificationController.java:26
+    contract:
+      method: GET/PATCH
+      path: /api/notifications/**
+      request: notification id or read-all action
+      response: NotificationResponse and unread-count payload
+      error: authenticated resource not found
+      auth: bearer JWT
+    target_contract:
+      method: GET/PATCH /api/notifications/**
+      notes: Preserve per-user scoping and read-all/read-one behavior.
+    semantic_divergence: []
+
+  - name: warranty-reminder-job
+    unit: warranty-reminders
+    type: rest
+    stability: must_preserve
+    source_loc: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    contract:
+      method: scheduled
+      path: app.warranty.reminder-cron
+      request: cron time and MongoDB warranty data
+      response: persisted notification records
+      error: logging and no throw contract
+      auth: system
+    target_contract:
+      method: scheduled warranty reminder job
+      notes: Preserve configurable cron and daily expiration notification behavior.
+    semantic_divergence: []

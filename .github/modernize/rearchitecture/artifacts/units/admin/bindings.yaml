@@ -1,0 +1,9 @@
+unit: admin
+bindings:
+  - type: route-declaration
+    name: /api/admin/**
+    source_loc: backend/src/main/java/com/warrantrack/controller/AdminController.java:30
+    target: AdminController
+    must_appear_in_target: true
+    notes: Restricted to ADMIN role.
+runtime_config: []

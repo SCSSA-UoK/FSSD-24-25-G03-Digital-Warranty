@@ -1,0 +1,7 @@
+unit: warranty-reminders
+commit: false
+candidate_splits:
+  - id: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java:31
+    drivers: [execution_model_split, concern_split]
+    rationale: Scheduled scanning and notification delivery have distinct execution and retry concerns.
+    source_slice: {file: backend/src/main/java/com/warrantrack/service/WarrantyReminderScheduler.java, lines: [31, 31]}

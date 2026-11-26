@@ -1,0 +1,23 @@
+unit: billing
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/BillingService.java:1
+    effect: creates Bill and Purchase records and recalculates totals
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/service/BillingService.java:1
+    condition: bill item quantity, price, tax, or discount input
+    behavior: calculates subtotal, tax, and grand total from bill items
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/BillingController.java:54
+    trigger: public invoice lookup has unknown invoice number
+    outcome: resource-not-found
+    contract: 404
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/BillingService.java:1
+    scope: bill creation and purchase creation
+    isolation: not specified
+    must_preserve: true

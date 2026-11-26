@@ -1,0 +1,23 @@
+unit: notifications
+side_effects:
+  - source_loc: backend/src/main/java/com/warrantrack/service/NotificationService.java:1
+    effect: creates in-app notifications and marks notifications read
+    must_preserve: true
+branches:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/NotificationController.java:40
+    condition: notification read action
+    behavior: marks one notification or all notifications read for the authenticated user
+    must_preserve: true
+error_paths:
+  - source_loc: backend/src/main/java/com/warrantrack/controller/NotificationController.java:26
+    trigger: notification belongs to another user
+    outcome: unauthorized or not-found
+    contract: 403/404
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: backend/src/main/java/com/warrantrack/service/NotificationService.java:1
+    scope: notification creation or read-state update
+    isolation: not specified
+    must_preserve: true
