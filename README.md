@@ -176,16 +176,6 @@ cd backend
 ```
 Configure the MongoDB Atlas URI in `backend/.env` using the template in `backend/.env.example`. The backend requires `SPRING_DATA_MONGODB_URI` and does not connect to a local MongoDB instance.
 
-To enable the natural-language WarranTrack chatbot, set these variables in `backend/.env`:
-
-```env
-OPENAI_API_URL=https://api.openai.com/v1/chat/completions
-OPENAI_API_KEY=your-api-key
-OPENAI_MODEL=gpt-4o-mini
-```
-
-The assistant uses an OpenAI-compatible chat completions API, reads only account-scoped WarranTrack data, restricts tools by user role, and requires confirmation before executing mutations. The user's chat messages and the minimum account context needed for a request are sent to the configured AI provider; do not enter passwords, OTPs, or payment details.
-
 ### Step 2: Run Spring Boot Backend
 ```bash
 mvn spring-boot:run
