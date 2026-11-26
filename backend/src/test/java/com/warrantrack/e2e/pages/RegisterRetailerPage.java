@@ -9,12 +9,12 @@ import org.openqa.selenium.WebDriver;
 public class RegisterRetailerPage extends BasePage {
 
     private final By businessNameInput = By.cssSelector("input[name='businessName']");
-    private final By regNumInput = By.cssSelector("input[name='businessRegistrationNumber']");
+    private final By regNumInput = By.cssSelector("input[name='registrationNumber']");
     private final By contactNameInput = By.cssSelector("input[name='name']");
-    private final By emailInput = By.cssSelector("input[name='email']");
+    private final By emailInput = By.cssSelector("input[name='contactEmail']");
     private final By passwordInput = By.cssSelector("input[name='password']");
     private final By confirmPasswordInput = By.cssSelector("input[name='confirmPassword']");
-    private final By phoneInput = By.cssSelector("input[name='phone']");
+    private final By phoneInput = By.cssSelector("input[name='contactPhone']");
     private final By addressInput = By.cssSelector("input[name='address']");
     private final By submitBtn = By.cssSelector("button[type='submit']");
     private final By successAlert = By.xpath("//div[contains(@class, 'bg-emerald-50')]");

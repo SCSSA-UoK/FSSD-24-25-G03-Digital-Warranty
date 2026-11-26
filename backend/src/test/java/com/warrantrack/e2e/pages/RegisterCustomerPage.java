@@ -11,8 +11,8 @@ public class RegisterCustomerPage extends BasePage {
     private final By nameInput = By.xpath("//label[contains(text(), 'Full Name')]/following-sibling::input | //input[@placeholder='John Doe']");
     private final By emailInput = By.xpath("//label[contains(text(), 'Email Address')]/following-sibling::input | //input[@type='email']");
     private final By phoneInput = By.xpath("//label[contains(text(), 'Phone')]/following-sibling::input | //input[@type='tel']");
-    private final By passwordInput = By.xpath("//label[contains(text(), 'Create Password')]/following-sibling::div//input | //label[contains(text(), 'Create Password')]/..//input");
-    private final By confirmPasswordInput = By.xpath("//label[contains(text(), 'Confirm Password')]/following-sibling::div//input | //label[contains(text(), 'Confirm Password')]/..//input");
+    private final By passwordInput = By.xpath("(//form//input[@type='password'])[1]");
+    private final By confirmPasswordInput = By.xpath("(//form//input[@type='password'])[2]");
     private final By submitBtn = By.cssSelector("button[type='submit']");
     private final By successAlert = By.xpath("//div[contains(@class, 'bg-emerald-50')]");
     private final By errorAlert = By.xpath("//div[contains(@class, 'bg-red-50') or contains(@class, 'bg-rose-50')]");
